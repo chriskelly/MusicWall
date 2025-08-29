@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct FavAlbumView: View {
-    @State private var albums = SavedAlbums()
+    @State var albums: SavedAlbums
     
     @State private var showingAddView = false
     
@@ -74,5 +74,5 @@ struct AlbumTile: View {
 }
 
 #Preview {
-    FavAlbumView()
+    FavAlbumView(albums: SavedAlbums())
 }

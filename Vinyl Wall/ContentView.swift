@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         Group {
             if isAuthorized {
-                FavAlbumView()
+                FavAlbumView(albums: SavedAlbums())
             } else if authorizationDenied {
                 VStack {
                     Text("Apple Music access is required to use this app.")
