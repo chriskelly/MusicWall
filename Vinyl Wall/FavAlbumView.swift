@@ -34,6 +34,9 @@ struct FavAlbumView: View {
                 albums.items.append(SavedAlbum(from: album))
             })
         }
+        .task {
+            await albums.load()
+        }
     }
 }
 
@@ -50,7 +53,7 @@ struct AlbumTile: View {
                     .font(.footnote)
             }
             Spacer()
-            if let url = album.artworkURL.xSmall {
+            if let url = album.artworkURL.small {
                 AsyncImage(url: url) { image in
                     image
                         .resizable()

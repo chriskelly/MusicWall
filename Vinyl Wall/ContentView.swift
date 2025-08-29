@@ -81,24 +81,44 @@ struct SavedAlbum: Identifiable, Codable {
 
 @Observable
 class SavedAlbums {
-    static let itemsKey = "savedAlbumsItemsKey"
+    let itemsKey = "savedAlbumsItemsKey"
+    let backupIDsKey = "backupIDsKey"
     
     var items = [SavedAlbum]() {
         didSet {
-            if let encoded = try? JSONEncoder().encode(items) {
-                UserDefaults.standard.set(encoded, forKey: SavedAlbums.itemsKey)
+            if let fullDataFormat = try? JSONEncoder().encode(items) {
+                UserDefaults.standard.set(fullDataFormat, forKey: itemsKey)
             }
+            let backupIDs = items.map { $0.id.rawValue }
+            UserDefaults.standard.set(backupIDs, forKey: backupIDsKey)
         }
     }
-    
-    init() {
-        if let savedItems = UserDefaults.standard.data(forKey: SavedAlbums.itemsKey) {
+
+    @MainActor
+    func load() async {
+        if let savedItems = UserDefaults.standard.data(forKey: itemsKey) {
             if let decoded = try? JSONDecoder().decode([SavedAlbum].self, from: savedItems) {
                 items = decoded
                 return
             }
         }
+        if let backupIDs = UserDefaults.standard.array(forKey: backupIDsKey) as? [String] {
+            if let albums = try? await fetchAlbums(ids: backupIDs) {
+                items = albums.map {SavedAlbum(from: $0)}
+                return
+            }
+        }
         items = []
+    }
+}
+
+func fetchAlbums(ids: [String]) async throws -> [Album]? {
+    let ids = ids.map { MusicItemID($0) }
+    let request = MusicCatalogResourceRequest<Album>(matching: \.id, memberOf: ids)
+    if let response = try? await request.response() {
+        return Array(response.items)
+    } else {
+        return nil
     }
 }
 
