@@ -6,32 +6,77 @@
 //
 
 import SwiftUI
+import MusicKit
 
 struct ContentView: View {
-    @State private var albums = AlbumsPlaceholder()
+    @State private var albums = SavedAlbums()
+    
+    @State private var showingAddView = false
+    
+    @State private var isAuthorized = false
+    @State private var authorizationDenied = false
 
         var body: some View {
-            NavigationStack {
-                List {
-                    ForEach(albums.items) {
-                        AlbumTile(album: $0)
+            Group {
+                if isAuthorized {
+                    NavigationStack {
+                        List {
+                            ForEach(albums.items) {
+                                AlbumTile(album: $0)
+                            }
+                            .onDelete { indexSet in
+                                albums.items.remove(atOffsets: indexSet)
+                            }
+                        }
+                        .navigationTitle("Fav Albums")
+                        .toolbar {
+                            Button("Add album", systemImage: "plus") {
+                                showingAddView = true
+                            }
+                        }
                     }
-                    .onDelete { indexSet in
-                        albums.items.remove(atOffsets: indexSet)
+                    .sheet(isPresented: $showingAddView) {
+                        AlbumSearchView(onSelect: { album in
+                            print(album)
+                        })
                     }
-                }
-                .navigationTitle("Fav Albums")
-                .toolbar {
-                    Button("Add album", systemImage: "plus") {
-                        albums.items.append(AlbumPlaceholder(title: "New Album", artistName: "Unknown"))
+                } else if authorizationDenied {
+                    VStack {
+                        Text("Apple Music access is required to use this app.")
+                            .multilineTextAlignment(.center)
+                            .padding()
+                        Button("Try Again") {
+                            Task {
+                                await requestAuthorization()
+                            }
+                        }
                     }
+                } else {
+                    ProgressView("Requesting Music Access…")
                 }
             }
+            .task {
+                await requestAuthorization()
+            }
         }
+    
+    func requestAuthorization() async {
+        let status = await MusicAuthorization.request()
+        switch status {
+        case .authorized:
+            isAuthorized = true
+        case .denied, .restricted, .notDetermined:
+            isAuthorized = false
+            authorizationDenied = true
+        @unknown default:
+            isAuthorized = false
+            authorizationDenied = true
+        }
+    }
     }
 
 struct AlbumTile: View {
-    let album: AlbumPlaceholder
+    let album: SavedAlbum
     
     var body: some View {
         HStack {
@@ -42,41 +87,53 @@ struct AlbumTile: View {
                     .font(.footnote)
             }
             Spacer()
-            Text(album.artworkURL)
+            if let url = album.artworkURL {
+                AsyncImage(url: url) { image in
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 60, height: 60)
+                } placeholder: {
+                    ProgressView()
+                }
+            } else {
+                Image(systemName: "music.note")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .foregroundColor(.gray)
+            }
         }
     }
 }
 
-struct AlbumPlaceholder: Identifiable, Codable {
-    var id = UUID()
+struct SavedAlbum: Identifiable, Codable {
+    let id: MusicItemID
     let title: String
     let artistName: String
-    var artworkURL = "O"
+    var artworkURL: URL?
 }
 
 @Observable
-class AlbumsPlaceholder {
-    static let itemsKey = "itemsKey"
+class SavedAlbums {
+    static let itemsKey = "savedAlbumsItemsKey"
     
-    var items = [AlbumPlaceholder]() {
+    var items = [SavedAlbum]() {
         didSet {
             if let encoded = try? JSONEncoder().encode(items) {
-                UserDefaults.standard.set(encoded, forKey: AlbumsPlaceholder.itemsKey)
+                UserDefaults.standard.set(encoded, forKey: SavedAlbums.itemsKey)
             }
         }
     }
     
     init() {
-        if let savedItems = UserDefaults.standard.data(forKey: AlbumsPlaceholder.itemsKey) {
-            if let decoded = try? JSONDecoder().decode([AlbumPlaceholder].self, from: savedItems) {
+        if let savedItems = UserDefaults.standard.data(forKey: SavedAlbums.itemsKey) {
+            if let decoded = try? JSONDecoder().decode([SavedAlbum].self, from: savedItems) {
                 items = decoded
                 return
             }
         }
-        items = [
-            AlbumPlaceholder(title: "Take Care", artistName: "Drake"),
-            AlbumPlaceholder(title: "Born Sinner", artistName: "J. Cole")
-        ]
+        items = []
     }
 }
 
