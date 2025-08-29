@@ -31,7 +31,7 @@ struct FavAlbumView: View {
         }
         .sheet(isPresented: $showingAddView) {
             AlbumSearchView(onSelect: { album in
-                print(album)
+                albums.items.append(SavedAlbum(from: album))
             })
         }
     }
@@ -39,6 +39,7 @@ struct FavAlbumView: View {
 
 struct AlbumTile: View {
     let album: SavedAlbum
+    let imageSize = CGFloat(60)
     
     var body: some View {
         HStack {
@@ -49,12 +50,12 @@ struct AlbumTile: View {
                     .font(.footnote)
             }
             Spacer()
-            if let url = album.artworkURL {
+            if let url = album.artworkURL.xSmall {
                 AsyncImage(url: url) { image in
                     image
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 60, height: 60)
+                        .frame(width: imageSize, height: imageSize)
                 } placeholder: {
                     ProgressView()
                 }
@@ -62,7 +63,7 @@ struct AlbumTile: View {
                 Image(systemName: "music.note")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 60, height: 60)
+                    .frame(width: imageSize, height: imageSize)
                     .foregroundColor(.gray)
             }
         }
