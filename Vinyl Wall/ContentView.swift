@@ -122,6 +122,20 @@ func fetchAlbums(ids: [String]) async throws -> [Album]? {
     }
 }
 
+func playAlbum(id: MusicItemID) async {
+    do {
+        let request = MusicCatalogResourceRequest<Album>(matching: \.id, equalTo: id)
+        let response = try await request.response()
+        if let album = response.items.first {
+            let player = SystemMusicPlayer.shared
+            player.queue = [album]
+            try await player.play()
+        }
+    } catch {
+        print("Playback error: \(error)")
+    }
+}
+
 #Preview {
     ContentView()
 }

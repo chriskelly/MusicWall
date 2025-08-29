@@ -45,33 +45,41 @@ struct AlbumTile: View {
     let imageSize = CGFloat(60)
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
-                Text(album.title)
-                    .font(.headline)
-                Text(album.artistName)
-                    .font(.footnote)
+        Button {
+            Task {
+                await playAlbum(id: album.id)
             }
-            Spacer()
-            if let url = album.artworkURL.small {
-                AsyncImage(url: url) { image in
-                    image
+        } label: {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(album.title)
+                        .font(.headline)
+                    Text(album.artistName)
+                        .font(.footnote)
+                }
+                Spacer()
+                if let url = album.artworkURL.small {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: imageSize, height: imageSize)
+                    } placeholder: {
+                        ProgressView()
+                    }
+                } else {
+                    Image(systemName: "music.note")
                         .resizable()
                         .scaledToFit()
                         .frame(width: imageSize, height: imageSize)
-                } placeholder: {
-                    ProgressView()
+                        .foregroundColor(.gray)
                 }
-            } else {
-                Image(systemName: "music.note")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: imageSize, height: imageSize)
-                    .foregroundColor(.gray)
             }
         }
     }
 }
+
+
 
 #Preview {
     FavAlbumView(albums: SavedAlbums())
