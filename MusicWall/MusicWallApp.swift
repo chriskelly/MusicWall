@@ -1,6 +1,6 @@
 //
-//  Vinyl_WallApp.swift
-//  Vinyl Wall
+//  MusicWallApp.swift
+//  MusicWall
 //
 //  Created by Chris Kelly on 8/27/25.
 //
@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct Vinyl_WallApp: App {
+struct MusicWallApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
