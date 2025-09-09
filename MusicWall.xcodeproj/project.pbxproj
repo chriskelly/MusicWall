@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 835DD9832E5FB592001CD95F /* Build configuration list for PBXProject "Vinyl Wall" */;
+			buildConfigurationList = 835DD9832E5FB592001CD95F /* Build configuration list for PBXProject "MusicWall" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -307,7 +307,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		835DD9832E5FB592001CD95F /* Build configuration list for PBXProject "Vinyl Wall" */ = {
+		835DD9832E5FB592001CD95F /* Build configuration list for PBXProject "MusicWall" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				835DD9912E5FB592001CD95F /* Debug */,
