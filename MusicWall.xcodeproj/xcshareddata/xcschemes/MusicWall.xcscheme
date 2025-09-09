@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "835DD9872E5FB592001CD95F"
-               BuildableName = "Vinyl Wall.app"
-               BlueprintName = "Vinyl Wall"
+               BuildableName = "MusicWall.app"
+               BlueprintName = "MusicWall"
                ReferencedContainer = "container:MusicWall.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "835DD9872E5FB592001CD95F"
-            BuildableName = "Vinyl Wall.app"
-            BlueprintName = "Vinyl Wall"
+            BuildableName = "MusicWall.app"
+            BlueprintName = "MusicWall"
             ReferencedContainer = "container:MusicWall.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "835DD9872E5FB592001CD95F"
-            BuildableName = "Vinyl Wall.app"
-            BlueprintName = "Vinyl Wall"
+            BuildableName = "MusicWall.app"
+            BlueprintName = "MusicWall"
             ReferencedContainer = "container:MusicWall.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
