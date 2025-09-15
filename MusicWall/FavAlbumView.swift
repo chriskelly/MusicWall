@@ -82,5 +82,11 @@ struct AlbumTile: View {
 
 
 #Preview {
-    FavAlbumView(albums: SavedAlbums())
+    var savedAlbums = SavedAlbums()
+    savedAlbums.items = [
+        SavedAlbum(dummyTitle: "Take Care", dummyArtist: "Drake"),
+        SavedAlbum(dummyTitle: "Born Sinners", dummyArtist: "J. Cole"),
+        SavedAlbum(dummyTitle: "Good Kid, m.A.A.d City", dummyArtist: "Kendrick Lamar"),
+    ]
+    return FavAlbumView(albums: savedAlbums)
 }

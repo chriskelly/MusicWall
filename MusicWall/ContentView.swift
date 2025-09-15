@@ -64,7 +64,9 @@ struct SavedAlbum: Identifiable, Codable {
     let title: String
     let artistName: String
     var artworkURL: ArtworkURLs
-    
+}
+
+extension SavedAlbum {
     init(from album:Album) {
         self.id = album.id
         self.title = album.title
@@ -76,6 +78,12 @@ struct SavedAlbum: Identifiable, Codable {
             large: album.artwork?.url(width: 480, height: 480),
             xLarge: album.artwork?.url(width: 960, height: 960)
         )
+    }
+    init(dummyTitle: String, dummyArtist: String) {
+        self.id = MusicItemID("\(UUID())")
+        self.title = dummyTitle
+        self.artistName = dummyArtist
+        self.artworkURL = ArtworkURLs(xSmall: nil, small: nil, medium: nil, large: nil, xLarge: nil)
     }
 }
 
