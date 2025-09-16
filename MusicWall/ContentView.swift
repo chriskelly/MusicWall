@@ -51,6 +51,30 @@ struct ContentView: View {
     }
 }
 
+class UserDefaultsManager {
+    enum Key: String {
+        case savedAlbumsItemsKey = "savedAlbumsItemsKey"
+        case backupAlbumIDsKey = "backupIDsKey"
+        case sortDirectionKey = "sortDirectionKey"
+        case currentSortKey = "currentSortKey"
+    }
+    
+    static func setData<T:Encodable>(key:Key, data: T) {
+        if let encoded = try? JSONEncoder().encode(data) {
+            UserDefaults.standard.set(encoded, forKey: key.rawValue)
+        }
+    }
+    
+    static func loadData<T:Decodable>(key: Key, type: T.Type) -> T? {
+        if let data = UserDefaults.standard.data(forKey: key.rawValue) {
+            if let decoded = try? JSONDecoder().decode(type, from: data) {
+                return decoded
+            }
+        }
+        return nil
+    }
+}
+
 struct ArtworkURLs: Codable {
     let xSmall: URL?
     let small: URL?
@@ -89,18 +113,10 @@ extension SavedAlbum {
 
 @Observable
 class SavedAlbums {
-    let itemsKey = "savedAlbumsItemsKey"
-    let backupIDsKey = "backupIDsKey"
-    let sortDirectionKey = "sortDirectionKey"
-    let currentSortKey = "currentSortKey"
-    
     var items = [SavedAlbum]() {
         didSet {
-            if let fullDataFormat = try? JSONEncoder().encode(items) {
-                UserDefaults.standard.set(fullDataFormat, forKey: itemsKey)
-            }
-            let backupIDs = items.map { $0.id.rawValue }
-            UserDefaults.standard.set(backupIDs, forKey: backupIDsKey)
+            UserDefaultsManager.setData(key: .savedAlbumsItemsKey, data: items)
+            UserDefaultsManager.setData(key: .backupAlbumIDsKey, data: items.map { $0.id.rawValue })
         }
     }
     
@@ -111,35 +127,30 @@ class SavedAlbums {
     }
     
     func loadItems() async {
-        if let savedItems = UserDefaults.standard.data(forKey: itemsKey) {
-            if let decoded = try? JSONDecoder().decode([SavedAlbum].self, from: savedItems) {
-                items = decoded
-                return
-            }
-        }
-        if let backupIDs = UserDefaults.standard.array(forKey: backupIDsKey) as? [String] {
+        items = UserDefaultsManager.loadData(
+            key: .savedAlbumsItemsKey,
+            type: [SavedAlbum].self
+        ) ?? []
+        if items.isEmpty {
+            let backupIDs = UserDefaultsManager.loadData(
+                key: .backupAlbumIDsKey,
+                type: [String].self
+            ) ?? []
             if let albums = try? await fetchAlbums(ids: backupIDs) {
-                items = albums.map {SavedAlbum(from: $0)}
-                return
+                items = albums.map { SavedAlbum(from: $0) }
             }
         }
-        items = []
     }
     
     func loadSort() {
-        if let sortDirectionData = UserDefaults.standard.data(forKey: sortDirectionKey) {
-            if let decoded  = try? JSONDecoder().decode([SortOptions: Bool].self, from: sortDirectionData) {
-                sortDirection = decoded
-                print("decoded direction: \(decoded)")
-            } else { sortDirection = [:] }
-        } else { sortDirection = [:] }
-        
-        if let currentSortData = UserDefaults.standard.data(forKey: currentSortKey) {
-            if let decoded  = try? JSONDecoder().decode(SortOptions.self, from: currentSortData) {
-                currentSort = decoded
-                print("decoded current: \(decoded)")
-            } else { currentSort = .artist }
-        } else { currentSort = .artist }
+        sortDirection = UserDefaultsManager.loadData(
+            key: .sortDirectionKey,
+            type: [SortOptions: Bool].self
+        ) ?? [:]
+        currentSort = UserDefaultsManager.loadData(
+            key: .currentSortKey,
+            type: SortOptions.self
+        ) ?? .artist
     }
     
     enum SortOptions: String, CaseIterable, Identifiable, Codable {
@@ -151,18 +162,12 @@ class SavedAlbums {
     
     var currentSort: SortOptions = .artist {
         didSet {
-            if let encoded = try? JSONEncoder().encode(currentSort) {
-                UserDefaults.standard.set(encoded, forKey: currentSortKey)
-                print("encoding current: \(currentSort)")
-            }
+            UserDefaultsManager.setData(key: .currentSortKey, data: currentSort)
         }
     }
     var sortDirection: [SortOptions: Bool] = [:] {// true = ascending, false = descending
         didSet {
-            if let encoded = try? JSONEncoder().encode(sortDirection) {
-                UserDefaults.standard.set(encoded, forKey: sortDirectionKey)
-                print("encoding direction: \(sortDirection)")
-            }
+            UserDefaultsManager.setData(key: .sortDirectionKey, data: sortDirection)
         }
     }
     
