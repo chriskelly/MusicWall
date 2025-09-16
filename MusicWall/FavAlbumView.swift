@@ -24,6 +24,11 @@ struct FavAlbumView: View {
             }
             .navigationTitle("Fav Albums")
             .toolbar {
+                Menu {
+                    SortMenu(albums: albums)
+                } label: {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                }
                 Button("Add album", systemImage: "plus") {
                     showingAddView = true
                 }
@@ -32,10 +37,39 @@ struct FavAlbumView: View {
         .sheet(isPresented: $showingAddView) {
             AlbumSearchView(onSelect: { album in
                 albums.items.append(SavedAlbum(from: album))
+                albums.applySort()
             })
         }
         .task {
             await albums.load()
+        }
+    }
+}
+
+struct SortMenu: View {
+    var albums: SavedAlbums
+    
+    var body: some View {
+        Section {
+            ForEach(SavedAlbums.SortOptions.allCases) {option in
+                Button {
+                    if albums.currentSort == option {
+                        albums.toggleSortDirection(for: option)
+                    } else {
+                        albums.currentSort = option
+                    }
+                    albums.applySort()
+                } label: {
+                    HStack {
+                        Text(option.rawValue)
+                        Spacer()
+                        if albums.currentSort == option {
+                            Image(systemName: albums.isAscending(for: option) ? "arrow.down" : "arrow.up")
+                                .foregroundColor(.accentColor)
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -82,7 +116,7 @@ struct AlbumTile: View {
 
 
 #Preview {
-    var savedAlbums = SavedAlbums()
+    let savedAlbums = SavedAlbums()
     savedAlbums.items = [
         SavedAlbum(dummyTitle: "Take Care", dummyArtist: "Drake"),
         SavedAlbum(dummyTitle: "Born Sinners", dummyArtist: "J. Cole"),
