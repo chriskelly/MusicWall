@@ -80,6 +80,7 @@ struct SavedAlbum: Identifiable, Codable {
     let id: MusicItemID
     let title: String
     let artistName: String
+    let releaseDate: Date?
 }
 
 extension SavedAlbum {
@@ -87,11 +88,13 @@ extension SavedAlbum {
         self.id = album.id
         self.title = album.title
         self.artistName = album.artistName
+        self.releaseDate = album.releaseDate
     }
-    init(dummyTitle: String, dummyArtist: String) {
+    init(dummyTitle: String, dummyArtist: String, dummyReleaseDate: Date? = nil) {
         self.id = MusicItemID("\(UUID())")
         self.title = dummyTitle
         self.artistName = dummyArtist
+        self.releaseDate = dummyReleaseDate
     }
     
 }
@@ -111,7 +114,7 @@ class SavedAlbums {
         loadSort()
     }
     
-    func loadItems() async {
+    private func loadItems() async {
         items = UserDefaultsManager.loadData(
             key: .savedAlbumsItemsKey,
             type: [SavedAlbum].self
@@ -127,7 +130,7 @@ class SavedAlbums {
         }
     }
     
-    func loadSort() {
+    private func loadSort() {
         sortDirection = UserDefaultsManager.loadData(
             key: .sortDirectionKey,
             type: [SortOptions: Bool].self
@@ -143,6 +146,7 @@ class SavedAlbums {
         
         case artist = "Artist"
         case title = "Title"
+        case date = "Year"
     }
     
     var currentSort: SortOptions = .artist {
@@ -171,6 +175,12 @@ class SavedAlbums {
                 items.sort { $0.title < $1.title }
             } else {
                 items.sort { $0.title > $1.title }
+            }
+        case .date:
+            if isAscending {
+                items.sort { ($0.releaseDate ?? Date.distantFuture) < ($1.releaseDate ?? Date.distantFuture) }
+            } else {
+                items.sort { ($0.releaseDate ?? Date.distantPast) > ($1.releaseDate ?? Date.distantPast) }
             }
         }
     }
