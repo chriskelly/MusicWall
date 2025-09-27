@@ -101,10 +101,14 @@ extension SavedAlbum {
 
 @Observable
 class SavedAlbums {
+    private var itemsSavingLocked = false
+    
     var items = [SavedAlbum]() {
         didSet {
-            UserDefaultsManager.setData(key: .savedAlbumsItemsKey, data: items)
-            UserDefaultsManager.setData(key: .backupAlbumIDsKey, data: items.map { $0.id.rawValue })
+            if !itemsSavingLocked {
+                UserDefaultsManager.setData(key: .savedAlbumsItemsKey, data: items)
+                UserDefaultsManager.setData(key: .backupAlbumIDsKey, data: items.map { $0.id.rawValue })
+            }
         }
     }
     
@@ -115,6 +119,7 @@ class SavedAlbums {
     }
     
     private func loadItems() async {
+        itemsSavingLocked = true
         items = UserDefaultsManager.loadData(
             key: .savedAlbumsItemsKey,
             type: [SavedAlbum].self
@@ -125,9 +130,11 @@ class SavedAlbums {
                 type: [String].self
             ) ?? []
             if let albums = try? await fetchAlbums(ids: backupIDs) {
+                itemsSavingLocked = false
                 items = albums.map { SavedAlbum(from: $0) }
             }
         }
+        itemsSavingLocked = false
     }
     
     private func loadSort() {
@@ -196,6 +203,7 @@ class SavedAlbums {
 }
 
 func fetchAlbums(ids: [String]) async throws -> [Album]? {
+    guard !ids.isEmpty else { return nil }
     let ids = ids.map { MusicItemID($0) }
     let request = MusicCatalogResourceRequest<Album>(matching: \.id, memberOf: ids)
     if let response = try? await request.response() {
