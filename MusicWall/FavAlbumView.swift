@@ -92,23 +92,33 @@ struct AlbumTile: View {
                         .font(.footnote)
                 }
                 Spacer()
-                if let url = album.artworkURL.small {
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: imageSize, height: imageSize)
-                    } placeholder: {
-                        ProgressView()
-                    }
-                } else {
-                    Image(systemName: "music.note")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: imageSize, height: imageSize)
-                        .foregroundColor(.gray)
-                }
+                AlbumArtwork(album: album, imageSize: imageSize)
             }
+        }
+    }
+    
+}
+
+struct AlbumArtwork: View {
+    let album: SavedAlbum
+    let imageSize: CGFloat
+    
+    @State private var imageURL: URL?
+    
+    var body: some View {
+        AsyncImage(url: imageURL) { image in
+            image
+                .resizable()
+                .scaledToFit()
+                .frame(width: imageSize, height: imageSize)
+        } placeholder: {
+            ProgressView()
+        }
+        .task {
+            imageURL = await ImageCache().getArtwork(
+                albumID: album.id.rawValue,
+                size: Int(imageSize)
+            )
         }
     }
 }
