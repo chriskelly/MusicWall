@@ -173,15 +173,15 @@ class SavedAlbums {
         switch currentSort {
         case .artist:
             if isAscending {
-                items.sort { $0.artistName < $1.artistName }
+                items.sort { $0.artistName.lowercased() < $1.artistName.lowercased() }
             } else {
-                items.sort { $0.artistName > $1.artistName }
+                items.sort { $0.artistName.lowercased() > $1.artistName.lowercased() }
             }
         case .title:
             if isAscending {
-                items.sort { $0.title < $1.title }
+                items.sort { $0.title.lowercased() < $1.title.lowercased() }
             } else {
-                items.sort { $0.title > $1.title }
+                items.sort { $0.title.lowercased() > $1.title.lowercased() }
             }
         case .date:
             if isAscending {
