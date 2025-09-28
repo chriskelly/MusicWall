@@ -92,7 +92,7 @@ struct AlbumTile: View {
                         .font(.footnote)
                 }
                 Spacer()
-                AlbumArtwork(album: album, imageSize: imageSize)
+                AlbumArtwork(album: album, viewSize: imageSize)
             }
         }
     }
@@ -101,7 +101,7 @@ struct AlbumTile: View {
 
 struct AlbumArtwork: View {
     let album: SavedAlbum
-    let imageSize: CGFloat
+    let viewSize: CGFloat
     
     @State private var imageURL: URL?
     
@@ -110,14 +110,16 @@ struct AlbumArtwork: View {
             image
                 .resizable()
                 .scaledToFit()
-                .frame(width: imageSize, height: imageSize)
+                .frame(width: viewSize, height: viewSize)
         } placeholder: {
             ProgressView()
         }
         .task {
+            let scale = UIScreen.main.scale   // @2x for most iPhones, @3x on latest pro/max models
+            let pixelSize = Int((viewSize * scale).rounded())
             imageURL = await ImageCache().getArtwork(
                 albumID: album.id.rawValue,
-                size: Int(imageSize)
+                size: pixelSize
             )
         }
     }
