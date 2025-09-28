@@ -33,7 +33,12 @@ struct AlbumSearchView: View {
                         onSelect(album)
                         dismiss()
                     } label: {
-                        Text("\(album.title) — \(album.artistName)")
+                        HStack {
+                            if album.contentRating == .explicit {
+                                Image(systemName: "e.square.fill")
+                            }
+                            Text("\(album.title) — \(album.artistName)")
+                        }
                     }
                 }
             }
