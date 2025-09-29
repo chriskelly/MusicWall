@@ -58,7 +58,9 @@ struct SortMenu: View {
                     } else {
                         albums.currentSort = option
                     }
-                    albums.applySort()
+                    withAnimation {
+                        albums.applySort()
+                    }
                 } label: {
                     HStack {
                         Text(option.rawValue)
