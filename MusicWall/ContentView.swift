@@ -90,13 +90,6 @@ extension SavedAlbum {
         self.artistName = album.artistName
         self.releaseDate = album.releaseDate
     }
-    init(dummyTitle: String, dummyArtist: String, dummyReleaseDate: Date? = nil) {
-        self.id = MusicItemID("\(UUID())")
-        self.title = dummyTitle
-        self.artistName = dummyArtist
-        self.releaseDate = dummyReleaseDate
-    }
-    
 }
 
 @Observable
@@ -200,6 +193,15 @@ class SavedAlbums {
         return sortDirection[option] ?? true
     }
     
+    static func dummyData() -> SavedAlbums {
+        let savedAlbums = SavedAlbums()
+        savedAlbums.items = [
+            SavedAlbum(id: MusicItemID("\(UUID())"), title: "Take Care", artistName: "Drake", releaseDate: Date()),
+            SavedAlbum(id: MusicItemID("\(UUID())"), title: "Born Sinners", artistName: "J. Cole", releaseDate: nil),
+            SavedAlbum(id: MusicItemID("\(UUID())"), title: "Good Kid, m.A.A.d City", artistName: "Kendrick Lamar", releaseDate: Date(timeIntervalSinceNow: 500)),
+        ]
+        return savedAlbums
+    }
 }
 
 func fetchAlbums(ids: [String]) async throws -> [Album]? {

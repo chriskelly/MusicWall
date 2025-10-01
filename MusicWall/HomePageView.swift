@@ -131,11 +131,5 @@ struct AlbumArtwork: View {
 
 
 #Preview {
-    let savedAlbums = SavedAlbums()
-    savedAlbums.items = [
-        SavedAlbum(dummyTitle: "Take Care", dummyArtist: "Drake", dummyReleaseDate: Date()),
-        SavedAlbum(dummyTitle: "Born Sinners", dummyArtist: "J. Cole"),
-        SavedAlbum(dummyTitle: "Good Kid, m.A.A.d City", dummyArtist: "Kendrick Lamar", dummyReleaseDate: Date(timeIntervalSinceNow: 500)),
-    ]
-    return HomePageView(albums: savedAlbums)
+    HomePageView(albums: SavedAlbums.dummyData())
 }
