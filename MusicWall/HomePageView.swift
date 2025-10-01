@@ -11,24 +11,21 @@ struct HomePageView: View {
     @State var albums: SavedAlbums
     
     @State private var showingAddView = false
+    @State private var currentLayout = LayoutMenu.loadLayout() ?? .grid
     
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(albums.items) {
-                    AlbumTile(album: $0)
-                }
-                .onDelete { indexSet in
-                    albums.items.remove(atOffsets: indexSet)
+            Group {
+                switch currentLayout {
+                case .grid:
+                    GridLayout()
+                case .list:
+                    ListLayout()
                 }
             }
             .navigationTitle("Fav Albums")
             .toolbar {
-                Menu {
-                    SortMenu()
-                } label: {
-                    Image(systemName: "line.3.horizontal.decrease.circle")
-                }
+                HomePageMenu(currentLayout: $currentLayout)
                 Button("Add album", systemImage: "plus") {
                     showingAddView = true
                 }
@@ -43,6 +40,19 @@ struct HomePageView: View {
         }
         .task {
             await albums.load()
+        }
+    }
+}
+
+struct HomePageMenu: View {
+    @Binding var currentLayout: LayoutMenu.Option
+    
+    var body: some View {
+        Menu {
+            LayoutMenu(currentLayout: $currentLayout)
+            SortMenu()
+        } label: {
+            Label("Options", systemImage: "line.3.horizontal.decrease.circle")
         }
     }
 }
@@ -64,42 +74,16 @@ struct SortMenu: View {
                     }
                 } label: {
                     HStack {
-                        Text(option.rawValue)
-                        Spacer()
                         if albums.currentSort == option {
                             Image(systemName: albums.isAscending(for: option) ? "arrow.down" : "arrow.up")
                                 .foregroundColor(.accentColor)
                         }
+                        Text(option.rawValue)
                     }
                 }
             }
         }
     }
-}
-
-struct AlbumTile: View {
-    let album: SavedAlbum
-    let imageSize = CGFloat(60)
-    
-    var body: some View {
-        Button {
-            Task {
-                await playAlbum(id: album.id)
-            }
-        } label: {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(album.title)
-                        .font(.headline)
-                    Text(album.artistName)
-                        .font(.footnote)
-                }
-                Spacer()
-                AlbumArtwork(album: album, viewSize: imageSize)
-            }
-        }
-    }
-    
 }
 
 struct AlbumArtwork: View {

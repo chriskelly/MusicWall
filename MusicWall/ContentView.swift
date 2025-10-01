@@ -57,6 +57,7 @@ class UserDefaultsManager {
         case backupAlbumIDsKey = "backupIDsKey"
         case sortDirectionKey = "sortDirectionKey"
         case currentSortKey = "currentSortKey"
+        case homePageLayoutKey = "homePageLayoutKey"
     }
     
     static func setData<T:Encodable>(key:Key, data: T) {
