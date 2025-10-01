@@ -25,7 +25,7 @@ struct HomePageView: View {
             .navigationTitle("Fav Albums")
             .toolbar {
                 Menu {
-                    SortMenu(albums: albums)
+                    SortMenu()
                 } label: {
                     Image(systemName: "line.3.horizontal.decrease.circle")
                 }
@@ -34,6 +34,7 @@ struct HomePageView: View {
                 }
             }
         }
+        .environment(albums)
         .sheet(isPresented: $showingAddView) {
             AlbumSearchView(onSelect: { album in
                 albums.items.append(SavedAlbum(from: album))
@@ -47,7 +48,7 @@ struct HomePageView: View {
 }
 
 struct SortMenu: View {
-    var albums: SavedAlbums
+    @Environment(SavedAlbums.self) private var albums
     
     var body: some View {
         Section {
