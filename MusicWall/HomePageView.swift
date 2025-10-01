@@ -1,5 +1,5 @@
 //
-//  FavAlbumView.swift
+//  HomePageView.swift
 //  MusicWall
 //
 //  Created by Chris Kelly on 8/29/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FavAlbumView: View {
+struct HomePageView: View {
     @State var albums: SavedAlbums
     
     @State private var showingAddView = false
@@ -136,5 +136,5 @@ struct AlbumArtwork: View {
         SavedAlbum(dummyTitle: "Born Sinners", dummyArtist: "J. Cole"),
         SavedAlbum(dummyTitle: "Good Kid, m.A.A.d City", dummyArtist: "Kendrick Lamar", dummyReleaseDate: Date(timeIntervalSinceNow: 500)),
     ]
-    return FavAlbumView(albums: savedAlbums)
+    return HomePageView(albums: savedAlbums)
 }
