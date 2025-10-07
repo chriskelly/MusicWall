@@ -16,34 +16,32 @@ struct GridLayout: View {
         ScrollView {
             LazyVGrid(columns: [GridItem(.adaptive(minimum: size))]) {
                 ForEach(albums.items) { album in
-                    VStack{
-                        VStack {
-                            AlbumArtwork(album: album, viewSize: size)
-                                .frame(width: size, height: size)
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                            Text(album.title)
-                                .lineLimit(1)
-                                .allowsTightening(true)
-                                .font(.headline)
-                            Text(album.artistName)
-                                .lineLimit(1)
-                                .allowsTightening(true)
-                                .font(.footnote)
-                        }
-                        .onTapGesture {
-                            Task {await album.play()}
-                        }
-                        .contextMenu {
-                            Button(role: .destructive) {
-                                if let index = albums.items.firstIndex(where: { $0.id == album.id }) {
-                                    albums.items.remove(at: index)
-                                }
-                            } label: {
-                                Label("Remove Album", systemImage: "trash")
-                            }
-                        }
-                        Spacer(minLength: 50)
+                    VStack {
+                        AlbumArtwork(album: album, viewSize: size)
+                            .frame(width: size, height: size)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                        Text(album.title)
+                            .lineLimit(1)
+                            .allowsTightening(true)
+                            .font(.headline)
+                        Text(album.artistName)
+                            .lineLimit(1)
+                            .allowsTightening(true)
+                            .font(.footnote)
                     }
+                    .onTapGesture {
+                        Task {await album.play()}
+                    }
+                    .contextMenu {
+                        Button(role: .destructive) {
+                            if let index = albums.items.firstIndex(where: { $0.id == album.id }) {
+                                albums.items.remove(at: index)
+                            }
+                        } label: {
+                            Label("Remove Album", systemImage: "trash")
+                        }
+                    }
+                    .padding(.bottom, 25)
                 }
             }
             .padding(20)
