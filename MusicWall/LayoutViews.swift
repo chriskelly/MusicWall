@@ -31,7 +31,7 @@ struct GridLayout: View {
                                 .font(.footnote)
                         }
                         .onTapGesture {
-                            Task {await playAlbum(id: album.id)}
+                            Task {await album.play()}
                         }
                         .contextMenu {
                             Button(role: .destructive) {
@@ -68,7 +68,7 @@ struct ListLayout: View {
                     AlbumArtwork(album: album, viewSize: CGFloat(60))
                 }
                 .onTapGesture {
-                    Task {await playAlbum(id: album.id)}
+                    Task {await album.play()}
                 }
             }
             .onDelete { indexSet in
