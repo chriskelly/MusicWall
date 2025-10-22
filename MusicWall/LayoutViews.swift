@@ -116,6 +116,32 @@ struct ListLayout: View {
     }
 }
 
+struct AlbumArtwork: View {
+    let album: SavedAlbum
+    let viewSize: CGFloat
+    
+    @State private var imageURL: URL?
+    
+    var body: some View {
+        AsyncImage(url: imageURL) { image in
+            image
+                .resizable()
+                .scaledToFit()
+                .frame(width: viewSize, height: viewSize)
+        } placeholder: {
+            ProgressView()
+        }
+        .task {
+            let scale = UIScreen.main.scale   // @2x for most iPhones, @3x on latest pro/max models
+            let pixelSize = Int((viewSize * scale).rounded())
+            imageURL = await ImageCache().getArtwork(
+                albumID: album.id.rawValue,
+                size: pixelSize
+            )
+        }
+    }
+}
+
 struct LayoutMenu: View {
     @Binding var currentLayout: Option
     
