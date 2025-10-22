@@ -26,6 +26,11 @@ struct HomePageView: View {
             .navigationTitle("Fav Albums")
             .toolbar {
                 HomePageMenu(currentLayout: $currentLayout)
+                Button("Shuffle albums temporarily", systemImage: "shuffle.circle") {
+                    withAnimation {
+                        albums.temporarilyShuffle()
+                    }
+                }
                 Button("Add album", systemImage: "plus") {
                     showingAddView = true
                 }

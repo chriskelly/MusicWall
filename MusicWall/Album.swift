@@ -128,6 +128,12 @@ class SavedAlbums {
         return sortDirection[option] ?? true
     }
     
+    func temporarilyShuffle() {
+        itemsSavingLocked = true
+        items.shuffle()
+        itemsSavingLocked = false
+    }
+    
     static func dummyData() -> SavedAlbums {
         let savedAlbums = SavedAlbums()
         savedAlbums.items = [
