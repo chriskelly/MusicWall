@@ -9,9 +9,9 @@ import SwiftUI
 import MusicKit
 
 struct AlbumSearchView: View {
-    @Environment(\.dismiss) var dismiss
     @State private var query = ""
-    @State private var searchResults: [Album] = []
+    @State private var catalogSearchResults: [Album] = []
+    @State private var librarySearchResults: [Album] = []
     
     var onSelect: (Album) -> Void
     
@@ -21,35 +21,53 @@ struct AlbumSearchView: View {
                 TextField("Search for an album", text: $query)
                     .textFieldStyle(.roundedBorder)
                     .padding()
-                
                 Button("Search") {
-                    Task {
-                        await searchAlbums()
-                    }
+                    Task {await searchAlbums()}
                 }
-                
-                List(searchResults, id: \.id) { album in
-                    Button {
-                        onSelect(album)
-                        dismiss()
-                    } label: {
-                        HStack {
-                            if album.contentRating == .explicit {
-                                Image(systemName: "e.square.fill")
-                            }
-                            Text("\(album.title) — \(album.artistName)")
+                List {
+                    Section(header: Text("Library")){
+                        ForEach(librarySearchResults, id: \.id) { album in
+                            SearchResultButton(onSelect: onSelect, album: album)
                         }
                     }
+                    Section(header: Text("Apple Music")){
+                        ForEach(catalogSearchResults, id: \.id) { album in
+                            SearchResultButton(onSelect: onSelect, album: album)
+                        }
+                    }
+                    
                 }
             }
             .navigationTitle("Find Album")
         }
     }
     
+    struct SearchResultButton:View {
+        @Environment(\.dismiss) var dismiss
+        
+        var onSelect: (Album) -> Void
+        var album: Album
+        
+        var body: some View {
+            Button {
+                onSelect(album)
+                dismiss()
+            } label: {
+                HStack {
+                    if album.contentRating == .explicit {
+                        Image(systemName: "e.square.fill")
+                    }
+                    Text("\(album.title) — \(album.artistName)")
+                }
+            }
+        }
+    }
+    
     func searchAlbums() async {
         guard !query.isEmpty else { return }
         do {
-            searchResults = try await MusicService.searchAlbums(query: query)
+            catalogSearchResults = try await MusicService.searchAlbums(query: query, location: .catalog)
+            librarySearchResults = try await MusicService.searchAlbums(query: query, location: .library)
         } catch {
             print(error.localizedDescription)
         }

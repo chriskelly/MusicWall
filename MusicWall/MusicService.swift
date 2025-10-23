@@ -10,14 +10,26 @@ import Foundation
 
 
 enum MusicService {
-    static func searchAlbums(query: String) async throws -> [Album] {
+    enum Location {
+        case catalog
+        case library
+    }
+    
+    static func searchAlbums(query: String, location: Location) async throws -> [Album] {
         guard !query.isEmpty else {
             throw MusicServiceError.invalidQuery
         }
         do {
-            let request = MusicCatalogSearchRequest(term: query, types: [Album.self])
-            let response = try await request.response()
-            return Array(response.albums)
+            switch location {
+            case .catalog:
+                let request = MusicCatalogSearchRequest(term: query, types: [Album.self])
+                let response = try await request.response()
+                return Array(response.albums)
+            case .library:
+                let request = MusicLibrarySearchRequest(term: query, types: [Album.self])
+                let response = try await request.response()
+                return Array(response.albums)
+            }
         } catch {
             throw MusicServiceError.searchFailed(error.localizedDescription)
         }
@@ -27,9 +39,17 @@ enum MusicService {
         guard !ids.isEmpty else {return []}
         do {
             let musicItemIDs = ids.map { MusicItemID($0) }
-            let request = MusicCatalogResourceRequest<Album>(matching: \.id, memberOf: musicItemIDs)
-            let response = try await request.response()
-            return Array(response.items)
+            var libraryRequest = MusicLibraryRequest<Album>()
+            libraryRequest.filter(matching: \.id, memberOf: musicItemIDs)
+            let libraryResponse = try await libraryRequest.response()
+            let libraryAlbums = Array(libraryResponse.items)
+            if !libraryAlbums.isEmpty {
+                return libraryAlbums
+            }
+            let catalogRequest = MusicCatalogResourceRequest<Album>(matching: \.id, memberOf: musicItemIDs)
+            let catalogResponse = try await catalogRequest.response()
+            if catalogResponse.items.isEmpty {throw MusicServiceError.albumNotFound}
+            return Array(catalogResponse.items)
         } catch {
             throw MusicServiceError.networkError(error.localizedDescription)
         }
@@ -37,13 +57,7 @@ enum MusicService {
     
     static func playAlbum(id: MusicItemID) async throws {
         do {
-            let request = MusicCatalogResourceRequest<Album>(matching: \.id, equalTo: id)
-            let response = try await request.response()
-            
-            guard let album = response.items.first else {
-                throw MusicServiceError.albumNotFound
-            }
-            
+            let album = try await fetchAlbums(ids: [id.rawValue]).first!
             let player = SystemMusicPlayer.shared
             player.queue = [album]
             try await player.play()
@@ -77,3 +91,4 @@ enum MusicServiceError: Error, LocalizedError {
         }
     }
 }
+
