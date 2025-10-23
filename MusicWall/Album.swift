@@ -15,7 +15,7 @@ struct SavedAlbum: Identifiable, Codable {
     let artistName: String
     let releaseDate: Date?
     
-    func play() async {await playAlbum(id: id)}
+    func play() async throws { try await MusicService.playAlbum(id: id) }
 }
 
 extension SavedAlbum {
@@ -57,7 +57,7 @@ class SavedAlbums {
                 key: .backupAlbumIDsKey,
                 type: [String].self
             ) ?? []
-            if let albums = try? await fetchAlbums(ids: backupIDs) {
+            if let albums = try? await MusicService.fetchAlbums(ids: backupIDs) {
                 itemsSavingLocked = false
                 items = albums.map { SavedAlbum(from: $0) }
             }
@@ -145,27 +145,3 @@ class SavedAlbums {
     }
 }
 
-func fetchAlbums(ids: [String]) async throws -> [Album]? {
-    guard !ids.isEmpty else { return nil }
-    let ids = ids.map { MusicItemID($0) }
-    let request = MusicCatalogResourceRequest<Album>(matching: \.id, memberOf: ids)
-    if let response = try? await request.response() {
-        return Array(response.items)
-    } else {
-        return nil
-    }
-}
-
-func playAlbum(id: MusicItemID) async {
-    do {
-        let request = MusicCatalogResourceRequest<Album>(matching: \.id, equalTo: id)
-        let response = try await request.response()
-        if let album = response.items.first {
-            let player = SystemMusicPlayer.shared
-            player.queue = [album]
-            try await player.play()
-        }
-    } catch {
-        print("Playback error: \(error)")
-    }
-}

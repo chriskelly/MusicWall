@@ -20,7 +20,13 @@ struct GridLayout: View {
                     AlbumTile(album: album, isSelected: selectedAlbumID == album.id.rawValue)
                         .onTapGesture {
                             selectedAlbumID = album.id.rawValue
-                            Task {await album.play()}
+                            Task {
+                                do {
+                                    try await album.play()
+                                } catch {
+                                    print(error.localizedDescription)
+                                }
+                            }
                         }
                 }
             }
@@ -106,7 +112,13 @@ struct ListLayout: View {
                     AlbumArtwork(album: album, viewSize: CGFloat(60))
                 }
                 .onTapGesture {
-                    Task {await album.play()}
+                    Task {
+                        do {
+                            try await album.play()
+                        } catch {
+                            print(error.localizedDescription)
+                        }
+                    }
                 }
             }
             .onDelete { indexSet in

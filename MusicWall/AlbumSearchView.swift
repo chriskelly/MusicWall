@@ -48,12 +48,10 @@ struct AlbumSearchView: View {
     
     func searchAlbums() async {
         guard !query.isEmpty else { return }
-        let request = MusicCatalogSearchRequest(term: query, types: [Album.self])
         do {
-            let response = try await request.response()
-            searchResults = Array(response.albums)
+            searchResults = try await MusicService.searchAlbums(query: query)
         } catch {
-            print("Search failed: \(error)")
+            print(error.localizedDescription)
         }
     }
 }

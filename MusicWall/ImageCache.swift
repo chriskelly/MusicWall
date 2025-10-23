@@ -24,7 +24,7 @@ struct ImageCache {
         }
         
         // Fetch the album and get the artwork URL
-        guard let albums = try? await fetchAlbums(ids: [albumID]),
+        guard let albums = try? await MusicService.fetchAlbums(ids: [albumID]),
               let album = albums.first,
               let artworkURL = album.artwork?.url(width: size, height: size) else {
             return nil
