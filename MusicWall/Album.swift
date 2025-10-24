@@ -130,8 +130,10 @@ class StoredAlbums {
     
     /// Adds album and resorts items list
     func addAlbum(_ album: StoredAlbum) {
-        items.append(album)
-        applySort()
+        if !items.contains(where: { $0.id == album.id }) {
+            items.append(album)
+            applySort()
+        }
     }
     
     func temporarilyShuffle() {
