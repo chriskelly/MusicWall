@@ -7,6 +7,37 @@
 
 import SwiftUI
 
+struct LayoutContainer<Content: View>: View {
+    @Environment(SavedAlbums.self) private var albums
+    @State private var deletedAlbum: SavedAlbum?
+    @State private var showAlbumDeleteSnackbar = false
+    
+    private let content: (
+        _ onDeleteSnackbar: @escaping (SavedAlbum) -> Void
+    ) -> Content
+    
+    init(@ViewBuilder content: @escaping (_ onDeleteSnackbar: @escaping (SavedAlbum) -> Void) -> Content) {
+        self.content = content
+    }
+    
+    var body: some View {
+        content({ album in
+            deletedAlbum = album
+            showAlbumDeleteSnackbar = true
+        })
+        .snackbar(
+            isPresented: $showAlbumDeleteSnackbar,
+            message: "Removed \(deletedAlbum?.title ?? "album")",
+            actionLabel: "Undo",
+            action: {
+                if let album = deletedAlbum {
+                    albums.addAlbum(album)
+                }
+            }
+        )
+    }
+}
+
 struct GridLayout: View {
     @Environment(SavedAlbums.self) private var albums
     @State private var selectedAlbumID: String?
@@ -14,10 +45,15 @@ struct GridLayout: View {
     private static let size = CGFloat(150)
     
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: GridLayout.size))]) {
-                ForEach(albums.items) { album in
-                    AlbumTile(album: album, isSelected: selectedAlbumID == album.id.rawValue)
+        LayoutContainer { onDeleteSnackbar in
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: GridLayout.size))]) {
+                    ForEach(albums.items) { album in
+                        AlbumTile(
+                            album: album,
+                            isSelected: selectedAlbumID == album.id.rawValue,
+                            onDeleteSnackbar: onDeleteSnackbar
+                        )
                         .onTapGesture {
                             selectedAlbumID = album.id.rawValue
                             Task {
@@ -28,15 +64,17 @@ struct GridLayout: View {
                                 }
                             }
                         }
+                    }
                 }
+                .padding(20)
             }
-            .padding(20)
         }
     }
     
     struct AlbumTile: View {
         let album: SavedAlbum
         let isSelected: Bool
+        let onDeleteSnackbar: (SavedAlbum) -> Void
         
         @State private var animationID = UUID()
         @Environment(SavedAlbums.self) private var albums
@@ -81,16 +119,26 @@ struct GridLayout: View {
                     .allowsTightening(true)
                     .font(.footnote)
             }
-            .contextMenu {
+            .contextMenu {TileContextMenu(album: album, onDeleteSnackbar: onDeleteSnackbar)}
+            .padding(.bottom, 25)
+        }
+        
+        struct TileContextMenu: View {
+            let album: SavedAlbum
+            let onDeleteSnackbar: (SavedAlbum) -> Void
+            
+            @Environment(SavedAlbums.self) private var albums
+            
+            var body: some View {
                 Button(role: .destructive) {
                     if let index = albums.items.firstIndex(where: { $0.id == album.id }) {
                         albums.items.remove(at: index)
+                        onDeleteSnackbar(album)
                     }
                 } label: {
                     Label("Remove Album", systemImage: "trash")
                 }
             }
-            .padding(.bottom, 25)
         }
     }
 }
@@ -99,30 +147,36 @@ struct ListLayout: View {
     @Environment(SavedAlbums.self) private var albums
     
     var body: some View {
-        List {
-            ForEach(albums.items) { album in
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(album.title)
-                            .font(.headline)
-                        Text(album.artistName)
-                            .font(.footnote)
+        LayoutContainer { onDeleteSnackbar in
+            List {
+                ForEach(albums.items) { album in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(album.title)
+                                .font(.headline)
+                            Text(album.artistName)
+                                .font(.footnote)
+                        }
+                        Spacer()
+                        AlbumArtwork(album: album, viewSize: CGFloat(60))
                     }
-                    Spacer()
-                    AlbumArtwork(album: album, viewSize: CGFloat(60))
-                }
-                .onTapGesture {
-                    Task {
-                        do {
-                            try await album.play()
-                        } catch {
-                            print(error.localizedDescription)
+                    .onTapGesture {
+                        Task {
+                            do {
+                                try await album.play()
+                            } catch {
+                                print(error.localizedDescription)
+                            }
                         }
                     }
                 }
-            }
-            .onDelete { indexSet in
-                albums.items.remove(atOffsets: indexSet)
+                .onDelete { indexSet in
+                    let deletedAlbums = indexSet.map { albums.items[$0] }
+                    albums.items.remove(atOffsets: indexSet)
+                    if !deletedAlbums.isEmpty {
+                        onDeleteSnackbar(deletedAlbums.first!)
+                    }
+                }
             }
         }
     }
