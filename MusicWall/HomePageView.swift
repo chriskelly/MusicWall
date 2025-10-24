@@ -23,7 +23,7 @@ struct HomePageView: View {
                     ListLayout()
                 }
             }
-            .navigationTitle("Fav Albums")
+            .navigationTitle("My Albums")
             .toolbar {
                 HomePageMenu(currentLayout: $currentLayout)
                 Button("Shuffle albums temporarily", systemImage: "shuffle.circle") {
@@ -35,6 +35,7 @@ struct HomePageView: View {
                     showingAddView = true
                 }
             }
+            .background(Color(.systemGray6))
         }
         .environment(albums)
         .sheet(isPresented: $showingAddView) {

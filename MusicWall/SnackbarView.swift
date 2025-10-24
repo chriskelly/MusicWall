@@ -12,23 +12,22 @@ struct SnackbarView: View {
     var icon: String? = nil
     var actionLabel: String? = nil
     var action: (() -> Void)? = nil
-    var backgroundColor: Color = Color(.systemGray5)
     var textColor: Color = .primary
-
+    
     var body: some View {
         HStack(spacing: 8) {
             if let icon = icon {
                 Image(systemName: icon)
                     .foregroundColor(textColor)
             }
-
+            
             Text(message)
                 .foregroundColor(textColor)
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
-
+            
             Spacer(minLength: 10)
-
+            
             if let actionLabel = actionLabel, let action = action {
                 Button(actionLabel) {
                     action()
@@ -39,7 +38,16 @@ struct SnackbarView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(backgroundColor)
+        .background {
+            if #available(iOS 26.0, *) {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.clear)
+                    .glassEffect()
+            } else {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color(.systemGray5))
+            }
+        }
         .cornerRadius(12)
         .shadow(radius: 5)
         .padding(.horizontal, 16)
