@@ -16,41 +16,50 @@ struct SnackbarView: View {
     
     var body: some View {
         HStack(spacing: 8) {
-            if let icon = icon {
-                Image(systemName: icon)
-                    .foregroundColor(textColor)
-            }
-            
-            Text(message)
-                .foregroundColor(textColor)
-                .multilineTextAlignment(.leading)
-                .lineLimit(2)
-            
+            if let icon = icon {snackbarIcon(icon)}
+            snackbarMessage()
             Spacer(minLength: 10)
-            
             if let actionLabel = actionLabel, let action = action {
-                Button(actionLabel) {
-                    action()
-                }
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.accentColor)
+                actionButton(actionLabel, action)
             }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background {
-            if #available(iOS 26.0, *) {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(.clear)
-                    .glassEffect()
-            } else {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray5))
-            }
-        }
+        .background {snackbarBackground()}
         .cornerRadius(12)
         .shadow(radius: 5)
         .padding(.horizontal, 16)
+    }
+    
+    private func snackbarIcon(_ icon: String) -> some View {
+        return Image(systemName: icon)
+            .foregroundColor(textColor)
+    }
+    
+    private func snackbarMessage() -> some View {
+        return Text(message)
+            .foregroundColor(textColor)
+            .multilineTextAlignment(.leading)
+            .lineLimit(2)
+    }
+    
+    private func actionButton(_ actionLabel: String, _ action: @escaping () -> Void) -> some View {
+        return Button(actionLabel) {
+            action()
+        }
+        .font(.system(size: 14, weight: .semibold))
+        .foregroundColor(.accentColor)
+    }
+    
+    private func snackbarBackground() -> some View {
+        if #available(iOS 26.0, *) {
+            return RoundedRectangle(cornerRadius: 12)
+                .fill(.clear)
+                .glassEffect()
+        } else {
+            return RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemGray5))
+        }
     }
 }
 

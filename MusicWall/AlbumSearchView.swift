@@ -27,21 +27,25 @@ struct AlbumSearchView: View {
                     isSearchFieldFocused = false
                     Task {await searchAlbums()}
                 }
-                List {
-                    Section(header: Text("Library")){
-                        ForEach(librarySearchResults, id: \.id) { album in
-                            SearchResultButton(onSelect: onSelect, album: album)
-                        }
-                    }
-                    Section(header: Text("Apple Music")){
-                        ForEach(catalogSearchResults, id: \.id) { album in
-                            SearchResultButton(onSelect: onSelect, album: album)
-                        }
-                    }
-                    
-                }
+                resultsView()
             }
             .navigationTitle("Find Album")
+        }
+    }
+    
+    private func resultsView() -> some View {
+        return List {
+            Section(header: Text("Library")){
+                ForEach(librarySearchResults, id: \.id) { album in
+                    SearchResultButton(onSelect: onSelect, album: album)
+                }
+            }
+            Section(header: Text("Apple Music")){
+                ForEach(catalogSearchResults, id: \.id) { album in
+                    SearchResultButton(onSelect: onSelect, album: album)
+                }
+            }
+            
         }
     }
     

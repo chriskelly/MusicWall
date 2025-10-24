@@ -54,16 +54,7 @@ struct GridLayout: View {
                             isSelected: selectedAlbumID == album.id.rawValue,
                             onDeleteSnackbar: onDeleteSnackbar
                         )
-                        .onTapGesture {
-                            selectedAlbumID = album.id.rawValue
-                            Task {
-                                do {
-                                    try await album.play()
-                                } catch {
-                                    print(error.localizedDescription)
-                                }
-                            }
-                        }
+                        .onTapGesture {onTileTap(album: album)}
                     }
                 }
                 .padding(20)
@@ -81,35 +72,7 @@ struct GridLayout: View {
         
         var body: some View {
             VStack {
-                AlbumArtwork(album: album, viewSize: GridLayout.size)
-                    .frame(width: isSelected ? 50 : GridLayout.size,
-                           height: isSelected ? 50 : GridLayout.size)
-                    .clipShape(
-                        isSelected
-                        ? AnyShape(Circle())
-                        : AnyShape(RoundedRectangle(cornerRadius: 20))
-                    )
-                    .overlay(
-                        Circle().inset(by: -25).stroke(Color.black.opacity(0.95), lineWidth: isSelected ? 50 : 0)
-                    )
-                    .overlay(Circle().inset(by: -5).stroke(Color.black, lineWidth: isSelected ? 5 : 0))
-                    .overlay(Circle().inset(by: -20).stroke(Color.black, lineWidth: isSelected ? 2 : 0))
-                    .overlay(Circle().inset(by: -35).stroke(Color.black, lineWidth: isSelected ? 2 : 0))
-                    .frame(width: GridLayout.size, height: GridLayout.size)
-                    .animation(.default, value: isSelected)
-                    .rotationEffect(.degrees(isSelected ? 360 : 0))
-                    .animation(
-                        isSelected
-                        ? .linear(duration: 1.5).repeatForever(autoreverses: false)
-                        : .default,
-                        value: isSelected
-                    )
-                    .id(animationID)
-                    .onChange(of: isSelected, { wasSelected, isNowSelected in
-                        if wasSelected && !isNowSelected {
-                            animationID = UUID() // forces the View to rebuild, which is necessary to force all animations to stop even when out of view
-                        }
-                    })
+                vinylAnimation(AlbumArtwork(album: album, viewSize: GridLayout.size))
                 Text(album.title)
                     .lineLimit(1)
                     .allowsTightening(true)
@@ -119,25 +82,61 @@ struct GridLayout: View {
                     .allowsTightening(true)
                     .font(.footnote)
             }
-            .contextMenu {TileContextMenu(album: album, onDeleteSnackbar: onDeleteSnackbar)}
+            .contextMenu {tileContextMenu()}
             .padding(.bottom, 25)
         }
         
-        struct TileContextMenu: View {
-            let album: SavedAlbum
-            let onDeleteSnackbar: (SavedAlbum) -> Void
-            
-            @Environment(SavedAlbums.self) private var albums
-            
-            var body: some View {
-                Button(role: .destructive) {
-                    if let index = albums.items.firstIndex(where: { $0.id == album.id }) {
-                        albums.items.remove(at: index)
-                        onDeleteSnackbar(album)
+        private func vinylAnimation(_ content: some View) -> some View {
+            content
+                .frame(width: isSelected ? 50 : GridLayout.size,
+                       height: isSelected ? 50 : GridLayout.size)
+                .clipShape(
+                    isSelected
+                    ? AnyShape(Circle())
+                    : AnyShape(RoundedRectangle(cornerRadius: 20))
+                )
+                .overlay(
+                    Circle().inset(by: -25).stroke(Color.black.opacity(0.95), lineWidth: isSelected ? 50 : 0)
+                )
+                .overlay(Circle().inset(by: -5).stroke(Color.black, lineWidth: isSelected ? 5 : 0))
+                .overlay(Circle().inset(by: -20).stroke(Color.black, lineWidth: isSelected ? 2 : 0))
+                .overlay(Circle().inset(by: -35).stroke(Color.black, lineWidth: isSelected ? 2 : 0))
+                .frame(width: GridLayout.size, height: GridLayout.size)
+                .animation(.default, value: isSelected)
+                .rotationEffect(.degrees(isSelected ? 360 : 0))
+                .animation(
+                    isSelected
+                    ? .linear(duration: 1.5).repeatForever(autoreverses: false)
+                    : .default,
+                    value: isSelected
+                )
+                .id(animationID)
+                .onChange(of: isSelected, { wasSelected, isNowSelected in
+                    if wasSelected && !isNowSelected {
+                        animationID = UUID() // forces the View to rebuild, which is necessary to force all animations to stop even when out of view
                     }
-                } label: {
-                    Label("Remove Album", systemImage: "trash")
+                })
+        }
+        
+        private func tileContextMenu() -> some View {
+            Button(role: .destructive) {
+                if let index = albums.items.firstIndex(where: { $0.id == album.id }) {
+                    albums.items.remove(at: index)
+                    onDeleteSnackbar(album)
                 }
+            } label: {
+                Label("Remove Album", systemImage: "trash")
+            }
+        }
+    }
+    
+    private func onTileTap(album: SavedAlbum) {
+        selectedAlbumID = album.id.rawValue
+        Task {
+            do {
+                try await album.play()
+            } catch {
+                print(error.localizedDescription)
             }
         }
     }
@@ -150,25 +149,8 @@ struct ListLayout: View {
         LayoutContainer { onDeleteSnackbar in
             List {
                 ForEach(albums.items) { album in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(album.title)
-                                .font(.headline)
-                            Text(album.artistName)
-                                .font(.footnote)
-                        }
-                        Spacer()
-                        AlbumArtwork(album: album, viewSize: CGFloat(60))
-                    }
-                    .onTapGesture {
-                        Task {
-                            do {
-                                try await album.play()
-                            } catch {
-                                print(error.localizedDescription)
-                            }
-                        }
-                    }
+                    listItem(album)
+                    .onTapGesture {onListItemTap(album)}
                 }
                 .onDelete { indexSet in
                     let deletedAlbums = indexSet.map { albums.items[$0] }
@@ -177,6 +159,29 @@ struct ListLayout: View {
                         onDeleteSnackbar(deletedAlbums.first!)
                     }
                 }
+            }
+        }
+    }
+    
+    private func listItem(_ album: SavedAlbum) -> some View {
+        return HStack {
+            VStack(alignment: .leading) {
+                Text(album.title)
+                    .font(.headline)
+                Text(album.artistName)
+                    .font(.footnote)
+            }
+            Spacer()
+            AlbumArtwork(album: album, viewSize: CGFloat(60))
+        }
+    }
+    
+    private func onListItemTap(_ album: SavedAlbum){
+        Task {
+            do {
+                try await album.play()
+            } catch {
+                print(error.localizedDescription)
             }
         }
     }

@@ -17,16 +17,7 @@ struct ContentView: View {
             if isAuthorized {
                 HomePageView(albums: SavedAlbums())
             } else if authorizationDenied {
-                VStack {
-                    Text("Apple Music access is required to use this app.")
-                        .multilineTextAlignment(.center)
-                        .padding()
-                    Button("Try Again") {
-                        Task {
-                            await requestAuthorization()
-                        }
-                    }
-                }
+                authorizationDeniedView()
             } else {
                 ProgressView("Requesting Music Access…")
             }
@@ -36,7 +27,20 @@ struct ContentView: View {
         }
     }
     
-    func requestAuthorization() async {
+    private func authorizationDeniedView() -> some View {
+        return VStack {
+            Text("Apple Music access is required to use this app.")
+                .multilineTextAlignment(.center)
+                .padding()
+            Button("Try Again") {
+                Task {
+                    await requestAuthorization()
+                }
+            }
+        }
+    }
+    
+    private func requestAuthorization() async {
         let status = await MusicAuthorization.request()
         switch status {
         case .authorized:

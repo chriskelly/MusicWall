@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MusicKit
 
 struct HomePageView: View {
     @State var albums: SavedAlbums
@@ -15,39 +16,47 @@ struct HomePageView: View {
     
     var body: some View {
         NavigationStack {
-            Group {
-                switch currentLayout {
-                case .grid:
-                    GridLayout()
-                case .list:
-                    ListLayout()
-                }
-            }
+            layoutView()
             .navigationTitle("My Albums")
-            .toolbar {
-                HomePageMenu(currentLayout: $currentLayout)
-                Button("Shuffle albums temporarily", systemImage: "shuffle.circle") {
-                    withAnimation {
-                        albums.temporarilyShuffle()
-                    }
-                }
-                Button("Add album", systemImage: "plus") {
-                    showingAddView = true
-                }
-            }
+            .toolbar {toolbarView()}
             .background(Color(.systemGray6))
         }
         .environment(albums)
         .sheet(isPresented: $showingAddView) {
-            AlbumSearchView(onSelect: { album in
-                albums.addAlbum(SavedAlbum(from: album))
-                showingAlbumAddSnackbar = true
-            })
+            AlbumSearchView(onSelect: onSearchSelect)
         }
         .snackbar(isPresented: $showingAlbumAddSnackbar, message: "Album successfully added!")
-        .task {
-            await albums.load()
+        .task {await albums.load()}
+    }
+    
+    private func layoutView() -> some View {
+        return Group {
+            switch currentLayout {
+            case .grid:
+                GridLayout()
+            case .list:
+                ListLayout()
+            }
         }
+    }
+    
+    private func toolbarView() -> some View {
+        return Group {
+            HomePageMenu(currentLayout: $currentLayout)
+            Button("Shuffle albums temporarily", systemImage: "shuffle.circle") {
+                withAnimation {
+                    albums.temporarilyShuffle()
+                }
+            }
+            Button("Add album", systemImage: "plus") {
+                showingAddView = true
+            }
+        }
+    }
+    
+    private func onSearchSelect(_ album: Album) {
+        albums.addAlbum(SavedAlbum(from: album))
+        showingAlbumAddSnackbar = true
     }
 }
 
