@@ -12,6 +12,7 @@ struct AlbumSearchView: View {
     @State private var query = ""
     @State private var catalogSearchResults: [Album] = []
     @State private var librarySearchResults: [Album] = []
+    @FocusState private var isSearchFieldFocused: Bool
     
     var onSelect: (Album) -> Void
     
@@ -21,7 +22,9 @@ struct AlbumSearchView: View {
                 TextField("Search for an album", text: $query)
                     .textFieldStyle(.roundedBorder)
                     .padding()
+                    .focused($isSearchFieldFocused)
                 Button("Search") {
+                    isSearchFieldFocused = false
                     Task {await searchAlbums()}
                 }
                 List {
