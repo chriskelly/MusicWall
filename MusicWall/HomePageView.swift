@@ -9,9 +9,9 @@ import SwiftUI
 
 struct HomePageView: View {
     @State var albums: SavedAlbums
-    
     @State private var showingAddView = false
     @State private var currentLayout = LayoutMenu.loadLayout() ?? .grid
+    @State private var showingAlbumAddSnackbar = false
     
     var body: some View {
         NavigationStack {
@@ -39,10 +39,11 @@ struct HomePageView: View {
         .environment(albums)
         .sheet(isPresented: $showingAddView) {
             AlbumSearchView(onSelect: { album in
-                albums.items.append(SavedAlbum(from: album))
-                albums.applySort()
+                albums.addAlbum(SavedAlbum(from: album))
+                showingAlbumAddSnackbar = true
             })
         }
+        .snackbar(isPresented: $showingAlbumAddSnackbar, message: "Album successfully added!")
         .task {
             await albums.load()
         }

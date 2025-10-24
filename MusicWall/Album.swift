@@ -128,6 +128,12 @@ class SavedAlbums {
         return sortDirection[option] ?? true
     }
     
+    /// Adds album and resorts items list
+    func addAlbum(_ album: SavedAlbum) {
+        items.append(album)
+        applySort()
+    }
+    
     func temporarilyShuffle() {
         itemsSavingLocked = true
         items.shuffle()
