@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct LayoutContainer<Content: View>: View {
-    @Environment(SavedAlbums.self) private var albums
-    @State private var deletedAlbum: SavedAlbum?
+    @Environment(StoredAlbums.self) private var albums
+    @State private var deletedAlbum: StoredAlbum?
     @State private var showAlbumDeleteSnackbar = false
     
     private let content: (
-        _ onDeleteSnackbar: @escaping (SavedAlbum) -> Void
+        _ onDeleteSnackbar: @escaping (StoredAlbum) -> Void
     ) -> Content
     
-    init(@ViewBuilder content: @escaping (_ onDeleteSnackbar: @escaping (SavedAlbum) -> Void) -> Content) {
+    init(@ViewBuilder content: @escaping (_ onDeleteSnackbar: @escaping (StoredAlbum) -> Void) -> Content) {
         self.content = content
     }
     
@@ -39,7 +39,7 @@ struct LayoutContainer<Content: View>: View {
 }
 
 struct GridLayout: View {
-    @Environment(SavedAlbums.self) private var albums
+    @Environment(StoredAlbums.self) private var albums
     @State private var selectedAlbumID: String?
     
     private static let size = CGFloat(150)
@@ -63,12 +63,12 @@ struct GridLayout: View {
     }
     
     struct AlbumTile: View {
-        let album: SavedAlbum
+        let album: StoredAlbum
         let isSelected: Bool
-        let onDeleteSnackbar: (SavedAlbum) -> Void
+        let onDeleteSnackbar: (StoredAlbum) -> Void
         
         @State private var animationID = UUID()
-        @Environment(SavedAlbums.self) private var albums
+        @Environment(StoredAlbums.self) private var albums
         
         var body: some View {
             VStack {
@@ -130,7 +130,7 @@ struct GridLayout: View {
         }
     }
     
-    private func onTileTap(album: SavedAlbum) {
+    private func onTileTap(album: StoredAlbum) {
         selectedAlbumID = album.id.rawValue
         Task {
             do {
@@ -143,7 +143,7 @@ struct GridLayout: View {
 }
 
 struct ListLayout: View {
-    @Environment(SavedAlbums.self) private var albums
+    @Environment(StoredAlbums.self) private var albums
     
     var body: some View {
         LayoutContainer { onDeleteSnackbar in
@@ -163,7 +163,7 @@ struct ListLayout: View {
         }
     }
     
-    private func listItem(_ album: SavedAlbum) -> some View {
+    private func listItem(_ album: StoredAlbum) -> some View {
         return HStack {
             VStack(alignment: .leading) {
                 Text(album.title)
@@ -176,7 +176,7 @@ struct ListLayout: View {
         }
     }
     
-    private func onListItemTap(_ album: SavedAlbum){
+    private func onListItemTap(_ album: StoredAlbum){
         Task {
             do {
                 try await album.play()
@@ -188,7 +188,7 @@ struct ListLayout: View {
 }
 
 struct AlbumArtwork: View {
-    let album: SavedAlbum
+    let album: StoredAlbum
     let viewSize: CGFloat
     
     @State private var imageURL: URL?
@@ -254,9 +254,9 @@ struct LayoutMenu: View {
     @Previewable @State var layout: LayoutMenu.Option = .grid
     LayoutMenu(currentLayout: $layout)
     ListLayout()
-        .environment(SavedAlbums.dummyData())
+        .environment(StoredAlbums.dummyData())
     GridLayout()
-        .environment(SavedAlbums.dummyData())
+        .environment(StoredAlbums.dummyData())
     
 }
 

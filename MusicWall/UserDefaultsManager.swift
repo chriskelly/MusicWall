@@ -11,7 +11,7 @@ import MusicKit
 
 class UserDefaultsManager {
     enum Key: String {
-        case savedAlbumsItemsKey = "savedAlbumsItemsKey"
+        case storedAlbumsItemsKey = "savedAlbumsItemsKey"
         case backupAlbumIDsKey = "backupIDsKey"
         case sortDirectionKey = "sortDirectionKey"
         case currentSortKey = "currentSortKey"

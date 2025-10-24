@@ -9,7 +9,7 @@ import Foundation
 import MusicKit
 
 
-struct SavedAlbum: Identifiable, Codable {
+struct StoredAlbum: Identifiable, Codable {
     let id: MusicItemID
     let title: String
     let artistName: String
@@ -18,8 +18,8 @@ struct SavedAlbum: Identifiable, Codable {
     func play() async throws { try await MusicService.playAlbum(id: id) }
 }
 
-extension SavedAlbum {
-    init(from album:Album) {
+extension StoredAlbum {
+    init(from album:MusicKitAlbum) {
         self.id = album.id
         self.title = album.title
         self.artistName = album.artistName
@@ -28,13 +28,13 @@ extension SavedAlbum {
 }
 
 @Observable
-class SavedAlbums {
+class StoredAlbums {
     private var itemsSavingLocked = false
     
-    var items = [SavedAlbum]() {
+    var items = [StoredAlbum]() {
         didSet {
             if !itemsSavingLocked {
-                UserDefaultsManager.setData(key: .savedAlbumsItemsKey, data: items)
+                UserDefaultsManager.setData(key: .storedAlbumsItemsKey, data: items)
                 UserDefaultsManager.setData(key: .backupAlbumIDsKey, data: items.map { $0.id.rawValue })
             }
         }
@@ -49,8 +49,8 @@ class SavedAlbums {
     private func loadItems() async {
         itemsSavingLocked = true
         items = UserDefaultsManager.loadData(
-            key: .savedAlbumsItemsKey,
-            type: [SavedAlbum].self
+            key: .storedAlbumsItemsKey,
+            type: [StoredAlbum].self
         ) ?? []
         if items.isEmpty {
             let backupIDs = UserDefaultsManager.loadData(
@@ -59,7 +59,7 @@ class SavedAlbums {
             ) ?? []
             if let albums = try? await MusicService.fetchAlbums(ids: backupIDs) {
                 itemsSavingLocked = false
-                items = albums.map { SavedAlbum(from: $0) }
+                items = albums.map { StoredAlbum(from: $0) }
             }
         }
         itemsSavingLocked = false
@@ -129,7 +129,7 @@ class SavedAlbums {
     }
     
     /// Adds album and resorts items list
-    func addAlbum(_ album: SavedAlbum) {
+    func addAlbum(_ album: StoredAlbum) {
         items.append(album)
         applySort()
     }
@@ -140,14 +140,14 @@ class SavedAlbums {
         itemsSavingLocked = false
     }
     
-    static func dummyData() -> SavedAlbums {
-        let savedAlbums = SavedAlbums()
-        savedAlbums.items = [
-            SavedAlbum(id: MusicItemID("\(UUID())"), title: "Take Care", artistName: "Drake", releaseDate: Date()),
-            SavedAlbum(id: MusicItemID("\(UUID())"), title: "Born Sinners", artistName: "J. Cole", releaseDate: nil),
-            SavedAlbum(id: MusicItemID("\(UUID())"), title: "Good Kid, m.A.A.d City", artistName: "Kendrick Lamar", releaseDate: Date(timeIntervalSinceNow: 500)),
+    static func dummyData() -> StoredAlbums {
+        let storedAlbums = StoredAlbums()
+        storedAlbums.items = [
+            StoredAlbum(id: MusicItemID("\(UUID())"), title: "Take Care", artistName: "Drake", releaseDate: Date()),
+            StoredAlbum(id: MusicItemID("\(UUID())"), title: "Born Sinners", artistName: "J. Cole", releaseDate: nil),
+            StoredAlbum(id: MusicItemID("\(UUID())"), title: "Good Kid, m.A.A.d City", artistName: "Kendrick Lamar", releaseDate: Date(timeIntervalSinceNow: 500)),
         ]
-        return savedAlbums
+        return storedAlbums
     }
 }
 

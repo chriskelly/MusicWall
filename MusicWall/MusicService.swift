@@ -8,6 +8,7 @@
 import MusicKit
 import Foundation
 
+typealias MusicKitAlbum = MusicKit.Album
 
 enum MusicService {
     enum Location {
@@ -15,18 +16,18 @@ enum MusicService {
         case library
     }
     
-    static func searchAlbums(query: String, location: Location) async throws -> [Album] {
+    static func searchAlbums(query: String, location: Location) async throws -> [MusicKitAlbum] {
         guard !query.isEmpty else {
             throw MusicServiceError.invalidQuery
         }
         do {
             switch location {
             case .catalog:
-                let request = MusicCatalogSearchRequest(term: query, types: [Album.self])
+                let request = MusicCatalogSearchRequest(term: query, types: [MusicKitAlbum.self])
                 let response = try await request.response()
                 return Array(response.albums)
             case .library:
-                let request = MusicLibrarySearchRequest(term: query, types: [Album.self])
+                let request = MusicLibrarySearchRequest(term: query, types: [MusicKitAlbum.self])
                 let response = try await request.response()
                 return Array(response.albums)
             }
@@ -35,18 +36,18 @@ enum MusicService {
         }
     }
     
-    static func fetchAlbums(ids: [String]) async throws -> [Album] {
+    static func fetchAlbums(ids: [String]) async throws -> [MusicKitAlbum] {
         guard !ids.isEmpty else {return []}
         do {
             let musicItemIDs = ids.map { MusicItemID($0) }
-            var libraryRequest = MusicLibraryRequest<Album>()
+            var libraryRequest = MusicLibraryRequest<MusicKitAlbum>()
             libraryRequest.filter(matching: \.id, memberOf: musicItemIDs)
             let libraryResponse = try await libraryRequest.response()
             let libraryAlbums = Array(libraryResponse.items)
             if !libraryAlbums.isEmpty {
                 return libraryAlbums
             }
-            let catalogRequest = MusicCatalogResourceRequest<Album>(matching: \.id, memberOf: musicItemIDs)
+            let catalogRequest = MusicCatalogResourceRequest<MusicKitAlbum>(matching: \.id, memberOf: musicItemIDs)
             let catalogResponse = try await catalogRequest.response()
             if catalogResponse.items.isEmpty {throw MusicServiceError.albumNotFound}
             return Array(catalogResponse.items)

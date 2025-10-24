@@ -10,11 +10,11 @@ import MusicKit
 
 struct AlbumSearchView: View {
     @State private var query = ""
-    @State private var catalogSearchResults: [Album] = []
-    @State private var librarySearchResults: [Album] = []
+    @State private var catalogSearchResults: [MusicKitAlbum] = []
+    @State private var librarySearchResults: [MusicKitAlbum] = []
     @FocusState private var isSearchFieldFocused: Bool
     
-    var onSelect: (Album) -> Void
+    var onSelect: (MusicKitAlbum) -> Void
     
     var body: some View {
         NavigationStack {
@@ -52,8 +52,8 @@ struct AlbumSearchView: View {
     struct SearchResultButton:View {
         @Environment(\.dismiss) var dismiss
         
-        var onSelect: (Album) -> Void
-        var album: Album
+        var onSelect: (MusicKitAlbum) -> Void
+        var album: MusicKitAlbum
         
         var body: some View {
             Button {

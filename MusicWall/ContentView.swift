@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         Group {
             if isAuthorized {
-                HomePageView(albums: SavedAlbums())
+                HomePageView(albums: StoredAlbums())
             } else if authorizationDenied {
                 authorizationDeniedView()
             } else {

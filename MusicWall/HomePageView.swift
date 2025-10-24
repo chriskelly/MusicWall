@@ -9,7 +9,7 @@ import SwiftUI
 import MusicKit
 
 struct HomePageView: View {
-    @State var albums: SavedAlbums
+    @State var albums: StoredAlbums
     @State private var showingAddView = false
     @State private var currentLayout = LayoutMenu.loadLayout() ?? .grid
     @State private var showingAlbumAddSnackbar = false
@@ -54,8 +54,8 @@ struct HomePageView: View {
         }
     }
     
-    private func onSearchSelect(_ album: Album) {
-        albums.addAlbum(SavedAlbum(from: album))
+    private func onSearchSelect(_ album: MusicKitAlbum) {
+        albums.addAlbum(StoredAlbum(from: album))
         showingAlbumAddSnackbar = true
     }
 }
@@ -74,11 +74,11 @@ struct HomePageMenu: View {
 }
 
 struct SortMenu: View {
-    @Environment(SavedAlbums.self) private var albums
+    @Environment(StoredAlbums.self) private var albums
     
     var body: some View {
         Section {
-            ForEach(SavedAlbums.SortOptions.allCases) {option in
+            ForEach(StoredAlbums.SortOptions.allCases) {option in
                 Button {
                     if albums.currentSort == option {
                         albums.toggleSortDirection(for: option)
@@ -104,5 +104,5 @@ struct SortMenu: View {
 
 
 #Preview {
-    HomePageView(albums: SavedAlbums.dummyData())
+    HomePageView(albums: StoredAlbums.dummyData())
 }
