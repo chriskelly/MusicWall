@@ -142,6 +142,27 @@ class StoredAlbums {
         itemsSavingLocked = false
     }
     
+    func exportAlbumIDs() -> [String] {
+        return items.map { $0.id.rawValue }
+    }
+    
+    @MainActor
+    func importAlbums(from ids: [String]) async throws {
+        guard !ids.isEmpty else { return }
+        
+        let fetchedAlbums = try await MusicService.fetchAlbums(ids: ids)
+        let storedAlbums = fetchedAlbums.map { StoredAlbum(from: $0) }
+        
+        itemsSavingLocked = true
+        for album in storedAlbums {
+            if !items.contains(where: { $0.id == album.id }) {
+                items.append(album)
+            }
+        }
+        itemsSavingLocked = false
+        applySort()
+    }
+    
     static func dummyData() -> StoredAlbums {
         let storedAlbums = StoredAlbums()
         storedAlbums.items = [
