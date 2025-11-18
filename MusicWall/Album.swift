@@ -16,6 +16,7 @@ struct StoredAlbum: Identifiable, Codable {
     let releaseDate: Date?
     
     func play() async throws { try await MusicService.playAlbum(id: id) }
+    func pause() { MusicService.pauseAlbum() }
 }
 
 extension StoredAlbum {

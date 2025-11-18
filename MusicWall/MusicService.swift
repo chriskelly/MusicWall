@@ -68,6 +68,10 @@ enum MusicService {
             throw MusicServiceError.playbackFailed(error.localizedDescription)
         }
     }
+    
+    static func pauseAlbum() {
+        SystemMusicPlayer.shared.pause()
+    }
 }
 
 enum MusicServiceError: Error, LocalizedError {

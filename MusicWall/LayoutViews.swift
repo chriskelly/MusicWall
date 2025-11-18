@@ -54,7 +54,10 @@ struct GridLayout: View {
                             isSelected: selectedAlbumID == album.id.rawValue,
                             onDeleteSnackbar: onDeleteSnackbar
                         )
-                        .onTapGesture {onTileTap(album: album)}
+                        .onTapGesture {onAlbumTapped(
+                            album: album,
+                            selectedAlbumIdBinding: $selectedAlbumID
+                        )}
                     }
                 }
                 .padding(20)
@@ -129,28 +132,21 @@ struct GridLayout: View {
             }
         }
     }
-    
-    private func onTileTap(album: StoredAlbum) {
-        selectedAlbumID = album.id.rawValue
-        Task {
-            do {
-                try await album.play()
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-    }
 }
 
 struct ListLayout: View {
     @Environment(StoredAlbums.self) private var albums
+    @State private var selectedAlbumID: String?
     
     var body: some View {
         LayoutContainer { onDeleteSnackbar in
             List {
                 ForEach(albums.items) { album in
                     listItem(album)
-                    .onTapGesture {onListItemTap(album)}
+                        .onTapGesture {onAlbumTapped(
+                            album: album, 
+                            selectedAlbumIdBinding: $selectedAlbumID
+                        )}
                 }
                 .onDelete { indexSet in
                     let deletedAlbums = indexSet.map { albums.items[$0] }
@@ -175,8 +171,14 @@ struct ListLayout: View {
             AlbumArtwork(album: album, viewSize: CGFloat(60))
         }
     }
-    
-    private func onListItemTap(_ album: StoredAlbum){
+}
+
+private func onAlbumTapped(album: StoredAlbum, selectedAlbumIdBinding: Binding<String?>) {
+    if selectedAlbumIdBinding.wrappedValue == album.id.rawValue {
+        album.pause()
+        selectedAlbumIdBinding.wrappedValue = nil
+    } else {
+        selectedAlbumIdBinding.wrappedValue = album.id.rawValue
         Task {
             do {
                 try await album.play()
