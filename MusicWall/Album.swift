@@ -137,6 +137,14 @@ class StoredAlbums {
         }
     }
     
+    /// Updates an existing album and resorts items list
+    func updateAlbum(_ album: StoredAlbum) {
+        if let index = items.firstIndex(where: { $0.id == album.id }) {
+            items[index] = album
+            applySort()
+        }
+    }
+    
     func temporarilyShuffle() {
         itemsSavingLocked = true
         items.shuffle()

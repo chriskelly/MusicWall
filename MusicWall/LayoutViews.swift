@@ -11,20 +11,34 @@ struct LayoutContainer<Content: View>: View {
     @Environment(StoredAlbums.self) private var albums
     @State private var deletedAlbum: StoredAlbum?
     @State private var showAlbumDeleteSnackbar = false
+    @State private var editingAlbum: StoredAlbum?
     
     private let content: (
-        _ onDeleteSnackbar: @escaping (StoredAlbum) -> Void
+        _ onDeleteSnackbar: @escaping (StoredAlbum) -> Void,
+        _ onEdit: @escaping (StoredAlbum) -> Void
     ) -> Content
     
-    init(@ViewBuilder content: @escaping (_ onDeleteSnackbar: @escaping (StoredAlbum) -> Void) -> Content) {
+    init(@ViewBuilder content: @escaping (
+        _ onDeleteSnackbar: @escaping (StoredAlbum) -> Void, 
+        _ onEdit: @escaping (StoredAlbum) -> Void
+    ) -> Content) {
         self.content = content
     }
     
+    private func handleDeleteSnackbar(album: StoredAlbum) {
+        deletedAlbum = album
+        showAlbumDeleteSnackbar = true
+    }
+    
+    private func handleEdit(album: StoredAlbum) {
+        editingAlbum = album
+    }
+    
     var body: some View {
-        content({ album in
-            deletedAlbum = album
-            showAlbumDeleteSnackbar = true
-        })
+        content(
+            handleDeleteSnackbar,
+            handleEdit
+        )
         .snackbar(
             isPresented: $showAlbumDeleteSnackbar,
             message: "Removed \(deletedAlbum?.title ?? "album")",
@@ -35,6 +49,11 @@ struct LayoutContainer<Content: View>: View {
                 }
             }
         )
+        .sheet(item: $editingAlbum) { album in
+            AlbumEditView(album: album) { updatedAlbum in
+                albums.updateAlbum(updatedAlbum)
+            }
+        }
     }
 }
 
@@ -45,14 +64,15 @@ struct GridLayout: View {
     private static let size = CGFloat(150)
     
     var body: some View {
-        LayoutContainer { onDeleteSnackbar in
+        LayoutContainer { onDeleteSnackbar, onEdit in
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: GridLayout.size))]) {
                     ForEach(albums.items) { album in
                         AlbumTile(
                             album: album,
                             isSelected: selectedAlbumID == album.id.rawValue,
-                            onDeleteSnackbar: onDeleteSnackbar
+                            onDeleteSnackbar: onDeleteSnackbar,
+                            onEdit: onEdit
                         )
                         .onTapGesture {onAlbumTapped(
                             album: album,
@@ -69,6 +89,7 @@ struct GridLayout: View {
         let album: StoredAlbum
         let isSelected: Bool
         let onDeleteSnackbar: (StoredAlbum) -> Void
+        let onEdit: (StoredAlbum) -> Void
         
         @State private var animationID = UUID()
         @Environment(StoredAlbums.self) private var albums
@@ -122,13 +143,21 @@ struct GridLayout: View {
         }
         
         private func tileContextMenu() -> some View {
-            Button(role: .destructive) {
-                if let index = albums.items.firstIndex(where: { $0.id == album.id }) {
-                    albums.items.remove(at: index)
-                    onDeleteSnackbar(album)
+            Group {
+                Button {
+                    onEdit(album)
+                } label: {
+                    Label("Edit", systemImage: "pencil")
                 }
-            } label: {
-                Label("Remove Album", systemImage: "trash")
+                
+                Button(role: .destructive) {
+                    if let index = albums.items.firstIndex(where: { $0.id == album.id }) {
+                        albums.items.remove(at: index)
+                        onDeleteSnackbar(album)
+                    }
+                } label: {
+                    Label("Remove Album", systemImage: "trash")
+                }
             }
         }
     }
@@ -139,7 +168,7 @@ struct ListLayout: View {
     @State private var selectedAlbumID: String?
     
     var body: some View {
-        LayoutContainer { onDeleteSnackbar in
+        LayoutContainer { onDeleteSnackbar, onEdit in
             List {
                 ForEach(albums.items) { album in
                     listItem(album)
@@ -147,6 +176,14 @@ struct ListLayout: View {
                             album: album, 
                             selectedAlbumIdBinding: $selectedAlbumID
                         )}
+                        .swipeActions(edge: .leading) {
+                            Button {
+                                onEdit(album)
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            .tint(.blue)
+                        }
                 }
                 .onDelete { indexSet in
                     let deletedAlbums = indexSet.map { albums.items[$0] }
