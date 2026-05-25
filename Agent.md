@@ -18,7 +18,7 @@ flowchart LR
 |-------|---------|-----------|-------|
 | Fast feedback | PR + label `no-deploy` | Simulator build only (`ci_build`) | Optional |
 | Feature validation | PR push (default) | match → build → **TestFlight internal** | **Test on device** before approving PR |
-| Store release | Push tag `v*` (e.g. `v1.2.0`) or **Actions → iOS Release → Run workflow** with version `1.2.0` | Upload + **submit for review** | Approve release in App Store Connect |
+| Store release | Push tag `v*` (e.g. `v1.2.0`) or **Actions → iOS Release → Run workflow** with version `1.2.0` | Upload + **submit for review**; **automatic release** after Apple approves | Monitor in App Store Connect (no manual Release click) |
 
 **Rules for agents**
 
@@ -107,6 +107,7 @@ Before marking work complete:
 - **PR marketing version:** Fastlane `resolve_marketing_version_for_preview` reads the highest version on App Store Connect. If `MARKETING_VERSION` in the project is not **above** that (e.g. store already has 1.2), CI bumps the patch (→ 1.3) for the upload only. You do not need to bump the project after every shipped release for TestFlight to work.
 - **Source of truth in git:** Keep `MARKETING_VERSION` in `project.pbxproj` at the version you are developing toward (currently **1.2**). After a store release, bump it when you start the next feature cycle (or let the first PR preview auto-select the next train).
 - **Release tag `v1.2.0` or manual dispatch:** `CFBundleShortVersionString` = `1.2.0` from the tag/input; build number uses the same ASC lookup for that version.
+- **Release after approval:** `automatic_release: true` in Fastlane — the version goes live automatically when App Review passes (not “Pending Developer Release”). To hold a release, set `automatic_release: false` or change the version in ASC before approval.
 - **Export compliance:** `ITSAppUsesNonExemptEncryption = NO` in the app Info.plist; TestFlight upload passes `uses_non_exempt_encryption: false` (App Store upload uses the plist only).
 - **App Store metadata (release):** Edit `fastlane/metadata/en-CA/release_notes.txt` (What’s New) and keep `copyright.txt` as the current year before each store release. Primary locale is **English (Canada)** (`en-CA`). Deliver uploads these files when `skip_metadata: false` on the release lane.
 - **Precheck:** Runs on **preview** (before build) and **release** (before submit). `default_rule_level: :error` — warnings fail CI. IAP checks are off (API key limitation). Validates the **live App Store Connect listing**, not the PR diff.

@@ -208,7 +208,7 @@ platform :ios do
     upload_to_app_store(
       api_key: asc_api_key,
       submit_for_review: true,
-      automatic_release: false,
+      automatic_release: true,
       force: true,
       skip_metadata: false,
       skip_screenshots: true,
