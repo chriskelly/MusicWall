@@ -101,19 +101,31 @@ Before marking work complete:
 - Do not push directly to `main` if branch protection is enabled.
 - Release to App Store is **tag-driven** (`v1.2.0`), not merge-driven.
 
+## Build numbers and versions
+
+- **PR / TestFlight:** `CFBundleVersion` = `github.run_number` (set via `BUILD_NUMBER` in `ios-preview.yml`).
+- **Release tag `v1.2.0`:** `CFBundleShortVersionString` = `1.2.0`; build number still `github.run_number` from `ios-release.yml`.
+- Do not reuse a build number already uploaded for `chris.MusicWall`.
+
 ## Secrets (humans only)
 
 Stored in GitHub → Settings → Secrets and variables → Actions:
 
-- `MATCH_PASSWORD`, `MATCH_GIT_PRIVATE_KEY`
-- `APP_STORE_CONNECT_API_KEY_*` (Key ID, Issuer ID, base64 `.p8`)
+| Secret | Purpose |
+|--------|---------|
+| `MATCH_PASSWORD` | Decrypt match cert repo |
+| `MATCH_GIT_PRIVATE_KEY` | SSH deploy key (read cert repo) |
+| `MATCH_GIT_URL` | `git@github.com:…/musicwall-match-certs.git` |
+| `APP_STORE_CONNECT_API_KEY_KEY_ID` | App Store Connect API |
+| `APP_STORE_CONNECT_API_KEY_ISSUER_ID` | App Store Connect API |
+| `APP_STORE_CONNECT_API_KEY_CONTENT` | Base64 `.p8` key |
 
-Agents: reference secret **names** in workflow docs only; never print or commit values.
+Agents: reference secret **names** only; never print or commit values.
 
 ## Specs and plans
 
 - Design: `docs/specs/2026-05-24-ios-cicd-design.md`
-- Implementation plan: `docs/plans/2026-05-24-ios-cicd.md` (when present)
+- Implementation plan: `docs/plans/2026-05-24-ios-cicd.md`
 
 ## Common failures
 
