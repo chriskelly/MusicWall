@@ -48,7 +48,7 @@ def latest_app_store_version_string
   app = Spaceship::ConnectAPI::App.find(ENV["APP_IDENTIFIER"] || "chris.MusicWall")
   return nil unless app
 
-  versions = Spaceship::ConnectAPI::AppStoreVersion.all(app_id: app.id, limit: 100)
+  versions = app.get_app_store_versions(limit: 100)
   strings = versions.map(&:version_string).compact
   strings.max_by { |s| Gem::Version.new(s) }
 rescue StandardError => e
