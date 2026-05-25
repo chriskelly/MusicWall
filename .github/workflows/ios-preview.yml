@@ -1,0 +1,94 @@
+name: iOS Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to comment on (required for manual runs)
+        required: true
+        type: string
+
+# One run per PR commit; do not cancel in-progress (avoids killing manual re-runs mid-setup)
+concurrency:
+  group: ios-preview-${{ github.event.pull_request.number || inputs.pr_number }}-${{ github.event.pull_request.head.sha || github.sha }}
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    name: Build and deploy preview
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: macos-26
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      CI: true
+      APP_IDENTIFIER: chris.MusicWall
+      DEVELOPMENT_TEAM: CD8XP2U645
+      BUILD_NUMBER: ${{ github.run_number }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+      APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+      APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+      APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+    steps:
+      - name: Check for no-deploy label
+        id: labels
+        uses: actions/github-script@v8
+        with:
+          script: |
+            let labels = [];
+            if (context.eventName === 'workflow_dispatch') {
+              const prNumber = Number('${{ inputs.pr_number }}');
+              const { data: pr } = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+              });
+              labels = pr.labels.map((l) => l.name);
+            } else {
+              labels = context.payload.pull_request.labels.map((l) => l.name);
+            }
+            return labels.includes('no-deploy');
+          result-encoding: string
+
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Configure SSH for match
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
+
+      - name: Add GitHub to known_hosts
+        run: ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+
+      - name: Simulator build (no-deploy)
+        if: steps.labels.outputs.result == 'true'
+        run: bundle exec fastlane ci_build
+
+      - name: TestFlight preview
+        if: steps.labels.outputs.result != 'true'
+        run: bundle exec fastlane preview
+
+      - name: Comment on PR
+        if: success()
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          PREVIEW_MODE: ${{ steps.labels.outputs.result == 'true' && 'simulator' || 'testflight' }}
+          BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+        with:
+          script: |
+            const comment = require('./.github/scripts/ios-preview-pr-comment.js');
+            await comment({ github, context, core });
