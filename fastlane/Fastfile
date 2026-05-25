@@ -139,6 +139,15 @@ rescue StandardError => e
   ENV.fetch("BUILD_NUMBER", "1")
 end
 
+def run_app_store_metadata_precheck
+  precheck(
+    api_key: asc_api_key,
+    app_identifier: BUNDLE_ID,
+    include_in_app_purchases: false,
+    default_rule_level: :error
+  )
+end
+
 platform :ios do
   desc "Simulator build only (no signing upload)"
   lane :ci_build do
@@ -154,6 +163,7 @@ platform :ios do
 
   desc "PR preview: TestFlight internal"
   lane :preview do
+    run_app_store_metadata_precheck
     prepare_appstore_signing
     marketing_version = resolve_marketing_version_for_preview
     build_number = resolve_build_number_for_upload(version: marketing_version)
@@ -175,11 +185,7 @@ platform :ios do
 
   desc "App Store precheck only (run locally before release; needs ASC API key env)"
   lane :precheck_release do
-    precheck(
-      api_key: asc_api_key,
-      app_identifier: BUNDLE_ID,
-      precheck_include_in_app_purchases: false
-    )
+    run_app_store_metadata_precheck
   end
 
   desc "Tagged release: App Store upload and submit for review"
@@ -204,9 +210,11 @@ platform :ios do
       submit_for_review: true,
       automatic_release: false,
       force: true,
-      skip_metadata: true,
+      skip_metadata: false,
       skip_screenshots: true,
-      precheck_include_in_app_purchases: false
+      precheck_include_in_app_purchases: false,
+      precheck_default_rule_level: :error,
+      run_precheck_before_submit: true
     )
   end
 end
