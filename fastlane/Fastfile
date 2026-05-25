@@ -34,6 +34,52 @@ def configure_appstore_signing
   )
 end
 
+def connect_api_token
+  Spaceship::ConnectAPI::Token.create(
+    key_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_KEY_ID"),
+    issuer_id: ENV.fetch("APP_STORE_CONNECT_API_KEY_ISSUER_ID"),
+    key: ENV.fetch("APP_STORE_CONNECT_API_KEY_CONTENT"),
+    is_key_content_base64: true
+  )
+end
+
+def latest_app_store_version_string
+  Spaceship::ConnectAPI.token = connect_api_token
+  app = Spaceship::ConnectAPI::App.find(ENV["APP_IDENTIFIER"] || "chris.MusicWall")
+  return nil unless app
+
+  versions = Spaceship::ConnectAPI::AppStoreVersion.all(app_id: app.id, limit: 100)
+  strings = versions.map(&:version_string).compact
+  strings.max_by { |s| Gem::Version.new(s) }
+rescue StandardError => e
+  UI.important("Could not read App Store Connect versions (#{e.message}); using project marketing version only.")
+  nil
+end
+
+def bump_patch_version(version_string)
+  segments = version_string.split(".")
+  segments << "0" if segments.length < 2
+  segments[-1] = (segments[-1].to_i + 1).to_s
+  segments.join(".")
+end
+
+def resolve_marketing_version_for_preview
+  project_version = get_version_number(xcodeproj: XCODEPROJ, target: "MusicWall")
+  connect_latest = latest_app_store_version_string
+
+  target = project_version
+  if connect_latest && Gem::Version.new(project_version) <= Gem::Version.new(connect_latest)
+    target = bump_patch_version(connect_latest)
+    UI.message(
+      "Marketing version #{project_version} is not above App Store Connect (#{connect_latest}); " \
+      "using #{target} for this TestFlight upload."
+    )
+  end
+
+  increment_version_number(version_number: target, xcodeproj: XCODEPROJ) if target != project_version
+  target
+end
+
 platform :ios do
   desc "Simulator build only (no signing upload)"
   lane :ci_build do
@@ -52,6 +98,7 @@ platform :ios do
     setup_ci if ENV["CI"]
     match(type: "appstore", readonly: true, app_identifier: "chris.MusicWall")
     configure_appstore_signing
+    resolve_marketing_version_for_preview
 
     increment_build_number(
       build_number: ENV.fetch("BUILD_NUMBER"),
@@ -80,6 +127,7 @@ platform :ios do
 
     upload_to_testflight(
       api_key: asc_api_key,
+      uses_non_exempt_encryption: false,
       skip_waiting_for_build_processing: true,
       distribute_external: false
     )
@@ -122,6 +170,7 @@ platform :ios do
 
     upload_to_app_store(
       api_key: asc_api_key,
+      uses_non_exempt_encryption: false,
       submit_for_review: true,
       automatic_release: false,
       force: true,
