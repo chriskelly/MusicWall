@@ -4,7 +4,7 @@
 
 ## App Store release (if shipping to the store)
 
-- [ ] Updated `fastlane/metadata/en-US/release_notes.txt` for this version (N/A — not a store release PR)
+- [ ] Updated `fastlane/metadata/en-CA/release_notes.txt` for this version (N/A — not a store release PR)
 
 ## TestFlight
 

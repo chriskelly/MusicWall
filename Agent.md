@@ -108,7 +108,7 @@ Before marking work complete:
 - **Source of truth in git:** Keep `MARKETING_VERSION` in `project.pbxproj` at the version you are developing toward (currently **1.2**). After a store release, bump it when you start the next feature cycle (or let the first PR preview auto-select the next train).
 - **Release tag `v1.2.0` or manual dispatch:** `CFBundleShortVersionString` = `1.2.0` from the tag/input; build number uses the same ASC lookup for that version.
 - **Export compliance:** `ITSAppUsesNonExemptEncryption = NO` in the app Info.plist; TestFlight upload passes `uses_non_exempt_encryption: false` (App Store upload uses the plist only).
-- **App Store metadata (release):** Edit `fastlane/metadata/en-US/release_notes.txt` (What’s New) and keep `copyright.txt` as the current year before each store release. Deliver uploads these files when `skip_metadata: false` on the release lane.
+- **App Store metadata (release):** Edit `fastlane/metadata/en-CA/release_notes.txt` (What’s New) and keep `copyright.txt` as the current year before each store release. Primary locale is **English (Canada)** (`en-CA`). Deliver uploads these files when `skip_metadata: false` on the release lane.
 - **Precheck:** Runs on **preview** (before build) and **release** (before submit). `default_rule_level: :error` — warnings fail CI. IAP checks are off (API key limitation). Validates the **live App Store Connect listing**, not the PR diff.
 - **Precheck locally:**
 
