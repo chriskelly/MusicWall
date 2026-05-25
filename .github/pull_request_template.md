@@ -2,6 +2,10 @@
 
 <!-- What changed? -->
 
+## App Store release (if shipping to the store)
+
+- [ ] Updated `fastlane/metadata/en-US/release_notes.txt` for this version (N/A — not a store release PR)
+
 ## TestFlight
 
 - [ ] Tested internal TestFlight build **#_____** (or N/A — label `no-deploy` used for docs-only)
