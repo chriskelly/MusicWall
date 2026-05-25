@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Marketing version to release (e.g. 1.2.0 — no leading v)
+        required: true
+        type: string
 
 jobs:
   release:
@@ -20,15 +26,27 @@ jobs:
       APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
       APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
     steps:
-      - name: Parse release version from tag
+      - name: Resolve release version
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          if [[ -z "$VERSION" || "$VERSION" == "$GITHUB_REF_NAME" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            VERSION="${{ inputs.version }}"
+          else
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          if [[ -z "$VERSION" ]]; then
+            echo "Release version is required (tag v1.2.3 or workflow_dispatch version input)." >&2
+            exit 1
+          fi
+          if [[ "$VERSION" == "$GITHUB_REF_NAME" && "${{ github.event_name }}" != "workflow_dispatch" ]]; then
             echo "Tag must look like v1.2.3 (got: $GITHUB_REF_NAME)" >&2
             exit 1
           fi
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Version must look like 1.2.0 (got: $VERSION)" >&2
+            exit 1
+          fi
           echo "RELEASE_VERSION=$VERSION" >> "$GITHUB_ENV"
-          echo "Release version: $VERSION"
+          echo "Release version: $VERSION (event: ${{ github.event_name }})"
 
       - name: Checkout
         uses: actions/checkout@v5

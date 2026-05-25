@@ -10,7 +10,7 @@ flowchart LR
   Preview --> TF[TestFlight internal]
   Human[Human tests on device] --> Approve[Approve PR]
   Approve --> Main[Merge to main]
-  Tag[Human tags vX.Y.Z] --> Release[ios-release workflow]
+  Tag[Human tags vX.Y.Z or manual dispatch] --> Release[ios-release workflow]
   Release --> ASC[App Store Connect review]
 ```
 
@@ -18,7 +18,7 @@ flowchart LR
 |-------|---------|-----------|-------|
 | Fast feedback | PR + label `no-deploy` | Simulator build only (`ci_build`) | Optional |
 | Feature validation | PR push (default) | match → build → **TestFlight internal** | **Test on device** before approving PR |
-| Store release | Push tag `v*` (e.g. `v1.2.0`) | Upload + **submit for review** | Approve release in App Store Connect |
+| Store release | Push tag `v*` (e.g. `v1.2.0`) or **Actions → iOS Release → Run workflow** with version `1.2.0` | Upload + **submit for review** | Approve release in App Store Connect |
 
 **Rules for agents**
 
