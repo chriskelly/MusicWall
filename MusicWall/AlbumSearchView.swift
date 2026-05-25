@@ -12,6 +12,7 @@ struct AlbumSearchView: View {
     @State private var query = ""
     @State private var catalogSearchResults: [MusicKitAlbum] = []
     @State private var librarySearchResults: [MusicKitAlbum] = []
+    @State private var isSearching = false
     @FocusState private var isSearchFieldFocused: Bool
     
     var onSelect: (MusicKitAlbum) -> Void
@@ -25,7 +26,12 @@ struct AlbumSearchView: View {
                     .focused($isSearchFieldFocused)
                 Button("Search") {
                     isSearchFieldFocused = false
-                    Task {await searchAlbums()}
+                    Task { await searchAlbums() }
+                }
+                .disabled(isSearching)
+                if isSearching {
+                    ProgressView("Searching…")
+                        .padding(.vertical, 4)
                 }
                 resultsView()
             }
@@ -72,6 +78,8 @@ struct AlbumSearchView: View {
     
     func searchAlbums() async {
         guard !query.isEmpty else { return }
+        isSearching = true
+        defer { isSearching = false }
         do {
             catalogSearchResults = try await MusicService.searchAlbums(query: query, location: .catalog)
             librarySearchResults = try await MusicService.searchAlbums(query: query, location: .library)
