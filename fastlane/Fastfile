@@ -14,6 +14,26 @@ def asc_api_key
   )
 end
 
+def appstore_profile_name
+  mapping = lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] || {}
+  mapping["chris.MusicWall"] || "match AppStore chris.MusicWall"
+end
+
+def configure_appstore_signing
+  profile = appstore_profile_name
+  team = ENV["DEVELOPMENT_TEAM"] || "CD8XP2U645"
+
+  update_code_signing_settings(
+    use_automatic_signing: false,
+    path: XCODEPROJ,
+    team_id: team,
+    targets: ["MusicWall"],
+    bundle_identifier: "chris.MusicWall",
+    profile_name: profile,
+    code_sign_identity: "Apple Distribution"
+  )
+end
+
 platform :ios do
   desc "Simulator build only (no signing upload)"
   lane :ci_build do
@@ -31,18 +51,31 @@ platform :ios do
   lane :preview do
     setup_ci if ENV["CI"]
     match(type: "appstore", readonly: true, app_identifier: "chris.MusicWall")
+    configure_appstore_signing
 
     increment_build_number(
       build_number: ENV.fetch("BUILD_NUMBER"),
       xcodeproj: XCODEPROJ
     )
 
+    profile = appstore_profile_name
     build_app(
       scheme: SCHEME,
       project: XCODEPROJ,
       export_method: "app-store",
       output_directory: "./build",
-      clean: true
+      clean: true,
+      codesigning_identity: "Apple Distribution",
+      xcargs: {
+        CODE_SIGN_STYLE: "Manual",
+        PROVISIONING_PROFILE_SPECIFIER: profile,
+        DEVELOPMENT_TEAM: ENV["DEVELOPMENT_TEAM"] || "CD8XP2U645"
+      },
+      export_options: {
+        provisioningProfiles: {
+          "chris.MusicWall" => profile
+        }
+      }
     )
 
     upload_to_testflight(
@@ -56,6 +89,7 @@ platform :ios do
   lane :release do
     setup_ci if ENV["CI"]
     match(type: "appstore", readonly: true, app_identifier: "chris.MusicWall")
+    configure_appstore_signing
 
     increment_version_number(
       version_number: ENV.fetch("RELEASE_VERSION"),
@@ -66,12 +100,24 @@ platform :ios do
       xcodeproj: XCODEPROJ
     )
 
+    profile = appstore_profile_name
     build_app(
       scheme: SCHEME,
       project: XCODEPROJ,
       export_method: "app-store",
       output_directory: "./build",
-      clean: true
+      clean: true,
+      codesigning_identity: "Apple Distribution",
+      xcargs: {
+        CODE_SIGN_STYLE: "Manual",
+        PROVISIONING_PROFILE_SPECIFIER: profile,
+        DEVELOPMENT_TEAM: ENV["DEVELOPMENT_TEAM"] || "CD8XP2U645"
+      },
+      export_options: {
+        provisioningProfiles: {
+          "chris.MusicWall" => profile
+        }
+      }
     )
 
     upload_to_app_store(
