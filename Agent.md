@@ -1,6 +1,6 @@
 # Agent guide — MusicWall (iOS)
 
-This repo is a **SwiftUI + MusicKit** iOS app. Most agent work is Swift source under `MusicWall/`. Builds, signing, and distribution run on **GitHub Actions (macOS)** — not on Linux cloud agents.
+This repo is a **SwiftUI + MusicKit** iOS app. Most agent work is Swift source under `MusicWall/`. Builds, signing, and distribution run on **GitHub Actions (`macos-26`, Xcode 26)** — not on Linux cloud agents.
 
 ## CI/CD loop (human vs automation)
 

@@ -8,7 +8,7 @@ on:
 jobs:
   release:
     name: App Store release
-    runs-on: macos-15
+    runs-on: macos-26
     env:
       CI: true
       APP_IDENTIFIER: chris.MusicWall

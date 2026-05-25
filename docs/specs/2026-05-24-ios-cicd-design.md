@@ -1,7 +1,7 @@
 # iOS CI/CD Design — MusicWall
 
 **Status:** Approved (2026-05-24)  
-**Implementation style:** Fastlane-centric on GitHub-hosted `macos-15` runners  
+**Implementation style:** Fastlane-centric on GitHub-hosted `macos-26` runners  
 **Signing:** fastlane match (private cert repository)
 
 ## Goals
@@ -10,7 +10,7 @@
 2. **PR pipeline:** On every push, build and upload to **TestFlight (internal testers only)**, unless PR has label `no-deploy`.
 3. **Release pipeline:** On version tags (`v*`) on `main`, upload and **submit for App Store review**.
 4. Same bundle ID (`chris.MusicWall`); monotonic **build numbers** from CI.
-5. Public repo uses standard GitHub Actions macOS runners (no self-hosted Mac).
+5. Public repo uses GitHub Actions `macos-26` runners (Xcode 26 default; no self-hosted Mac).
 
 ## Non-goals
 

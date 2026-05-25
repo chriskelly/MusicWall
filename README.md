@@ -61,7 +61,7 @@ MusicWall/
 
 ## CI/CD
 
-GitHub Actions on `macos-15` with Fastlane and [match](https://docs.fastlane.tools/actions/match/):
+GitHub Actions on `macos-26` (Xcode 26 default) with Fastlane and [match](https://docs.fastlane.tools/actions/match/):
 
 | Event | Workflow | Result |
 |-------|----------|--------|
