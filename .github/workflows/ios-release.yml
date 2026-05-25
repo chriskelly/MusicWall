@@ -19,6 +19,7 @@ jobs:
       CI: true
       APP_IDENTIFIER: chris.MusicWall
       DEVELOPMENT_TEAM: CD8XP2U645
+      # Fallback only if ASC lookup fails (Fastlane uses ASC latest + 1)
       BUILD_NUMBER: ${{ github.run_number }}
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}

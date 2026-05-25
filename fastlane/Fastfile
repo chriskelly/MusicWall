@@ -115,6 +115,30 @@ def resolve_marketing_version_for_preview
   target
 end
 
+def resolve_build_number_for_upload(version: nil)
+  # App-wide monotonic CFBundleVersion (Apple rejects reuse across any version train).
+  returned = latest_testflight_build_number(
+    api_key: asc_api_key,
+    initial_build_number: 1
+  ).to_i
+
+  latest = lane_context[SharedValues::LATEST_TESTFLIGHT_BUILD_NUMBER].to_i
+  # Action can return the current latest; always bump above ASC's highest uploaded build.
+  next_build = [returned, latest + 1].max
+
+  floor = ENV.fetch("BUILD_NUMBER", "1").to_i
+  next_build = [next_build, floor].max if floor.positive? && floor < 10_000_000
+
+  UI.message(
+    "Build number #{next_build} (App Store Connect latest: #{latest}" \
+    "#{version ? ", marketing version #{version}" : ''})."
+  )
+  next_build
+rescue StandardError => e
+  UI.important("Could not read latest build from App Store Connect (#{e.message}); using BUILD_NUMBER.")
+  ENV.fetch("BUILD_NUMBER", "1")
+end
+
 platform :ios do
   desc "Simulator build only (no signing upload)"
   lane :ci_build do
@@ -131,10 +155,11 @@ platform :ios do
   desc "PR preview: TestFlight internal"
   lane :preview do
     prepare_appstore_signing
-    resolve_marketing_version_for_preview
+    marketing_version = resolve_marketing_version_for_preview
+    build_number = resolve_build_number_for_upload(version: marketing_version)
 
     increment_build_number(
-      build_number: ENV.fetch("BUILD_NUMBER"),
+      build_number: build_number,
       xcodeproj: XCODEPROJ
     )
 
@@ -152,12 +177,14 @@ platform :ios do
   lane :release do
     prepare_appstore_signing
 
+    release_version = ENV.fetch("RELEASE_VERSION")
     increment_version_number(
-      version_number: ENV.fetch("RELEASE_VERSION"),
+      version_number: release_version,
       xcodeproj: XCODEPROJ
     )
+    build_number = resolve_build_number_for_upload(version: release_version)
     increment_build_number(
-      build_number: ENV.fetch("BUILD_NUMBER"),
+      build_number: build_number,
       xcodeproj: XCODEPROJ
     )
 
@@ -165,7 +192,6 @@ platform :ios do
 
     upload_to_app_store(
       api_key: asc_api_key,
-      uses_non_exempt_encryption: false,
       submit_for_review: true,
       automatic_release: false,
       force: true,
