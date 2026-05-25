@@ -108,6 +108,14 @@ Before marking work complete:
 - **Source of truth in git:** Keep `MARKETING_VERSION` in `project.pbxproj` at the version you are developing toward (currently **1.2**). After a store release, bump it when you start the next feature cycle (or let the first PR preview auto-select the next train).
 - **Release tag `v1.2.0` or manual dispatch:** `CFBundleShortVersionString` = `1.2.0` from the tag/input; build number uses the same ASC lookup for that version.
 - **Export compliance:** `ITSAppUsesNonExemptEncryption = NO` in the app Info.plist; TestFlight upload passes `uses_non_exempt_encryption: false` (App Store upload uses the plist only).
+- **Precheck (API key):** App Store Connect API keys cannot validate in-app purchases in precheck. Release upload sets `precheck_include_in_app_purchases: false`. Run locally before release:
+
+  ```bash
+  export APP_STORE_CONNECT_API_KEY_KEY_ID=...
+  export APP_STORE_CONNECT_API_KEY_ISSUER_ID=...
+  export APP_STORE_CONNECT_API_KEY_CONTENT=...   # base64 .p8
+  bundle exec fastlane ios precheck_release
+  ```
 
 ## Secrets (humans only)
 
