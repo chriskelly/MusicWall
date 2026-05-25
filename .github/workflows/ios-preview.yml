@@ -6,9 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       pr_number:
-        description: PR number to comment on (for manual runs)
+        description: PR number to comment on (required for manual runs)
         required: true
-        default: "3"
         type: string
 
 # One run per PR commit; do not cancel in-progress (avoids killing manual re-runs mid-setup)
@@ -58,7 +57,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.pull_request.head.ref || 'cursor/ios-cicd-6cff' }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -82,87 +81,14 @@ jobs:
         if: steps.labels.outputs.result != 'true'
         run: bundle exec fastlane preview
 
-      - name: Comment on PR (TestFlight)
-        if: steps.labels.outputs.result != 'true' && success()
+      - name: Comment on PR
+        if: success()
         uses: actions/github-script@v8
         env:
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+          PREVIEW_MODE: ${{ steps.labels.outputs.result == 'true' && 'simulator' || 'testflight' }}
+          BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
         with:
           script: |
-            const pr = Number(process.env.PR_NUMBER);
-            const build = process.env.BUILD_NUMBER;
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const body = [
-              '### iOS Preview (TestFlight internal)',
-              '',
-              '_Marketing version may be auto-bumped above the live App Store version for upload — see Fastlane logs._',
-              '',
-              `Build number: **${build}**`,
-              '',
-              'Install from TestFlight when Apple finishes processing (usually 10–20 minutes).',
-              '',
-              `[View workflow run](${runUrl})`
-            ].join('\n');
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr,
-            });
-            const marker = '<!-- ios-preview-comment -->';
-            const existing = comments.find((c) => c.body?.includes(marker));
-            const fullBody = `${marker}\n${body}`;
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body: fullBody,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr,
-                body: fullBody,
-              });
-            }
-
-      - name: Comment on PR (simulator only)
-        if: steps.labels.outputs.result == 'true' && success()
-        uses: actions/github-script@v8
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
-        with:
-          script: |
-            const pr = Number(process.env.PR_NUMBER);
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const marker = '<!-- ios-preview-comment -->';
-            const body = [
-              marker,
-              '### iOS Preview (simulator build only)',
-              '',
-              'PR has label `no-deploy` — skipped TestFlight upload.',
-              '',
-              `[View workflow run](${runUrl})`
-            ].join('\n');
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr,
-            });
-            const existing = comments.find((c) => c.body?.includes(marker));
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr,
-                body,
-              });
-            }
+            const comment = require('./.github/scripts/ios-preview-pr-comment.js');
+            await comment({ github, context, core });
