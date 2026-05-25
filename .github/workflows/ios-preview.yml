@@ -27,7 +27,8 @@ jobs:
       CI: true
       APP_IDENTIFIER: chris.MusicWall
       DEVELOPMENT_TEAM: CD8XP2U645
-      BUILD_NUMBER: ${{ github.run_number }}
+      # Floor for ASC lookup; Fastlane picks max(ASC latest, this) + 1 per version
+      BUILD_NUMBER: ${{ github.run_id }}
       MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
       MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
       APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
