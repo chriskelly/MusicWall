@@ -141,6 +141,7 @@ Agents: reference secret **names** only; never print or commit values.
 
 - Design: `docs/specs/2026-05-24-ios-cicd-design.md`
 - Implementation plan: `docs/plans/2026-05-24-ios-cicd.md`
+- **Test refactor program (agent skills):** `.cursor/skills/musicwall-test-refactor/` — overview; invoke one PR per session via `/musicwall-test-refactor-pr-01` … `/musicwall-test-refactor-pr-14` (optional PR 15 for SPM split).
 
 ## Common failures
 
