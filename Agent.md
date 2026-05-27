@@ -17,7 +17,7 @@ flowchart LR
 
 | Stage | Trigger | What runs | Human |
 |-------|---------|-----------|-------|
-| Fast feedback | PR push or push to `main` | `ci-tests` runs simulator unit tests (`ci_test`) | Optional |
+| Fast feedback | PR push or push to `main` | `ci-tests` runs simulator unit tests (`ci_tests`) | Optional |
 | Feature validation | PR push (default, after `ci-tests` passes) | `testflight-release` runs match → build → **TestFlight internal** | **Test on device** before approving PR |
 | Store release | Push tag `v*` (e.g. `v1.2.0`) or **Actions → App Store Release → Run workflow** with version `1.2.0` | Upload + **submit for review**; **automatic release** after Apple approves | Monitor in App Store Connect (no manual Release click) |
 

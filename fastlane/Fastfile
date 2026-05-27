@@ -178,7 +178,7 @@ def run_app_store_metadata_precheck
 end
 
 platform :ios do
-  desc "Simulator build only (no signing upload)"
+  desc "Simulator build only (no signing upload; local / no-deploy)"
   lane :ci_build do
     build_app(
       scheme: SCHEME,
@@ -190,13 +190,13 @@ platform :ios do
     )
   end
 
-  desc "Run unit tests on the CI simulator"
-  lane :ci_test do
+  desc "CI Tests workflow: unit tests on iOS Simulator"
+  lane :ci_tests do
     sh("xcodebuild test -project ../#{XCODEPROJ} -scheme #{SCHEME} -destination 'platform=iOS Simulator,name=iPhone 17'")
   end
 
-  desc "PR preview: TestFlight internal"
-  lane :preview do
+  desc "TestFlight Release workflow: internal TestFlight upload"
+  lane :testflight_release do
     run_app_store_metadata_precheck
     prepare_appstore_signing
     marketing_version = resolve_marketing_version_for_preview
@@ -226,8 +226,8 @@ platform :ios do
     run_app_store_metadata_precheck
   end
 
-  desc "Tagged release: App Store upload and submit for review"
-  lane :release do
+  desc "App Store Release workflow: upload and submit for review"
+  lane :app_store_release do
     prepare_appstore_signing
 
     release_version = ENV.fetch("RELEASE_VERSION")
@@ -256,5 +256,21 @@ platform :ios do
       precheck_default_rule_level: :error,
       run_precheck_before_submit: true
     )
+  end
+
+  # Legacy names: workflow_run uses workflow YAML from default branch until this PR merges.
+  desc "Deprecated — use ci_tests"
+  lane :ci_test do
+    ci_tests
+  end
+
+  desc "Deprecated — use testflight_release"
+  lane :preview do
+    testflight_release
+  end
+
+  desc "Deprecated — use app_store_release"
+  lane :release do
+    app_store_release
   end
 end

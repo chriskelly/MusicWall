@@ -67,4 +67,4 @@ jobs:
         run: ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
 
       - name: Release to App Store
-        run: bundle exec fastlane release
+        run: bundle exec fastlane app_store_release
