@@ -56,12 +56,17 @@ def prepare_appstore_signing
   configure_appstore_signing
 end
 
-def set_target_version_in_project(marketing_version: nil, build_number: nil, xcodeproj:, target_name:)
+def xcodeproj_file_path(xcodeproj = XCODEPROJ)
+  File.expand_path("../#{xcodeproj}", __dir__)
+end
+
+def set_target_version_in_project(marketing_version: nil, build_number: nil, xcodeproj: XCODEPROJ, target_name:)
   require "xcodeproj"
 
-  project = Xcodeproj::Project.open(File.expand_path(xcodeproj))
+  project_path = xcodeproj_file_path(xcodeproj)
+  project = Xcodeproj::Project.open(project_path)
   native_target = project.targets.find { |t| t.name == target_name }
-  UI.user_error!("Xcode target #{target_name} not found in #{xcodeproj}") unless native_target
+  UI.user_error!("Xcode target #{target_name} not found in #{project_path}") unless native_target
 
   native_target.build_configurations.each do |config|
     config.build_settings["MARKETING_VERSION"] = marketing_version.to_s if marketing_version
