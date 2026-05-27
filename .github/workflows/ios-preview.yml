@@ -67,16 +67,18 @@ jobs:
           bundler-cache: true
 
       - name: Configure SSH for match
+        if: steps.labels.outputs.result != 'true'
         uses: webfactory/ssh-agent@v0.10.0
         with:
           ssh-private-key: ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
 
       - name: Add GitHub to known_hosts
+        if: steps.labels.outputs.result != 'true'
         run: ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
 
-      - name: Simulator build (no-deploy)
+      - name: Unit tests (no-deploy)
         if: steps.labels.outputs.result == 'true'
-        run: bundle exec fastlane ci_build
+        run: bundle exec fastlane ci_test
 
       - name: TestFlight preview
         if: steps.labels.outputs.result != 'true'

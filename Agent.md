@@ -16,7 +16,7 @@ flowchart LR
 
 | Stage | Trigger | What runs | Human |
 |-------|---------|-----------|-------|
-| Fast feedback | PR + label `no-deploy` | Simulator build only (`ci_build`) | Optional |
+| Fast feedback | PR + label `no-deploy` | Simulator unit tests (`ci_test`) | Optional |
 | Feature validation | PR push (default) | match → build → **TestFlight internal** | **Test on device** before approving PR |
 | Store release | Push tag `v*` (e.g. `v1.2.0`) or **Actions → iOS Release → Run workflow** with version `1.2.0` | Upload + **submit for review**; **automatic release** after Apple approves | Monitor in App Store Connect (no manual Release click) |
 
@@ -34,10 +34,12 @@ flowchart LR
 
 ```
 MusicWall/                 # App source (SwiftUI views, services, models)
+MusicWallTests/            # Deterministic unit tests and test-specific guidance
 MusicWall.xcodeproj/       # Xcode project — scheme: MusicWall
 fastlane/                  # match, build, upload lanes
 .github/workflows/         # ios-preview.yml, ios-release.yml
 docs/specs/                # Design specs
+docs/plans/                # Implementation plans
 ```
 
 - **Bundle ID:** `chris.MusicWall`
@@ -73,7 +75,7 @@ docs/specs/                # Design specs
 
 - Match existing naming and file placement; no drive-by refactors.
 - Prefer compiler-driven safety over force-unwraps.
-- Add **unit tests** in a future `MusicWallTests` target for pure logic (sorting, mapping, backup encoding) — not required for every UI tweak.
+- Add **unit tests** under `MusicWallTests/` for pure logic and composition-root smoke coverage — not required for every UI tweak.
 
 ### Xcode project
 

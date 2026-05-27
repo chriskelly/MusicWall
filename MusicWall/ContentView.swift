@@ -9,6 +9,7 @@ import SwiftUI
 import MusicKit
 
 struct ContentView: View {
+    let dependencies: AppDependencies
     @State private var isAuthorized = false
     @State private var authorizationDenied = false
     
@@ -59,5 +60,5 @@ struct ContentView: View {
 
 
 #Preview {
-    ContentView()
+    ContentView(dependencies: .live)
 }

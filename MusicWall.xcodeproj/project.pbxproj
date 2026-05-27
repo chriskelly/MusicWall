@@ -6,13 +6,31 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BBAE99B1FA45969122576159 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B203760B33EAD816D6FDCB94 /* SmokeTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B190941EFFE7C48E8542490A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 835DD9802E5FB592001CD95F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 835DD9872E5FB592001CD95F;
+			remoteInfo = MusicWall;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		4074DBA99A12CE4F48D648E1 /* MusicWallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicWallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		835DD9882E5FB592001CD95F /* MusicWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B203760B33EAD816D6FDCB94 /* SmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		835DD98A2E5FB592001CD95F /* MusicWall */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = MusicWall;
 			sourceTree = "<group>";
 		};
@@ -20,6 +38,13 @@
 
 /* Begin PBXFrameworksBuildPhase section */
 		835DD9852E5FB592001CD95F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D9DB44332A9461DA9745F4F7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -34,6 +59,7 @@
 			children = (
 				835DD98A2E5FB592001CD95F /* MusicWall */,
 				835DD9892E5FB592001CD95F /* Products */,
+				850E21353DFC86412384C721 /* MusicWallTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,13 +67,41 @@
 			isa = PBXGroup;
 			children = (
 				835DD9882E5FB592001CD95F /* MusicWall.app */,
+				4074DBA99A12CE4F48D648E1 /* MusicWallTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		850E21353DFC86412384C721 /* MusicWallTests */ = {
+			isa = PBXGroup;
+			children = (
+				B203760B33EAD816D6FDCB94 /* SmokeTests.swift */,
+			);
+			name = MusicWallTests;
+			path = MusicWallTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5F0BEB58C2BFF7CB66E9D450 /* MusicWallTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 050FE7F5B2BD48E9EA84ACC3 /* Build configuration list for PBXNativeTarget "MusicWallTests" */;
+			buildPhases = (
+				CB9028FC613E793D35916DCD /* Sources */,
+				D9DB44332A9461DA9745F4F7 /* Frameworks */,
+				E511F21C2922B3CE6EAEE8B6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2B00DA7A3B2B13D75B42153D /* PBXTargetDependency */,
+			);
+			name = MusicWallTests;
+			productName = MusicWallTests;
+			productReference = 4074DBA99A12CE4F48D648E1 /* MusicWallTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		835DD9872E5FB592001CD95F /* MusicWall */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 835DD9932E5FB592001CD95F /* Build configuration list for PBXNativeTarget "MusicWall" */;
@@ -64,8 +118,6 @@
 				835DD98A2E5FB592001CD95F /* MusicWall */,
 			);
 			name = MusicWall;
-			packageProductDependencies = (
-			);
 			productName = "Vinyl Wall";
 			productReference = 835DD9882E5FB592001CD95F /* MusicWall.app */;
 			productType = "com.apple.product-type.application";
@@ -80,6 +132,10 @@
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					5F0BEB58C2BFF7CB66E9D450 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 835DD9872E5FB592001CD95F;
+					};
 					835DD9872E5FB592001CD95F = {
 						CreatedOnToolsVersion = 16.4;
 					};
@@ -100,12 +156,20 @@
 			projectRoot = "";
 			targets = (
 				835DD9872E5FB592001CD95F /* MusicWall */,
+				5F0BEB58C2BFF7CB66E9D450 /* MusicWallTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		835DD9862E5FB592001CD95F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E511F21C2922B3CE6EAEE8B6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,7 +186,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CB9028FC613E793D35916DCD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBAE99B1FA45969122576159 /* SmokeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2B00DA7A3B2B13D75B42153D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MusicWall;
+			target = 835DD9872E5FB592001CD95F /* MusicWall */;
+			targetProxy = B190941EFFE7C48E8542490A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		835DD9912E5FB592001CD95F /* Debug */ = {
@@ -308,9 +389,69 @@
 			};
 			name = Release;
 		};
+		944A84916DE51D0580A90ADF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CD8XP2U645;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = chris.MusicWallTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MusicWall.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MusicWall";
+				TEST_TARGET_NAME = MusicWall;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F0ADCAC359BEAA58B300DC90 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CD8XP2U645;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = chris.MusicWallTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MusicWall.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/MusicWall";
+				TEST_TARGET_NAME = MusicWall;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		050FE7F5B2BD48E9EA84ACC3 /* Build configuration list for PBXNativeTarget "MusicWallTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				944A84916DE51D0580A90ADF /* Release */,
+				F0ADCAC359BEAA58B300DC90 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		835DD9832E5FB592001CD95F /* Build configuration list for PBXProject "MusicWall" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
