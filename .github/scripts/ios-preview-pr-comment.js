@@ -42,9 +42,9 @@ module.exports = async function iosPreviewPrComment({ github, context }) {
       github,
       context,
       body: [
-        "### iOS Preview (simulator build only)",
+        "### iOS Preview (unit tests only)",
         "",
-        "PR has label `no-deploy` — skipped TestFlight upload.",
+        "PR has label `no-deploy` — ran `MusicWallTests` on the simulator and skipped TestFlight upload.",
         "",
         `[View workflow run](${runUrl})`,
       ].join("\n"),

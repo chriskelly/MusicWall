@@ -66,7 +66,7 @@ GitHub Actions on `macos-26` (Xcode 26 default) with Fastlane and [match](https:
 | Event | Workflow | Result |
 |-------|----------|--------|
 | Pull request (default) | `ios-preview.yml` | TestFlight **internal** build |
-| PR with label `no-deploy` | `ios-preview.yml` | Simulator build only |
+| PR with label `no-deploy` | `ios-preview.yml` | Simulator unit tests only |
 | Tag `v*` (e.g. `v1.2.0`) | `ios-release.yml` | App Store upload + submit for review |
 
 Design and setup: [`docs/specs/2026-05-24-ios-cicd-design.md`](docs/specs/2026-05-24-ios-cicd-design.md). Agent conventions: [`Agent.md`](Agent.md).
@@ -76,6 +76,7 @@ Local Fastlane (after `bundle install`):
 ```bash
 bundle exec fastlane match appstore --readonly
 bundle exec fastlane ci_build
+bundle exec fastlane ci_test
 ```
 
 Shield: [![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]
