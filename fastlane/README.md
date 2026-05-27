@@ -55,30 +55,6 @@ App Store precheck only (run locally before release; needs ASC API key env)
 
 App Store Release workflow: upload and submit for review
 
-### ios ci_test
-
-```sh
-[bundle exec] fastlane ios ci_test
-```
-
-Deprecated — use ci_tests
-
-### ios preview
-
-```sh
-[bundle exec] fastlane ios preview
-```
-
-Deprecated — use testflight_release
-
-### ios release
-
-```sh
-[bundle exec] fastlane ios release
-```
-
-Deprecated — use app_store_release
-
 ----
 
 This README.md is auto-generated and will be re-generated every time [_fastlane_](https://fastlane.tools) is run.

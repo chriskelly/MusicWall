@@ -470,7 +470,7 @@ gh pr create --title "test refactor PR 2: Core domain + AlbumSorter" --body "$(c
 - Delegate `StoredAlbums.applySort()` via `StoredAlbum` → `AlbumRecord` adapter
 
 ## Test plan
-- [ ] `ci-tests` workflow passes (`fastlane ci_test`)
+- [ ] `ci-tests` workflow passes (`fastlane ci_tests`)
 - [ ] `testflight-release` workflow passes (no `no-deploy` label)
 - [ ] Sort by Artist / Title / Year on device (TestFlight internal build)
 - [ ] No UserDefaults / on-disk format changes

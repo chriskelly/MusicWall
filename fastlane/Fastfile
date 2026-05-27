@@ -257,20 +257,4 @@ platform :ios do
       run_precheck_before_submit: true
     )
   end
-
-  # Legacy names: workflow_run uses workflow YAML from default branch until this PR merges.
-  desc "Deprecated — use ci_tests"
-  lane :ci_test do
-    ci_tests
-  end
-
-  desc "Deprecated — use testflight_release"
-  lane :preview do
-    testflight_release
-  end
-
-  desc "Deprecated — use app_store_release"
-  lane :release do
-    app_store_release
-  end
 end
