@@ -13,7 +13,7 @@
 
 ## Commands
 
-- `bundle exec fastlane ci_test`
+- `bundle exec fastlane ci_tests`
 - `xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall -destination 'platform=iOS Simulator,name=iPhone 17'`
 
 ## Coverage

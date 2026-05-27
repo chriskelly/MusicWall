@@ -32,4 +32,4 @@ jobs:
           bundler-cache: true
 
       - name: Run unit tests
-        run: bundle exec fastlane ci_test
+        run: bundle exec fastlane ci_tests

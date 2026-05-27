@@ -200,7 +200,7 @@ Optional belt-and-suspenders: one test file-local copy of legacy comparators ass
 
 ### CI
 
-No workflow changes. PR must pass existing `ci-tests` (`fastlane ci_test`).
+No workflow changes. PR must pass existing `ci-tests` (`fastlane ci_tests`).
 
 ## Acceptance criteria
 

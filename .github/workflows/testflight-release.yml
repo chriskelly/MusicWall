@@ -86,7 +86,7 @@ jobs:
 
       - name: TestFlight preview
         if: steps.pr.outputs.no_deploy != 'true'
-        run: bundle exec fastlane preview
+        run: bundle exec fastlane testflight_release
 
       - name: Comment on PR
         if: success()

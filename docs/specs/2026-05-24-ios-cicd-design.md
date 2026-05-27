@@ -25,7 +25,7 @@
 ```mermaid
 flowchart TB
   subgraph ciTests [ci-tests.yml — PR and main push]
-    T[Run fastlane ci_test]
+    T[Run fastlane ci_tests]
   end
   subgraph preview [testflight-release.yml — PR after CI Tests success]
     A{Label no-deploy?}
@@ -47,7 +47,7 @@ flowchart TB
 
 | Workflow | Event | Condition | Actions |
 |----------|-------|-----------|---------|
-| `ci-tests.yml` | `pull_request` (opened, synchronize, reopened), `push` to `main` | n/a | Run `fastlane ci_test` |
+| `ci-tests.yml` | `pull_request` (opened, synchronize, reopened), `push` to `main` | n/a | Run `fastlane ci_tests` |
 | `testflight-release.yml` | `workflow_run` from `CI Tests` | PR event + CI Tests conclusion = success + head repo == this repo | See label branch above |
 | `app-store-release.yml` | `push` tags matching `v*` | Tag on default branch history | match → build → upload → submit |
 
@@ -61,9 +61,9 @@ flowchart TB
 
 | Lane | Called by | Purpose |
 |------|-----------|---------|
-| `ci_build` | PR with `no-deploy` | Simulator build, no signing upload |
-| `preview` | PR default | match → increment build → archive → TestFlight internal |
-| `release` | Tag workflow | match → version from tag → archive → upload → submit_for_review |
+| `ci_build` | PR with `no-deploy` (local) | Simulator build, no signing upload |
+| `testflight_release` | TestFlight Release workflow | match → increment build → archive → TestFlight internal |
+| `app_store_release` | App Store Release workflow | match → version from tag → archive → upload → submit_for_review |
 
 ### Security
 

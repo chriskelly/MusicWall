@@ -46,7 +46,7 @@ Enable automated tests in CI and introduce dependency injection entry point with
 
 ## Acceptance criteria
 
-- [ ] `bundle exec fastlane ci_test` (or documented equivalent) passes locally on Mac.
+- [ ] `bundle exec fastlane ci_tests` (or documented equivalent) passes locally on Mac.
 - [ ] GitHub Actions `no-deploy` job runs tests and reports pass/fail.
 - [ ] App behavior unchanged; TestFlight path still works when label absent.
 - [ ] `docs/testing.md` exists.

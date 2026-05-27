@@ -6,7 +6,7 @@
 
 **Architecture:** Foundation-only Core types (`AlbumID`, `AlbumRecord`, `AlbumSortKey`, `AlbumSorter`) live under `MusicWall/Core/`. The app target adds `StoredAlbum+AlbumRecord.swift` for MusicKit bridging. `StoredAlbums.applySort()` maps to records, sorts via `AlbumSorter`, and rebuilds `[StoredAlbum]` by ID lookup.
 
-**Tech Stack:** Swift 5, Swift Testing, Xcode 16+, scheme `MusicWall`, simulator `iPhone 17`, `bundle exec fastlane ci_test`.
+**Tech Stack:** Swift 5, Swift Testing, Xcode 16+, scheme `MusicWall`, simulator `iPhone 17`, `bundle exec fastlane ci_tests`.
 
 **Spec:** `docs/specs/2026-05-27-pr-02-core-album-sorter-design.md`
 
@@ -408,7 +408,7 @@ Confirm no inline comparator closures remain in `Album.swift`.
 Run:
 
 ```bash
-bundle exec fastlane ci_test
+bundle exec fastlane ci_tests
 ```
 
 Expected: all tests PASS (SmokeTests + AlbumSorterTests)
@@ -452,7 +452,7 @@ Expected: same keys as before; no new keys added
 Run:
 
 ```bash
-bundle exec fastlane ci_test
+bundle exec fastlane ci_tests
 ```
 
 Expected: PASS
