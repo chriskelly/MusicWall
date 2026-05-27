@@ -1,0 +1,101 @@
+name: TestFlight Release
+
+on:
+  workflow_run:
+    workflows: ["CI Tests"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: PR number to comment on (required for manual runs)
+        required: true
+        type: string
+
+concurrency:
+  group: testflight-release-${{ github.event_name }}-${{ github.event_name == 'workflow_dispatch' && inputs.pr_number || github.event.workflow_run.id || github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    name: Build and deploy preview
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'workflow_run' && github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: macos-26
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      CI: true
+      APP_IDENTIFIER: chris.MusicWall
+      DEVELOPMENT_TEAM: CD8XP2U645
+      # Fallback only if ASC lookup fails (Fastlane uses ASC latest + 1)
+      BUILD_NUMBER: ${{ github.run_number }}
+      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+      MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+      APP_STORE_CONNECT_API_KEY_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_KEY_ID }}
+      APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ISSUER_ID }}
+      APP_STORE_CONNECT_API_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_API_KEY_CONTENT }}
+    steps:
+      - name: Resolve PR context
+        id: pr
+        uses: actions/github-script@v8
+        with:
+          script: |
+            let prNumber;
+            if (context.eventName === "workflow_dispatch") {
+              prNumber = Number("${{ inputs.pr_number }}");
+            } else {
+              const prs = context.payload.workflow_run.pull_requests || [];
+              if (!prs.length) {
+                core.setFailed("No pull request found in workflow_run payload.");
+                return;
+              }
+              prNumber = prs[0].number;
+            }
+
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            const labels = pr.labels.map((l) => l.name);
+            core.setOutput("pr_number", String(prNumber));
+            core.setOutput("head_ref", pr.head.ref);
+            core.setOutput("no_deploy", String(labels.includes("no-deploy")));
+
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ steps.pr.outputs.head_ref }}
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Configure SSH for match
+        if: steps.pr.outputs.no_deploy != 'true'
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
+
+      - name: Add GitHub to known_hosts
+        if: steps.pr.outputs.no_deploy != 'true'
+        run: ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts
+
+      - name: TestFlight preview
+        if: steps.pr.outputs.no_deploy != 'true'
+        run: bundle exec fastlane preview
+
+      - name: Comment on PR
+        if: success()
+        uses: actions/github-script@v8
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
+          PREVIEW_MODE: ${{ steps.pr.outputs.no_deploy == 'true' && 'simulator' || 'testflight' }}
+          BUILD_NUMBER: ${{ env.BUILD_NUMBER }}
+        with:
+          script: |
+            const comment = require('./.github/scripts/testflight-release-pr-comment.js');
+            await comment({ github, context, core });

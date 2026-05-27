@@ -192,7 +192,7 @@ platform :ios do
 
   desc "Run unit tests on the CI simulator"
   lane :ci_test do
-    sh("xcodebuild test -project ../#{XCODEPROJ} -scheme #{SCHEME} -destination 'platform=iOS Simulator,OS=18.5,name=iPhone 16'")
+    sh("xcodebuild test -project ../#{XCODEPROJ} -scheme #{SCHEME} -destination 'platform=iOS Simulator,name=iPhone 17'")
   end
 
   desc "PR preview: TestFlight internal"

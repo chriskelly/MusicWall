@@ -65,9 +65,10 @@ GitHub Actions on `macos-26` (Xcode 26 default) with Fastlane and [match](https:
 
 | Event | Workflow | Result |
 |-------|----------|--------|
-| Pull request (default) | `ios-preview.yml` | TestFlight **internal** build |
-| PR with label `no-deploy` | `ios-preview.yml` | Simulator unit tests only |
-| Tag `v*` (e.g. `v1.2.0`) | `ios-release.yml` | App Store upload + submit for review |
+| Pull request / push to `main` | `ci-tests.yml` | Simulator unit tests (`fastlane ci_test`) |
+| Pull request (default, when CI Tests pass) | `testflight-release.yml` | TestFlight **internal** build |
+| PR with label `no-deploy` | `testflight-release.yml` | Skip TestFlight upload |
+| Tag `v*` (e.g. `v1.2.0`) | `app-store-release.yml` | App Store upload + submit for review |
 
 Design and setup: [`docs/specs/2026-05-24-ios-cicd-design.md`](docs/specs/2026-05-24-ios-cicd-design.md). Agent conventions: [`Agent.md`](Agent.md).
 

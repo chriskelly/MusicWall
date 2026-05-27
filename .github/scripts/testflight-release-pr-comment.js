@@ -1,11 +1,11 @@
-// Upserts the iOS Preview PR comment (TestFlight or simulator-only).
-// Invoked from ios-preview.yml via actions/github-script.
+// Upserts the TestFlight Release PR comment (TestFlight or simulator-only).
+// Invoked from testflight-release.yml via actions/github-script.
 //
 // Env: PR_NUMBER, PREVIEW_MODE (testflight | simulator), BUILD_NUMBER (testflight only)
 
 async function upsertPreviewComment({ github, context, body }) {
   const pr = Number(process.env.PR_NUMBER);
-  const marker = "<!-- ios-preview-comment -->";
+  const marker = "<!-- testflight-release-comment -->";
   const fullBody = `${marker}\n${body}`;
 
   const { data: comments } = await github.rest.issues.listComments({
@@ -32,7 +32,7 @@ async function upsertPreviewComment({ github, context, body }) {
   }
 }
 
-module.exports = async function iosPreviewPrComment({ github, context }) {
+module.exports = async function testflightReleasePrComment({ github, context }) {
   const mode = process.env.PREVIEW_MODE;
   const build = process.env.BUILD_NUMBER;
   const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
@@ -42,7 +42,7 @@ module.exports = async function iosPreviewPrComment({ github, context }) {
       github,
       context,
       body: [
-        "### iOS Preview (unit tests only)",
+        "### TestFlight Release (unit tests only)",
         "",
         "PR has label `no-deploy` — ran `MusicWallTests` on the simulator and skipped TestFlight upload.",
         "",
@@ -56,7 +56,7 @@ module.exports = async function iosPreviewPrComment({ github, context }) {
     github,
     context,
     body: [
-      "### iOS Preview (TestFlight internal)",
+      "### TestFlight Release (TestFlight internal)",
       "",
       "_Marketing version may be auto-bumped above the live App Store version for upload — see Fastlane logs._",
       "",

@@ -6,19 +6,20 @@ This repo is a **SwiftUI + MusicKit** iOS app. Most agent work is Swift source u
 
 ```mermaid
 flowchart LR
-  Agent[Agent edits code + opens PR] --> Preview[ios-preview workflow]
+  Agent[Agent edits code + opens PR] --> CiTests[ci-tests workflow]
+  CiTests --> Preview[testflight-release workflow]
   Preview --> TF[TestFlight internal]
   Human[Human tests on device] --> Approve[Approve PR]
   Approve --> Main[Merge to main]
-  Tag[Human tags vX.Y.Z or manual dispatch] --> Release[ios-release workflow]
+  Tag[Human tags vX.Y.Z or manual dispatch] --> Release[app-store-release workflow]
   Release --> ASC[App Store Connect review]
 ```
 
 | Stage | Trigger | What runs | Human |
 |-------|---------|-----------|-------|
-| Fast feedback | PR + label `no-deploy` | Simulator unit tests (`ci_test`) | Optional |
-| Feature validation | PR push (default) | match → build → **TestFlight internal** | **Test on device** before approving PR |
-| Store release | Push tag `v*` (e.g. `v1.2.0`) or **Actions → iOS Release → Run workflow** with version `1.2.0` | Upload + **submit for review**; **automatic release** after Apple approves | Monitor in App Store Connect (no manual Release click) |
+| Fast feedback | PR push or push to `main` | `ci-tests` runs simulator unit tests (`ci_test`) | Optional |
+| Feature validation | PR push (default, after `ci-tests` passes) | `testflight-release` runs match → build → **TestFlight internal** | **Test on device** before approving PR |
+| Store release | Push tag `v*` (e.g. `v1.2.0`) or **Actions → App Store Release → Run workflow** with version `1.2.0` | Upload + **submit for review**; **automatic release** after Apple approves | Monitor in App Store Connect (no manual Release click) |
 
 **Rules for agents**
 
@@ -37,7 +38,7 @@ MusicWall/                 # App source (SwiftUI views, services, models)
 MusicWallTests/            # Deterministic unit tests and test-specific guidance
 MusicWall.xcodeproj/       # Xcode project — scheme: MusicWall
 fastlane/                  # match, build, upload lanes
-.github/workflows/         # ios-preview.yml, ios-release.yml
+.github/workflows/         # ci-tests.yml, testflight-release.yml, app-store-release.yml
 docs/specs/                # Design specs
 docs/plans/                # Implementation plans
 ```
@@ -93,7 +94,7 @@ They **cannot** compile iOS binaries. **CI is the source of truth** for “does 
 
 Before marking work complete:
 
-1. Ensure PR would pass **`ios-preview`** (or explain why `no-deploy` is appropriate).
+1. Ensure PR passes **`ci-tests`** before expecting **`testflight-release`** to run (or explain why `no-deploy` is appropriate).
 2. Note any **MusicKit / device-only** verification for the human.
 3. Never claim TestFlight or App Store success without workflow evidence.
 
@@ -122,7 +123,7 @@ Before marking work complete:
   bundle exec fastlane ios precheck_release
   ```
 
-  After adding metadata files for the first time, run **iOS Release** once (or set copyright in ASC) so preview precheck passes on copyright.
+  After adding metadata files for the first time, run **App Store Release** once (or set copyright in ASC) so TestFlight precheck passes on copyright.
 
 ## Secrets (humans only)
 

@@ -1,0 +1,35 @@
+name: CI Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-tests-${{ github.ref }}-${{ github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  ci-tests:
+    name: CI Tests
+    runs-on: macos-26
+    permissions:
+      contents: read
+    env:
+      CI: true
+      APP_IDENTIFIER: chris.MusicWall
+      DEVELOPMENT_TEAM: CD8XP2U645
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Run unit tests
+        run: bundle exec fastlane ci_test

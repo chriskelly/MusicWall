@@ -28,7 +28,7 @@ This skill describes a **multi-PR refactor** of the MusicWall SwiftUI + MusicKit
 2. Invoke **only** the PR skill, e.g. `/musicwall-test-refactor-pr-05` — do not implement other PRs in the same session.
 3. Branch from `main`: `cursor/test-refactor-pr-05-<short-topic>-c3d5` (or team convention).
 4. Read [references/architecture.md](references/architecture.md) for north-star rules.
-5. Ship one PR; CI must pass `ios-preview` (`no-deploy` until tests are stable, then drop label if appropriate).
+5. Ship one PR; CI must pass `ci-tests` (and `testflight-release` unless `no-deploy` is applied).
 6. Update `docs/testing.md` when behavior or coverage policy changes.
 
 ## North star (summary)
