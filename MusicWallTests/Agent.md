@@ -2,6 +2,10 @@
 
 `MusicWallTests` is the deterministic unit-test target for MusicWall. It runs through the shared `MusicWall` scheme on the iPhone 17 simulator.
 
+## Fixtures
+
+- `MusicWallTests/Fixtures/AlbumFixtures.swift` — canonical `AlbumRecord` samples (`baseTrio`, UTC date helpers). Reused across sort/collection tests; PR 6 adds JSON migration fixtures in the same folder.
+
 ## Framework
 
 - Default: Swift Testing

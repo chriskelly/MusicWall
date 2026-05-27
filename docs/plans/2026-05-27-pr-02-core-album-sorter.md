@@ -24,16 +24,19 @@
 | Create | `MusicWall/Core/AlbumSorter.swift` | Verbatim comparators from legacy `applySort()` |
 | Create | `MusicWall/StoredAlbum+AlbumRecord.swift` | Adapter + `SortOptions.albumSortKey` |
 | Modify | `MusicWall/Album.swift` | Replace inline comparators with delegation |
-| Create | `MusicWallTests/Core/AlbumSorterTests.swift` | Golden matrix + edge cases |
-| Modify | `MusicWall.xcodeproj/project.pbxproj` | Add test file to `MusicWallTests` target only |
+| Create | `MusicWallTests/Fixtures/AlbumFixtures.swift` | Shared UTC dates + `baseTrio` records (reused PR 4+) |
+| Create | `MusicWallTests/Core/AlbumSorterTests.swift` | Golden matrix + edge cases; uses `AlbumFixtures` |
+| Modify | `MusicWall.xcodeproj/project.pbxproj` | Register new test files in `MusicWallTests` target |
 
 **Xcode note:** The `MusicWall` app target uses `PBXFileSystemSynchronizedRootGroup` on the `MusicWall/` folder — new files there are picked up automatically. Test files under `MusicWallTests/` must be registered in `project.pbxproj` manually (mirror `SmokeTests.swift`).
+
+**Fixtures note:** `AlbumFixtures.baseTrio` is the canonical three-album sample for unit tests (mirrors `StoredAlbums.dummyData()` content with stable IDs/dates). Golden **sort order** expectations stay in `AlbumSorterTests`. PR 6 migration will add JSON files under the same `MusicWallTests/Fixtures/` folder.
 
 ---
 
 ## Golden fixture reference
 
-Base trio (used in matrix):
+`AlbumFixtures.baseTrio` (defined in `MusicWallTests/Fixtures/AlbumFixtures.swift`):
 
 | ID | Title | Artist | `releaseDate` (UTC) |
 |----|-------|--------|---------------------|
@@ -113,41 +116,31 @@ git commit -m "feat(core): Add AlbumID, AlbumRecord, and AlbumSortKey"
 
 ---
 
-### Task 2: `AlbumSorter` — failing tests first
+### Task 2: Shared fixtures + `AlbumSorter` failing tests
 
 **Files:**
+- Create: `MusicWallTests/Fixtures/AlbumFixtures.swift`
 - Create: `MusicWallTests/Core/AlbumSorterTests.swift`
 - Modify: `MusicWall.xcodeproj/project.pbxproj`
 
-- [ ] **Step 1: Register test file in Xcode project**
-
-Add `MusicWallTests/Core/AlbumSorterTests.swift` to the `MusicWallTests` target (Sources build phase + group), following the same pattern as `SmokeTests.swift`:
-
-1. Add `PBXFileReference` for `AlbumSorterTests.swift`
-2. Add `PBXBuildFile` entry in `MusicWallTests` Sources phase
-3. Add file to `850E21353DFC86412384C721 /* MusicWallTests */` group (optionally under a `Core` subgroup)
-
-Or open Xcode → add existing file → check `MusicWallTests` target membership.
-
-- [ ] **Step 2: Write `AlbumSorterTests.swift` (tests will fail — `AlbumSorter` not implemented yet)**
+- [ ] **Step 1: Create `AlbumFixtures.swift`**
 
 ```swift
 import Foundation
-import Testing
 @testable import MusicWall
 
-struct AlbumSorterTests {
-    private static var utcCalendar: Calendar {
+enum AlbumFixtures {
+    static var utcCalendar: Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = TimeZone(secondsFromGMT: 0)!
         return calendar
     }
 
-    private static func utcDate(year: Int, month: Int, day: Int) -> Date {
+    static func utcDate(year: Int, month: Int, day: Int) -> Date {
         utcCalendar.date(from: DateComponents(year: year, month: month, day: day))!
     }
 
-    private static func record(
+    static func record(
         id: String,
         title: String,
         artistName: String,
@@ -161,14 +154,36 @@ struct AlbumSorterTests {
         )
     }
 
-    private static var baseFixtures: [AlbumRecord] {
+    /// Canonical three-album sample (stable IDs/dates). Reused by PR 4+ collection tests.
+    static var baseTrio: [AlbumRecord] {
         [
             record(id: "fixture-drake", title: "Take Care", artistName: "Drake", releaseDate: utcDate(year: 2011, month: 11, day: 15)),
             record(id: "fixture-cole", title: "Born Sinners", artistName: "J. Cole", releaseDate: nil),
             record(id: "fixture-kendrick", title: "Good Kid, m.A.A.d City", artistName: "Kendrick Lamar", releaseDate: utcDate(year: 2012, month: 10, day: 22)),
         ]
     }
+}
+```
 
+- [ ] **Step 2: Register test files in Xcode project**
+
+Add both files to the `MusicWallTests` target (Sources build phase + group), following the same pattern as `SmokeTests.swift`:
+
+1. `MusicWallTests/Fixtures/AlbumFixtures.swift`
+2. `MusicWallTests/Core/AlbumSorterTests.swift`
+
+For each: `PBXFileReference`, `PBXBuildFile` in Sources phase, entry under `MusicWallTests` group (use `Fixtures` / `Core` subgroups).
+
+Or open Xcode → add existing files → check `MusicWallTests` target membership.
+
+- [ ] **Step 3: Write `AlbumSorterTests.swift` (tests will fail — `AlbumSorter` not implemented yet)**
+
+```swift
+import Foundation
+import Testing
+@testable import MusicWall
+
+struct AlbumSorterTests {
     private func sortedIDs(
         _ albums: [AlbumRecord],
         key: AlbumSortKey,
@@ -186,15 +201,15 @@ struct AlbumSorterTests {
         (AlbumSortKey.year, false, ["fixture-kendrick", "fixture-drake", "fixture-cole"]),
     ])
     func goldenSortOrder(key: AlbumSortKey, ascending: Bool, expectedIDs: [String]) {
-        let result = sortedIDs(Self.baseFixtures, key: key, ascending: ascending)
+        let result = sortedIDs(AlbumFixtures.baseTrio, key: key, ascending: ascending)
         #expect(result == expectedIDs)
     }
 
     @Test
     func artistSortIsCaseInsensitive() {
         let albums = [
-            Self.record(id: "lower", title: "Zebra", artistName: "drake"),
-            Self.record(id: "upper", title: "Alpha", artistName: "DRAKE"),
+            AlbumFixtures.record(id: "lower", title: "Zebra", artistName: "drake"),
+            AlbumFixtures.record(id: "upper", title: "Alpha", artistName: "DRAKE"),
         ]
         let ascending = sortedIDs(albums, key: .artist, ascending: true)
         #expect(ascending == ["lower", "upper"])
@@ -205,8 +220,8 @@ struct AlbumSorterTests {
     @Test
     func titleSortIsCaseInsensitive() {
         let albums = [
-            Self.record(id: "lower", title: "hello", artistName: "A"),
-            Self.record(id: "upper", title: "HELLO", artistName: "B"),
+            AlbumFixtures.record(id: "lower", title: "hello", artistName: "A"),
+            AlbumFixtures.record(id: "upper", title: "HELLO", artistName: "B"),
         ]
         let ascending = sortedIDs(albums, key: .title, ascending: true)
         #expect(ascending == ["lower", "upper"])
@@ -214,21 +229,19 @@ struct AlbumSorterTests {
 
     @Test
     func nilReleaseDateSortsLastAscendingYear() {
-        let withNil = Self.baseFixtures
-        let result = sortedIDs(withNil, key: .year, ascending: true)
+        let result = sortedIDs(AlbumFixtures.baseTrio, key: .year, ascending: true)
         #expect(result.last == "fixture-cole")
     }
 
     @Test
     func nilReleaseDateSortsLastDescendingYear() {
-        let withNil = Self.baseFixtures
-        let result = sortedIDs(withNil, key: .year, ascending: false)
+        let result = sortedIDs(AlbumFixtures.baseTrio, key: .year, ascending: false)
         #expect(result.last == "fixture-cole")
     }
 }
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [ ] **Step 4: Run tests to verify they fail**
 
 Run:
 
@@ -240,11 +253,11 @@ xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall \
 
 Expected: FAIL — `AlbumSorter` not found / cannot compile
 
-- [ ] **Step 4: Commit failing tests**
+- [ ] **Step 5: Commit failing tests**
 
 ```bash
-git add MusicWallTests/Core/AlbumSorterTests.swift MusicWall.xcodeproj/project.pbxproj
-git commit -m "test: Add AlbumSorter golden sort matrix (red)"
+git add MusicWallTests/Fixtures/AlbumFixtures.swift MusicWallTests/Core/AlbumSorterTests.swift MusicWall.xcodeproj/project.pbxproj
+git commit -m "test: Add AlbumFixtures and AlbumSorter golden sort matrix (red)"
 ```
 
 ---
@@ -475,6 +488,7 @@ Label PR `no-deploy` if skipping TestFlight for this refactor-only change.
 |------------------|------|
 | `AlbumID`, `AlbumRecord`, `AlbumSortKey` in Core | Task 1 |
 | `AlbumSorter.sorted` verbatim comparators | Task 3 |
+| Shared `AlbumFixtures.baseTrio` | Task 2 |
 | Golden matrix all keys × asc/desc | Task 2 |
 | Nil date + case insensitivity tests | Task 2 |
 | `StoredAlbum.asAlbumRecord` adapter | Task 4 |

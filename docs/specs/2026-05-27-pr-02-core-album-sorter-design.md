@@ -170,6 +170,8 @@ Swift Testing (consistent with PR 1 / `MusicWallTests/Agent.md`).
 
 ### Golden fixtures
 
+Shared helpers live in `MusicWallTests/Fixtures/AlbumFixtures.swift` (`utcDate`, `record`, `baseTrio`). Golden sort-order expectations remain in `AlbumSorterTests`.
+
 Fixed dates and stable string IDs (no `UUID()` or `Date()` in tests):
 
 | `AlbumID.rawValue` | Title | Artist | `releaseDate` |
