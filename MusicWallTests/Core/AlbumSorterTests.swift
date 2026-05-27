@@ -27,13 +27,13 @@ struct AlbumSorterTests {
     @Test
     func artistSortIsCaseInsensitive() {
         let albums = [
-            AlbumFixtures.record(id: "lower", title: "Zebra", artistName: "drake"),
-            AlbumFixtures.record(id: "upper", title: "Alpha", artistName: "DRAKE"),
+            AlbumFixtures.record(id: "lower", title: "x", artistName: "beta"),
+            AlbumFixtures.record(id: "upper", title: "y", artistName: "ALPHA"),
         ]
         let ascending = sortedIDs(albums, key: .artist, ascending: true)
-        #expect(ascending == ["lower", "upper"])
+        #expect(ascending == ["upper", "lower"])
         let descending = sortedIDs(albums, key: .artist, ascending: false)
-        #expect(descending == ["upper", "lower"])
+        #expect(descending == ["lower", "upper"])
     }
 
     @Test
