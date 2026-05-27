@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7A3C9E2F1B4D8A605E92F3C1 /* AlbumFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */; };
+		9F2E5C8A3D1B7F406A8E2D59 /* AlbumSorterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */; };
 		BBAE99B1FA45969122576159 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B203760B33EAD816D6FDCB94 /* SmokeTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -23,7 +25,9 @@
 /* Begin PBXFileReference section */
 		4074DBA99A12CE4F48D648E1 /* MusicWallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicWallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		835DD9882E5FB592001CD95F /* MusicWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumFixtures.swift; sourceTree = "<group>"; };
 		B203760B33EAD816D6FDCB94 /* SmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumSorterTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -72,13 +76,31 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		2F8A1C4E9D6B3A7051E8C2D0 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
 		850E21353DFC86412384C721 /* MusicWallTests */ = {
 			isa = PBXGroup;
 			children = (
+				3E7B2A9C5F1D8046A2C9E1B4 /* Fixtures */,
+				2F8A1C4E9D6B3A7051E8C2D0 /* Core */,
 				B203760B33EAD816D6FDCB94 /* SmokeTests.swift */,
 			);
 			name = MusicWallTests;
 			path = MusicWallTests;
+			sourceTree = "<group>";
+		};
+		3E7B2A9C5F1D8046A2C9E1B4 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */,
+			);
+			path = Fixtures;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -190,6 +212,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A3C9E2F1B4D8A605E92F3C1 /* AlbumFixtures.swift in Sources */,
+				9F2E5C8A3D1B7F406A8E2D59 /* AlbumSorterTests.swift in Sources */,
 				BBAE99B1FA45969122576159 /* SmokeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
