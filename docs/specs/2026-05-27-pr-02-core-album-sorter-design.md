@@ -214,7 +214,8 @@ No workflow changes. PR must pass existing `ci-tests` (`fastlane ci_test`).
 
 - Branch from `main`: `cursor/test-refactor-pr-02-core-album-sorter-c3d5` (or team convention).
 - Add new files to `MusicWall.xcodeproj` / test target membership.
-- Label PR `no-deploy` if skipping TestFlight for a test-only refactor (team preference).
+- Do **not** use `no-deploy` — run TestFlight on the PR and verify sort on a physical device.
+- Monitor `ci-tests` and `testflight-release` until green before merge.
 
 ## Follow-on PRs
 

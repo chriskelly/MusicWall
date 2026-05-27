@@ -459,6 +459,8 @@ Expected: PASS
 
 - [ ] **Step 4: Push branch and open PR**
 
+Do **not** add the `no-deploy` label — this PR should run the full PR pipeline including TestFlight so sort behavior can be verified on a physical device.
+
 ```bash
 git push -u origin cursor/test-refactor-pr-02-core-album-sorter-c3d5
 gh pr create --title "test refactor PR 2: Core domain + AlbumSorter" --body "$(cat <<'EOF'
@@ -468,8 +470,9 @@ gh pr create --title "test refactor PR 2: Core domain + AlbumSorter" --body "$(c
 - Delegate `StoredAlbums.applySort()` via `StoredAlbum` → `AlbumRecord` adapter
 
 ## Test plan
-- [ ] `bundle exec fastlane ci_test` passes locally or on CI
-- [ ] Sort by Artist / Title / Year in app still behaves correctly (manual smoke on simulator)
+- [ ] `ci-tests` workflow passes (`fastlane ci_test`)
+- [ ] `testflight-release` workflow passes (no `no-deploy` label)
+- [ ] Sort by Artist / Title / Year on device (TestFlight internal build)
 - [ ] No UserDefaults / on-disk format changes
 
 ## Spec
@@ -478,7 +481,25 @@ EOF
 )"
 ```
 
-Label PR `no-deploy` if skipping TestFlight for this refactor-only change.
+- [ ] **Step 5: Monitor PR checks until green**
+
+After opening the PR, watch GitHub Actions until all required checks complete. Fix any failures before merge.
+
+```bash
+# PR number from gh pr create output
+gh pr checks <PR_NUMBER> --watch
+```
+
+Expected workflows:
+
+| Check | Workflow | On failure |
+|-------|----------|------------|
+| CI Tests | `ci-tests.yml` | Read logs; fix tests/build; push fix |
+| TestFlight release | `testflight-release.yml` | Read Fastlane/signing logs; push fix |
+
+Re-run failed jobs after fixes: `gh run rerun <run-id> --failed`
+
+Do not merge until `ci-tests` and `testflight-release` (or whatever the repo requires) are passing.
 
 ---
 
@@ -496,7 +517,8 @@ Label PR `no-deploy` if skipping TestFlight for this refactor-only change.
 | `applySort()` delegation, inline removed | Task 5 |
 | Core free of MusicKit/SwiftUI/UIKit | Task 6 step 1 |
 | UserDefaults unchanged | Task 6 step 2 |
-| CI green | Task 5–6 |
+| CI green (`ci-tests` + `testflight-release`) | Task 5–6 |
+| PR checks monitored / failures fixed | Task 6 step 5 |
 | No SPM / no persistence migration | Implicit — not in file map |
 
 No placeholders. Type names consistent across tasks.
