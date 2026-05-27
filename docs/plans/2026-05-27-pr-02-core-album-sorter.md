@@ -6,7 +6,7 @@
 
 **Architecture:** Foundation-only Core types (`AlbumID`, `AlbumRecord`, `AlbumSortKey`, `AlbumSorter`) live under `MusicWall/Core/`. The app target adds `StoredAlbum+AlbumRecord.swift` for MusicKit bridging. `StoredAlbums.applySort()` maps to records, sorts via `AlbumSorter`, and rebuilds `[StoredAlbum]` by ID lookup.
 
-**Tech Stack:** Swift 5, Swift Testing, Xcode 16+, scheme `MusicWall`, simulator `iPhone 16`, `bundle exec fastlane ci_test`.
+**Tech Stack:** Swift 5, Swift Testing, Xcode 16+, scheme `MusicWall`, simulator `iPhone 17`, `bundle exec fastlane ci_test`.
 
 **Spec:** `docs/specs/2026-05-27-pr-02-core-album-sorter-design.md`
 
@@ -99,7 +99,7 @@ Run:
 
 ```bash
 xcodebuild build -project MusicWall.xcodeproj -scheme MusicWall \
-  -destination 'platform=iOS Simulator,name=iPhone 16' -quiet
+  -destination 'platform=iOS Simulator,name=iPhone 17' -quiet
 ```
 
 Expected: `BUILD SUCCEEDED`
@@ -234,7 +234,7 @@ Run:
 
 ```bash
 xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
   -only-testing:MusicWallTests/AlbumSorterTests 2>&1 | tail -20
 ```
 
@@ -297,7 +297,7 @@ Run:
 
 ```bash
 xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
   -only-testing:MusicWallTests/AlbumSorterTests 2>&1 | tail -20
 ```
 
@@ -351,7 +351,7 @@ Run:
 
 ```bash
 xcodebuild build -project MusicWall.xcodeproj -scheme MusicWall \
-  -destination 'platform=iOS Simulator,name=iPhone 16' -quiet
+  -destination 'platform=iOS Simulator,name=iPhone 17' -quiet
 ```
 
 Expected: `BUILD SUCCEEDED`

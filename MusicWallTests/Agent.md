@@ -1,6 +1,6 @@
 # Agent guide — MusicWallTests
 
-`MusicWallTests` is the deterministic unit-test target for MusicWall. It runs through the shared `MusicWall` scheme on the iPhone 16 simulator.
+`MusicWallTests` is the deterministic unit-test target for MusicWall. It runs through the shared `MusicWall` scheme on the iPhone 17 simulator.
 
 ## Framework
 
@@ -10,7 +10,7 @@
 ## Commands
 
 - `bundle exec fastlane ci_test`
-- `xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall -destination 'platform=iOS Simulator,name=iPhone 16'`
+- `xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall -destination 'platform=iOS Simulator,name=iPhone 17'`
 
 ## Coverage
 
