@@ -56,8 +56,31 @@ def prepare_appstore_signing
   configure_appstore_signing
 end
 
-def build_appstore_ipa
+def set_target_version_in_project(marketing_version: nil, build_number: nil, xcodeproj:, target_name:)
+  require "xcodeproj"
+
+  project = Xcodeproj::Project.open(File.expand_path(xcodeproj))
+  native_target = project.targets.find { |t| t.name == target_name }
+  UI.user_error!("Xcode target #{target_name} not found in #{xcodeproj}") unless native_target
+
+  native_target.build_configurations.each do |config|
+    config.build_settings["MARKETING_VERSION"] = marketing_version.to_s if marketing_version
+    config.build_settings["CURRENT_PROJECT_VERSION"] = build_number.to_s if build_number
+  end
+
+  project.save
+end
+
+def build_appstore_ipa(marketing_version: nil, build_number: nil)
   profile = appstore_profile_name
+  xcargs = {
+    CODE_SIGN_STYLE: "Manual",
+    PROVISIONING_PROFILE_SPECIFIER: profile,
+    DEVELOPMENT_TEAM: TEAM_ID
+  }
+  xcargs[:MARKETING_VERSION] = marketing_version if marketing_version
+  xcargs[:CURRENT_PROJECT_VERSION] = build_number.to_s if build_number
+
   build_app(
     scheme: SCHEME,
     project: XCODEPROJ,
@@ -65,11 +88,7 @@ def build_appstore_ipa
     output_directory: "./build",
     clean: true,
     codesigning_identity: "Apple Distribution",
-    xcargs: {
-      CODE_SIGN_STYLE: "Manual",
-      PROVISIONING_PROFILE_SPECIFIER: profile,
-      DEVELOPMENT_TEAM: TEAM_ID
-    },
+    xcargs: xcargs,
     export_options: {
       provisioningProfiles: {
         BUNDLE_ID => profile
@@ -111,7 +130,12 @@ def resolve_marketing_version_for_preview
     )
   end
 
-  increment_version_number(version_number: target, xcodeproj: XCODEPROJ) if target != project_version
+  # agvtool does not update explicit MARKETING_VERSION build settings in modern Xcode projects.
+  set_target_version_in_project(
+    marketing_version: target,
+    xcodeproj: XCODEPROJ,
+    target_name: TARGET
+  )
   target
 end
 
@@ -173,12 +197,16 @@ platform :ios do
     marketing_version = resolve_marketing_version_for_preview
     build_number = resolve_build_number_for_upload(version: marketing_version)
 
-    increment_build_number(
+    set_target_version_in_project(
       build_number: build_number,
-      xcodeproj: XCODEPROJ
+      xcodeproj: XCODEPROJ,
+      target_name: TARGET
     )
 
-    build_appstore_ipa
+    build_appstore_ipa(
+      marketing_version: marketing_version,
+      build_number: build_number
+    )
 
     upload_to_testflight(
       api_key: asc_api_key,
@@ -198,17 +226,19 @@ platform :ios do
     prepare_appstore_signing
 
     release_version = ENV.fetch("RELEASE_VERSION")
-    increment_version_number(
-      version_number: release_version,
-      xcodeproj: XCODEPROJ
-    )
     build_number = resolve_build_number_for_upload(version: release_version)
-    increment_build_number(
+
+    set_target_version_in_project(
+      marketing_version: release_version,
       build_number: build_number,
-      xcodeproj: XCODEPROJ
+      xcodeproj: XCODEPROJ,
+      target_name: TARGET
     )
 
-    build_appstore_ipa
+    build_appstore_ipa(
+      marketing_version: release_version,
+      build_number: build_number
+    )
 
     upload_to_app_store(
       api_key: asc_api_key,
