@@ -1,6 +1,10 @@
 # Agent guide — MusicWallTests
 
-`MusicWallTests` is the deterministic unit-test target for MusicWall. It runs through the shared `MusicWall` scheme on the iPhone 16 simulator.
+`MusicWallTests` is the deterministic unit-test target for MusicWall. It runs through the shared `MusicWall` scheme on the iPhone 17 simulator.
+
+## Fixtures
+
+- `MusicWallTests/Fixtures/AlbumFixtures.swift` — canonical `AlbumRecord` samples (`baseTrio`, UTC date helpers). Reused across sort/collection tests; PR 6 adds JSON migration fixtures in the same folder.
 
 ## Framework
 
@@ -10,7 +14,7 @@
 ## Commands
 
 - `bundle exec fastlane ci_test`
-- `xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall -destination 'platform=iOS Simulator,name=iPhone 16'`
+- `xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall -destination 'platform=iOS Simulator,name=iPhone 17'`
 
 ## Coverage
 

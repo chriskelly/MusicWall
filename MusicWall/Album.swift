@@ -97,28 +97,15 @@ class StoredAlbums {
     }
     
     func applySort() {
-        let isAscending = sortDirection[currentSort] ?? true
-        
-        switch currentSort {
-        case .artist:
-            if isAscending {
-                items.sort { $0.artistName.lowercased() < $1.artistName.lowercased() }
-            } else {
-                items.sort { $0.artistName.lowercased() > $1.artistName.lowercased() }
-            }
-        case .title:
-            if isAscending {
-                items.sort { $0.title.lowercased() < $1.title.lowercased() }
-            } else {
-                items.sort { $0.title.lowercased() > $1.title.lowercased() }
-            }
-        case .date:
-            if isAscending {
-                items.sort { ($0.releaseDate ?? Date.distantFuture) < ($1.releaseDate ?? Date.distantFuture) }
-            } else {
-                items.sort { ($0.releaseDate ?? Date.distantPast) > ($1.releaseDate ?? Date.distantPast) }
-            }
-        }
+        let ascending = sortDirection[currentSort] ?? true
+        let records = items.map(\.asAlbumRecord)
+        let sortedRecords = AlbumSorter.sorted(
+            records,
+            key: currentSort.albumSortKey,
+            ascending: ascending
+        )
+        let byID = Dictionary(uniqueKeysWithValues: items.map { ($0.id.rawValue, $0) })
+        items = sortedRecords.compactMap { byID[$0.id.rawValue] }
     }
     
     func toggleSortDirection(for option: SortOptions) {
