@@ -28,7 +28,7 @@ Enable automated tests in CI and introduce dependency injection entry point with
 - Wire **`MusicWall.xcscheme`** `TestAction` → `MusicWallTests`; enable **Gather code coverage**.
 - Extend **`fastlane`** (`ci_test` lane or extend `ci_build`) to run:
   `xcodebuild test -scheme MusicWall -destination 'platform=iOS Simulator,name=iPhone 16'` (match CI simulator).
-- Update **`.github/workflows/ios-preview.yml`**: run tests on `no-deploy` PRs (or all PRs once stable).
+- Update CI workflows so **`.github/workflows/ci-tests.yml`** runs tests and **`.github/workflows/testflight-release.yml`** handles TestFlight preview.
 - Add **`AppDependencies`** struct with static `.live` factory (empty/minimal protocols OK).
 - Pass `AppDependencies` from `MusicWallApp` → `ContentView` (no behavior change yet).
 - Create **`docs/testing.md`**: framework choice, local test command, exclusions list (MusicKit live).
@@ -62,4 +62,4 @@ Enable automated tests in CI and introduce dependency injection entry point with
 
 - `MusicWall/MusicWallApp.swift`, `MusicWall/ContentView.swift`
 - `MusicWall.xcodeproj/project.pbxproj`, `xcshareddata/xcschemes/MusicWall.xcscheme`
-- `fastlane/Fastfile`, `.github/workflows/ios-preview.yml`
+- `fastlane/Fastfile`, `.github/workflows/ci-tests.yml`, `.github/workflows/testflight-release.yml`

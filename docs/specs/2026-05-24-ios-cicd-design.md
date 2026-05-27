@@ -24,7 +24,10 @@
 
 ```mermaid
 flowchart TB
-  subgraph preview [ios-preview.yml — PR events]
+  subgraph ciTests [ci-tests.yml — PR and main push]
+    T[Run fastlane ci_test]
+  end
+  subgraph preview [testflight-release.yml — PR after CI Tests success]
     A{Label no-deploy?}
     A -->|yes| B[Simulator build only]
     A -->|no| C[match appstore]
@@ -32,7 +35,7 @@ flowchart TB
     D --> E[build_app + upload TestFlight internal]
     E --> F[Comment on PR with build info]
   end
-  subgraph release [ios-release.yml — push tag v*]
+  subgraph release [app-store-release.yml — push tag v*]
     G[match appstore]
     H[Set version from tag + build number]
     I[build_app + upload]
@@ -44,8 +47,9 @@ flowchart TB
 
 | Workflow | Event | Condition | Actions |
 |----------|-------|-----------|---------|
-| `ios-preview.yml` | `pull_request` (opened, synchronize, reopened) | Head repo == this repo | See label branch above |
-| `ios-release.yml` | `push` tags matching `v*` | Tag on default branch history | match → build → upload → submit |
+| `ci-tests.yml` | `pull_request` (opened, synchronize, reopened), `push` to `main` | n/a | Run `fastlane ci_test` |
+| `testflight-release.yml` | `workflow_run` from `CI Tests` | PR event + CI Tests conclusion = success + head repo == this repo | See label branch above |
+| `app-store-release.yml` | `push` tags matching `v*` | Tag on default branch history | match → build → upload → submit |
 
 ### Build numbering
 
@@ -72,8 +76,9 @@ flowchart TB
 
 | Path | Role |
 |------|------|
-| `.github/workflows/ios-preview.yml` | PR CI/CD preview |
-| `.github/workflows/ios-release.yml` | Tag release |
+| `.github/workflows/ci-tests.yml` | PR/main test workflow |
+| `.github/workflows/testflight-release.yml` | PR TestFlight preview workflow |
+| `.github/workflows/app-store-release.yml` | Tag release |
 | `fastlane/Appfile` | `app_identifier`, `team_id` from env |
 | `fastlane/Matchfile` | Cert git URL, `appstore` type |
 | `fastlane/Fastfile` | Lanes above |
@@ -88,7 +93,7 @@ flowchart TB
 - Explicit `MusicWall.entitlements` for MusicKit if CI requires it.
 - `MusicWallTests` target for simulator tests on `no-deploy` PRs.
 - PR template with TestFlight checkbox.
-- Branch protection requiring `ios-preview` check.
+- Optional branch protection requiring `CI Tests` check.
 
 ## GitHub Actions secrets
 
@@ -151,7 +156,7 @@ Workflows pass these to Fastlane via environment variables. Fastlane `app_store_
 ## Release conventions
 
 - Merge features to `main` via PR (TestFlight already validated on PR).
-- When ready for store: tag `v<major>.<minor>.<patch>` on `main` → `ios-release.yml` uploads and submits for review.
+- When ready for store: tag `v<major>.<minor>.<patch>` on `main` → `app-store-release.yml` uploads and submits for review.
 - Human monitors App Store Connect for review outcome and release.
 
 ## Error handling
