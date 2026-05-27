@@ -35,9 +35,9 @@
 
 Base trio (used in matrix):
 
-| ID | Artist | Title | `releaseDate` (UTC) |
-|----|--------|-------|---------------------|
-| `fixture-drake` | Drake | Take Care | 2011-11-15 |
+| ID | Title | Artist | `releaseDate` (UTC) |
+|----|-------|--------|---------------------|
+| `fixture-drake` | Take Care | Drake | 2011-11-15 |
 | `fixture-cole` | Born Sinners | J. Cole | `nil` |
 | `fixture-kendrick` | Good Kid, m.A.A.d City | Kendrick Lamar | 2012-10-22 |
 
