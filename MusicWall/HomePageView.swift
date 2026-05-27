@@ -11,14 +11,23 @@ import UIKit
 
 struct HomePageView: View {
     @State var albums: StoredAlbums
+    let preferences: PreferencesStore
     @State private var showingAddView = false
-    @State private var currentLayout = LayoutMenu.loadLayout() ?? .grid
+    @State private var currentLayout: LayoutMenu.Option
     @State private var showingAlbumAddSnackbar = false
     @State private var showingFileImporter = false
     @State private var exportedFileURL: URL?
     @State private var showingExportShareSheet = false
     @State private var showingImportSnackbar = false
     @State private var importSnackbarMessage = ""
+
+    init(albums: StoredAlbums, preferences: PreferencesStore) {
+        self._albums = State(initialValue: albums)
+        self.preferences = preferences
+        self._currentLayout = State(
+            initialValue: LayoutMenu.loadLayout(using: preferences) ?? .grid
+        )
+    }
     
     var body: some View {
         NavigationStack {
@@ -64,6 +73,7 @@ struct HomePageView: View {
             HomePageMenu(
                 currentLayout: $currentLayout,
                 showingFileImporter: $showingFileImporter,
+                preferences: preferences,
                 onExport: exportAlbums
             )
             Button("Shuffle albums temporarily", systemImage: "shuffle.circle") {
@@ -125,11 +135,12 @@ struct HomePageView: View {
 struct HomePageMenu: View {
     @Binding var currentLayout: LayoutMenu.Option
     @Binding var showingFileImporter: Bool
+    let preferences: PreferencesStore
     let onExport: () -> Void
     
     var body: some View {
         Menu {
-            LayoutMenu(currentLayout: $currentLayout)
+            LayoutMenu(currentLayout: $currentLayout, preferences: preferences)
             SortMenu()
             BackupMenu(showingFileImporter: $showingFileImporter, onExport: onExport)
         } label: {
@@ -196,12 +207,20 @@ struct ShareSheet: UIViewControllerRepresentable {
 }
 
 #Preview {
-    HomePageView(albums: StoredAlbums.dummyData())
+    let deps = AppDependencies.preview()
+    HomePageView(
+        albums: StoredAlbums.dummyData(preferences: deps.preferencesStore),
+        preferences: deps.preferencesStore
+    )
 }
 
 
 #Preview {
+    let deps = AppDependencies.preview()
     NavigationStack {
-        HomePageView(albums: StoredAlbums.dummyData())
+        HomePageView(
+            albums: StoredAlbums.dummyData(preferences: deps.preferencesStore),
+            preferences: deps.preferencesStore
+        )
     }
 }

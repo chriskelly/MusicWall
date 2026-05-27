@@ -47,7 +47,8 @@ MusicWall/
 ├── MusicService.swift           # Apple Music API service layer
 ├── LayoutViews.swift            # Grid and list layout implementations
 ├── ImageCache.swift             # Album artwork caching
-├── UserDefaultsManager.swift    # Data persistence utilities
+├── Core/PreferencesStore.swift    # Persistence protocol
+├── Adapters/UserDefaultsPreferencesStore.swift
 └── SnackbarView.swift           # User notification component
 ```
 
