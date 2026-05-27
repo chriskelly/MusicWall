@@ -71,6 +71,7 @@ GitHub Actions on `macos-26` (Xcode 26 default) with Fastlane and [match](https:
 | Tag `v*` (e.g. `v1.2.0`) | `app-store-release.yml` | App Store upload + submit for review |
 
 Design and setup: [`docs/specs/2026-05-24-ios-cicd-design.md`](docs/specs/2026-05-24-ios-cicd-design.md). Agent conventions: [`Agent.md`](Agent.md).
+On PRs, `testflight-release.yml` is triggered by successful completion of `CI Tests`.
 
 Local Fastlane (after `bundle install`):
 
