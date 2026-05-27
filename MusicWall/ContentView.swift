@@ -16,7 +16,11 @@ struct ContentView: View {
     var body: some View {
         Group {
             if isAuthorized {
-                HomePageView(albums: StoredAlbums())
+                let store = dependencies.preferencesStore
+                HomePageView(
+                    albums: StoredAlbums(preferences: store),
+                    preferences: store
+                )
             } else if authorizationDenied {
                 authorizationDeniedView()
             } else {

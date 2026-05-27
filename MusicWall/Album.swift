@@ -30,13 +30,18 @@ extension StoredAlbum {
 
 @Observable
 class StoredAlbums {
+    private let preferences: PreferencesStore
     private var itemsSavingLocked = false
+
+    init(preferences: PreferencesStore) {
+        self.preferences = preferences
+    }
     
     var items = [StoredAlbum]() {
         didSet {
             if !itemsSavingLocked {
-                UserDefaultsManager.setData(key: .storedAlbumsItemsKey, data: items)
-                UserDefaultsManager.setData(key: .backupAlbumIDsKey, data: items.map { $0.id.rawValue })
+                preferences.save(items, for: .storedAlbumsItems)
+                preferences.save(items.map { $0.id.rawValue }, for: .backupAlbumIDs)
             }
         }
     }
@@ -49,15 +54,9 @@ class StoredAlbums {
     
     private func loadItems() async {
         itemsSavingLocked = true
-        items = UserDefaultsManager.loadData(
-            key: .storedAlbumsItemsKey,
-            type: [StoredAlbum].self
-        ) ?? []
+        items = preferences.load([StoredAlbum].self, for: .storedAlbumsItems) ?? []
         if items.isEmpty {
-            let backupIDs = UserDefaultsManager.loadData(
-                key: .backupAlbumIDsKey,
-                type: [String].self
-            ) ?? []
+            let backupIDs = preferences.load([String].self, for: .backupAlbumIDs) ?? []
             if let albums = try? await MusicService.fetchAlbums(ids: backupIDs) {
                 itemsSavingLocked = false
                 items = albums.map { StoredAlbum(from: $0) }
@@ -67,14 +66,8 @@ class StoredAlbums {
     }
     
     private func loadSort() {
-        sortDirection = UserDefaultsManager.loadData(
-            key: .sortDirectionKey,
-            type: [SortOptions: Bool].self
-        ) ?? [:]
-        currentSort = UserDefaultsManager.loadData(
-            key: .currentSortKey,
-            type: SortOptions.self
-        ) ?? .artist
+        sortDirection = preferences.load([SortOptions: Bool].self, for: .sortDirection) ?? [:]
+        currentSort = preferences.load(SortOptions.self, for: .currentSort) ?? .artist
     }
     
     enum SortOptions: String, CaseIterable, Identifiable, Codable {
@@ -87,12 +80,12 @@ class StoredAlbums {
     
     var currentSort: SortOptions = .artist {
         didSet {
-            UserDefaultsManager.setData(key: .currentSortKey, data: currentSort)
+            preferences.save(currentSort, for: .currentSort)
         }
     }
     var sortDirection: [SortOptions: Bool] = [:] {// true = ascending, false = descending
         didSet {
-            UserDefaultsManager.setData(key: .sortDirectionKey, data: sortDirection)
+            preferences.save(sortDirection, for: .sortDirection)
         }
     }
     
@@ -159,8 +152,8 @@ class StoredAlbums {
         applySort()
     }
     
-    static func dummyData() -> StoredAlbums {
-        let storedAlbums = StoredAlbums()
+    static func dummyData(preferences: PreferencesStore) -> StoredAlbums {
+        let storedAlbums = StoredAlbums(preferences: preferences)
         storedAlbums.items = [
             StoredAlbum(id: MusicItemID("\(UUID())"), title: "Take Care", artistName: "Drake", releaseDate: Date()),
             StoredAlbum(id: MusicItemID("\(UUID())"), title: "Born Sinners", artistName: "J. Cole", releaseDate: nil),

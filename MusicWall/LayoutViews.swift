@@ -254,6 +254,7 @@ struct AlbumArtwork: View {
 
 struct LayoutMenu: View {
     @Binding var currentLayout: Option
+    let preferences: PreferencesStore
     
     enum Option: String, CaseIterable, Identifiable, Codable {
         var id: String { rawValue }
@@ -267,7 +268,7 @@ struct LayoutMenu: View {
             ForEach(LayoutMenu.Option.allCases) { option in
                 Button {
                     currentLayout = option
-                    UserDefaultsManager.setData(key: .homePageLayoutKey, data: currentLayout)
+                    preferences.save(currentLayout, for: .homePageLayout)
                 } label: {
                     HStack {
                         if currentLayout == option {
@@ -281,21 +282,19 @@ struct LayoutMenu: View {
         }
     }
     
-    static func loadLayout() -> Option? {
-        return UserDefaultsManager.loadData(
-            key: .homePageLayoutKey,
-            type: Option.self
-        )
+    static func loadLayout(using preferences: PreferencesStore) -> Option? {
+        preferences.load(Option.self, for: .homePageLayout)
     }
 }
 
 #Preview {
     @Previewable @State var layout: LayoutMenu.Option = .grid
-    LayoutMenu(currentLayout: $layout)
+    let deps = AppDependencies.preview()
+    let albums = StoredAlbums.dummyData(preferences: deps.preferencesStore)
+    LayoutMenu(currentLayout: $layout, preferences: deps.preferencesStore)
     ListLayout()
-        .environment(StoredAlbums.dummyData())
+        .environment(albums)
     GridLayout()
-        .environment(StoredAlbums.dummyData())
-    
+        .environment(albums)
 }
 

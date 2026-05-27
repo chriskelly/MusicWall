@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7A3C9E2F1B4D8A605E92F3C1 /* AlbumFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */; };
 		9F2E5C8A3D1B7F406A8E2D59 /* AlbumSorterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */; };
+		A1B2C3D4E5F60718293A4B5D /* UserDefaultsPreferencesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F60718293A4B5C6E /* UserDefaultsPreferencesStoreTests.swift */; };
 		BBAE99B1FA45969122576159 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B203760B33EAD816D6FDCB94 /* SmokeTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -27,6 +28,7 @@
 		835DD9882E5FB592001CD95F /* MusicWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumFixtures.swift; sourceTree = "<group>"; };
 		B203760B33EAD816D6FDCB94 /* SmokeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SmokeTests.swift; sourceTree = "<group>"; };
+		B2C3D4E5F60718293A4B5C6E /* UserDefaultsPreferencesStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UserDefaultsPreferencesStoreTests.swift; sourceTree = "<group>"; };
 		C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumSorterTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,9 +86,18 @@
 			path = Core;
 			sourceTree = "<group>";
 		};
+		C3D4E5F60718293A4B5C6D7F /* Adapters */ = {
+			isa = PBXGroup;
+			children = (
+				B2C3D4E5F60718293A4B5C6E /* UserDefaultsPreferencesStoreTests.swift */,
+			);
+			path = Adapters;
+			sourceTree = "<group>";
+		};
 		850E21353DFC86412384C721 /* MusicWallTests */ = {
 			isa = PBXGroup;
 			children = (
+				C3D4E5F60718293A4B5C6D7F /* Adapters */,
 				3E7B2A9C5F1D8046A2C9E1B4 /* Fixtures */,
 				2F8A1C4E9D6B3A7051E8C2D0 /* Core */,
 				B203760B33EAD816D6FDCB94 /* SmokeTests.swift */,
@@ -214,6 +225,7 @@
 			files = (
 				7A3C9E2F1B4D8A605E92F3C1 /* AlbumFixtures.swift in Sources */,
 				9F2E5C8A3D1B7F406A8E2D59 /* AlbumSorterTests.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5D /* UserDefaultsPreferencesStoreTests.swift in Sources */,
 				BBAE99B1FA45969122576159 /* SmokeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -5,7 +5,7 @@ struct SmokeTests {
     @Test
     func appDependenciesLiveConstructs() {
         let dependencies = AppDependencies.live
-        _ = dependencies
+        _ = dependencies.preferencesStore
         #expect(true)
     }
 }
