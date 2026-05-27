@@ -31,19 +31,29 @@ extension StoredAlbum {
 @Observable
 class StoredAlbums {
     private let preferences: PreferencesStore
-    private var itemsSavingLocked = false
+    fileprivate let collection: AlbumCollection
 
     init(preferences: PreferencesStore) {
         self.preferences = preferences
+        self.collection = Self.makeCollection(preferences: preferences)
     }
-    
-    var items = [StoredAlbum]() {
-        didSet {
-            if !itemsSavingLocked {
-                preferences.save(items, for: .storedAlbumsItems)
-                preferences.save(items.map { $0.id.rawValue }, for: .backupAlbumIDs)
+
+    var items = [StoredAlbum]()
+
+    private func refreshItems() {
+        items = collection.items.map { StoredAlbum(from: $0) }
+    }
+
+    private static func makeCollection(preferences: PreferencesStore) -> AlbumCollection {
+        AlbumCollection(
+            persistItems: { records in
+                let stored = records.map { StoredAlbum(from: $0) }
+                preferences.save(stored, for: .storedAlbumsItems)
+            },
+            persistBackupIDs: { ids in
+                preferences.save(ids, for: .backupAlbumIDs)
             }
-        }
+        )
     }
     
     @MainActor
@@ -53,16 +63,20 @@ class StoredAlbums {
     }
     
     private func loadItems() async {
-        itemsSavingLocked = true
-        items = preferences.load([StoredAlbum].self, for: .storedAlbumsItems) ?? []
-        if items.isEmpty {
-            let backupIDs = preferences.load([String].self, for: .backupAlbumIDs) ?? []
-            if let albums = try? await MusicService.fetchAlbums(ids: backupIDs) {
-                itemsSavingLocked = false
-                items = albums.map { StoredAlbum(from: $0) }
-            }
+        collection.performWithoutPersist {
+            let stored = preferences.load([StoredAlbum].self, for: .storedAlbumsItems) ?? []
+            collection.replaceAll(stored.map(\.asAlbumRecord), persist: false)
         }
-        itemsSavingLocked = false
+        refreshItems()
+
+        guard collection.items.isEmpty else { return }
+
+        let backupIDs = preferences.load([String].self, for: .backupAlbumIDs) ?? []
+        guard let albums = try? await MusicService.fetchAlbums(ids: backupIDs) else { return }
+
+        let records = albums.map { StoredAlbum(from: $0).asAlbumRecord }
+        collection.replaceAll(records, persist: true)
+        refreshItems()
     }
     
     private func loadSort() {
@@ -91,14 +105,8 @@ class StoredAlbums {
     
     func applySort() {
         let ascending = sortDirection[currentSort] ?? true
-        let records = items.map(\.asAlbumRecord)
-        let sortedRecords = AlbumSorter.sorted(
-            records,
-            key: currentSort.albumSortKey,
-            ascending: ascending
-        )
-        let byID = Dictionary(uniqueKeysWithValues: items.map { ($0.id.rawValue, $0) })
-        items = sortedRecords.compactMap { byID[$0.id.rawValue] }
+        collection.applySort(key: currentSort.albumSortKey, ascending: ascending)
+        refreshItems()
     }
     
     func toggleSortDirection(for option: SortOptions) {
@@ -111,28 +119,40 @@ class StoredAlbums {
     
     /// Adds album and resorts items list
     func addAlbum(_ album: StoredAlbum) {
-        if !items.contains(where: { $0.id == album.id }) {
-            items.append(album)
+        if collection.add(album.asAlbumRecord) {
             applySort()
         }
     }
     
     /// Updates an existing album and resorts items list
     func updateAlbum(_ album: StoredAlbum) {
-        if let index = items.firstIndex(where: { $0.id == album.id }) {
-            items[index] = album
+        let existed = collection.contains(id: album.asAlbumRecord.id)
+        collection.update(album.asAlbumRecord)
+        if existed {
             applySort()
         }
     }
+
+    func remove(album: StoredAlbum) {
+        collection.remove(id: album.asAlbumRecord.id)
+        refreshItems()
+    }
+
+    func remove(atOffsets offsets: IndexSet) {
+        let idsToRemove = offsets.map { items[$0].asAlbumRecord.id }
+        for id in idsToRemove {
+            collection.remove(id: id)
+        }
+        refreshItems()
+    }
     
     func temporarilyShuffle() {
-        itemsSavingLocked = true
-        items.shuffle()
-        itemsSavingLocked = false
+        collection.temporarilyShuffle()
+        refreshItems()
     }
     
     func exportAlbumIDs() -> [String] {
-        return items.map { $0.id.rawValue }
+        collection.exportIDs()
     }
     
     @MainActor
@@ -140,26 +160,28 @@ class StoredAlbums {
         guard !ids.isEmpty else { return }
         
         let fetchedAlbums = try await MusicService.fetchAlbums(ids: ids)
-        let storedAlbums = fetchedAlbums.map { StoredAlbum(from: $0) }
-        
-        itemsSavingLocked = true
-        for album in storedAlbums {
-            if !items.contains(where: { $0.id == album.id }) {
-                items.append(album)
+        collection.performWithoutPersist {
+            for album in fetchedAlbums {
+                let record = StoredAlbum(from: album).asAlbumRecord
+                if !collection.contains(id: record.id) {
+                    _ = collection.add(record)
+                }
             }
         }
-        itemsSavingLocked = false
         applySort()
     }
     
     static func dummyData(preferences: PreferencesStore) -> StoredAlbums {
         let storedAlbums = StoredAlbums(preferences: preferences)
-        storedAlbums.items = [
+        let samples = [
             StoredAlbum(id: MusicItemID("\(UUID())"), title: "Take Care", artistName: "Drake", releaseDate: Date()),
             StoredAlbum(id: MusicItemID("\(UUID())"), title: "Born Sinners", artistName: "J. Cole", releaseDate: nil),
             StoredAlbum(id: MusicItemID("\(UUID())"), title: "Good Kid, m.A.A.d City", artistName: "Kendrick Lamar", releaseDate: Date(timeIntervalSinceNow: 500)),
         ]
+        storedAlbums.collection.performWithoutPersist {
+            storedAlbums.collection.replaceAll(samples.map(\.asAlbumRecord), persist: false)
+        }
+        storedAlbums.refreshItems()
         return storedAlbums
     }
 }
-

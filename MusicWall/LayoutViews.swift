@@ -151,10 +151,8 @@ struct GridLayout: View {
                 }
                 
                 Button(role: .destructive) {
-                    if let index = albums.items.firstIndex(where: { $0.id == album.id }) {
-                        albums.items.remove(at: index)
-                        onDeleteSnackbar(album)
-                    }
+                    albums.remove(album: album)
+                    onDeleteSnackbar(album)
                 } label: {
                     Label("Remove Album", systemImage: "trash")
                 }
@@ -186,10 +184,10 @@ struct ListLayout: View {
                         }
                 }
                 .onDelete { indexSet in
-                    let deletedAlbums = indexSet.map { albums.items[$0] }
-                    albums.items.remove(atOffsets: indexSet)
-                    if !deletedAlbums.isEmpty {
-                        onDeleteSnackbar(deletedAlbums.first!)
+                    let deletedAlbum = indexSet.first.map { albums.items[$0] }
+                    albums.remove(atOffsets: indexSet)
+                    if let deletedAlbum {
+                        onDeleteSnackbar(deletedAlbum)
                     }
                 }
             }
