@@ -14,7 +14,8 @@ extension StoredAlbum {
             id: AlbumID(rawValue: id.rawValue),
             title: title,
             artistName: artistName,
-            releaseDate: releaseDate
+            releaseDate: releaseDate,
+            isExplicit: false
         )
     }
 }

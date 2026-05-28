@@ -5,4 +5,5 @@ struct AlbumRecord: Equatable, Sendable {
     let title: String
     let artistName: String
     let releaseDate: Date?
+    let isExplicit: Bool
 }

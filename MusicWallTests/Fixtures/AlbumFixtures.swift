@@ -16,13 +16,15 @@ enum AlbumFixtures {
         id: String,
         title: String,
         artistName: String,
-        releaseDate: Date? = nil
+        releaseDate: Date? = nil,
+        isExplicit: Bool = false
     ) -> AlbumRecord {
         AlbumRecord(
             id: AlbumID(rawValue: id),
             title: title,
             artistName: artistName,
-            releaseDate: releaseDate
+            releaseDate: releaseDate,
+            isExplicit: isExplicit
         )
     }
 
