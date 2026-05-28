@@ -24,9 +24,9 @@ Physical layout may be `Packages/*` (PR 15) or `MusicWall/Core/`, `MusicWall/Ada
 |------|-----------|
 | Core has zero MusicKit/SwiftUI/UIKit imports | Fast, deterministic unit tests |
 | Domain types are app-owned | Tests don't construct `MusicKit.Album` |
-| No `play()` / `pause()` on `AlbumRecord` | Playback is `PlaybackController` |
-| Views don't call repositories | Only ViewModels/coordinators do |
-| Single composition root (`AppDependencies.live`) | Previews/tests swap fakes |
+| No `play()` / `pause()` on `AlbumRecord` or `StoredAlbum` | Playback is `PlaybackController` (PR 5+) |
+| Views don't call repositories directly | PR 5: search uses injected `AlbumRepository`; PR 10+: ViewModels own async (see PR 5 design) |
+| Single composition root (`AppDependencies.live`) | Previews/tests swap fakes; leaf views may use `@Environment` for services (PR 5 hybrid) |
 | Side effects at boundaries | Sort/add/remove testable without I/O |
 
 ## Legacy → target mapping
@@ -38,20 +38,25 @@ Physical layout may be `Packages/*` (PR 15) or `MusicWall/Core/`, `MusicWall/Ada
 | `UserDefaultsManager` static | `PreferencesStore` protocol |
 | `MusicService` enum | `AlbumRepository` + `PlaybackController` |
 | `BackupService` | `BackupCodec` + `FileExportService` / `SecurityScopedReader` |
-| `StoredAlbum.play()` / `onAlbumTapped` inline | `AlbumTapCoordinator` + `PlaybackController` |
-| `ImageCache` + `MusicService` | `ArtworkProvider` with injected session/filesystem |
+| `StoredAlbum.play()` / `onAlbumTapped` inline | PR 5: `PlaybackController` in `onAlbumTapped`; PR 11: `AlbumTapCoordinator` |
+| `ImageCache` + `MusicService` | PR 5: `AlbumRepository.artworkURL`; PR 11: `ArtworkProvider` + injected session/filesystem |
 
 ## Environment injection pattern
 
 ```swift
-// Example — adapt names to codebase
+// PR 5 (services) — installed from HomePageView; facades use constructor injection
 extension EnvironmentValues {
-  @Entry var albumCollection: AlbumCollection
+  @Entry var albumRepository: any AlbumRepository
   @Entry var playback: any PlaybackController
 }
+
+// PR 6+ (collection state)
+// @Entry var albumCollection: AlbumCollection
 ```
 
-Previews: `.environment(\.albumCollection, .fixture(count: 3))`
+Previews: `AppDependencies.preview()` mocks + `.environment(\.playback, deps.playbackController)` on subtree.
+
+**`AlbumRecord` fields (PR 5):** `id`, `title`, `artistName`, `releaseDate`, `isExplicit`.
 
 ## Error handling
 

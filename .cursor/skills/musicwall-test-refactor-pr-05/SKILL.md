@@ -12,37 +12,52 @@ paths:
 # PR 5 — Repository + playback protocols
 
 **Requires:** PR 4 merged  
-**Blocks:** PR 6, PR 10, PR 11
+**Blocks:** PR 6, PR 10, PR 11  
+**Design:** [docs/specs/2026-05-27-pr-05-repository-playback-design.md](../../../docs/specs/2026-05-27-pr-05-repository-playback-design.md)
 
 ## Goal
 
 Eliminate static `MusicService` and playback methods on `StoredAlbum`; all MusicKit/SystemMusicPlayer behind protocols.
 
+## Decisions (locked)
+
+- **Search:** `AlbumSearchView` uses `[AlbumRecord]` + injected `AlbumRepository` (no `MusicKit.Album` in view).
+- **`AlbumRecord`:** add `isExplicit: Bool` (mapper from `contentRating == .explicit`).
+- **Injection:** Hybrid — `AppDependencies` owns instances; `StoredAlbums` / `AlbumSearchView` use constructor injection; leaf views use `@Environment(\.albumRepository)` / `@Environment(\.playback)` installed in `HomePageView`.
+- **Artwork (until PR 11):** `AlbumRepository.artworkURL(for:width:height:)` — `ImageCache` uses this; no `MusicService` in `ImageCache`.
+- **Errors:** `AlbumRepositoryError` + `PlaybackError` in Core (replace `MusicServiceError`).
+- **Tap:** Inline `onAlbumTapped` + `PlaybackController` in PR 5; `AlbumTapCoordinator` is PR 11.
+
 ## In scope
 
-- Protocols:
-  - **`AlbumRepository`**: `search(query, source: .catalog | .library)`, `fetch(ids: [AlbumID])`
+- Protocols (`MusicWall/Core/`):
+  - **`AlbumRepository`**: `search(query, source:)`, `fetch(ids:)`, `artworkURL(for:width:height:)`
+  - **`AlbumSearchSource`**: `.catalog` | `.library`
   - **`PlaybackController`**: `play(albumId:)`, `pause()`
-- Implementations:
-  - **`MusicKitAlbumRepository`** (move logic from `MusicService.swift`)
-  - **`SystemMusicPlayerAdapter`**
+- Implementations (`MusicWall/Adapters/`):
+  - **`MusicKitAlbumRepository`** (logic from `MusicService.swift`)
+  - **`SystemMusicPlayerAdapter`** (depends on repository; no force-unwrap on play)
   - **`AlbumMapper`**: `MusicKit.Album` → `AlbumRecord`
-- Register in **`AppDependencies.live`**
-- Environment keys or injection for `playback` + `repository`
-- Remove **`StoredAlbum.play()` / `pause()`**; update **`onAlbumTapped`** to use `PlaybackController`
-- **Tests:** `MockAlbumRepository`, `MockPlaybackController` — error mapping, empty query, empty IDs, call order on tap
+- **`Environment+Services.swift`**: `@Entry` keys for repository + playback
+- Register in **`AppDependencies.live`** / **`preview()`** with mocks
+- **`StoredAlbums(preferences:repository:)`** — `load` / `importAlbums` use repository
+- Remove **`StoredAlbum.play()` / `pause()`**; **`onAlbumTapped`** uses `PlaybackController`
+- **Tests:** `MockAlbumRepository`, `MockPlaybackController` — errors, empty query, empty IDs, tap call order
 
 ## Out of scope
 
-- Full `load()` migration (PR 6).
-- ViewModels (PR 8–10).
+- Full `load()` / persistence migration (PR 6).
+- `SearchViewModel` / snackbar errors (PR 10).
+- `AlbumTapCoordinator`, `ArtworkProvider` (PR 11).
 
 ## Acceptance criteria
 
-- [ ] No remaining `MusicService.` call sites in app (except adapter impl).
-- [ ] Mock tests cover `MusicServiceError` equivalent domain errors.
-- [ ] `Agent.md` architecture note can stay; optional one-line pointer to new protocols.
+- [ ] No remaining `MusicService.` call sites; `MusicService.swift` deleted.
+- [ ] `AlbumRecord.isExplicit` + mapper tests or mock coverage.
+- [ ] Mock tests cover `AlbumRepositoryError` / `PlaybackError` equivalents.
+- [ ] Hybrid injection per design spec.
+- [ ] Optional one-line `Agent.md` pointer to protocols.
 
 ## Risk
 
-- `fetchAlbums` force-unwrap in current `playAlbum` — fix while moving to adapter (use guard + typed error).
+- Playback needs `MusicKit.Album` for queue — use package-private helper on `MusicKitAlbumRepository` from `SystemMusicPlayerAdapter` (not on Core protocol).
