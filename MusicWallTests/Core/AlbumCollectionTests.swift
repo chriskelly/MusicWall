@@ -101,7 +101,7 @@ struct AlbumCollectionTests {
 
         collection.temporarilyShuffle()
 
-        #expect(collection.items != before || before.count <= 1)
+        #expect(Set(collection.items.map(\.id)) == Set(before.map(\.id)))
         #expect(spy.itemsCalls.isEmpty)
         #expect(spy.backupCalls.isEmpty)
     }
