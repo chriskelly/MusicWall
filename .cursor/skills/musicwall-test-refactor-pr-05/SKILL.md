@@ -13,7 +13,8 @@ paths:
 
 **Requires:** PR 4 merged  
 **Blocks:** PR 6, PR 10, PR 11  
-**Design:** [docs/specs/2026-05-27-pr-05-repository-playback-design.md](../../../docs/specs/2026-05-27-pr-05-repository-playback-design.md)
+**Design:** [docs/specs/2026-05-27-pr-05-repository-playback-design.md](../../../docs/specs/2026-05-27-pr-05-repository-playback-design.md)  
+**Plan:** [docs/plans/2026-05-27-pr-05-repository-playback.md](../../../docs/plans/2026-05-27-pr-05-repository-playback.md)
 
 ## Goal
 
