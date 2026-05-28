@@ -18,8 +18,9 @@ struct ContentView: View {
             if isAuthorized {
                 let store = dependencies.preferencesStore
                 HomePageView(
-                    albums: StoredAlbums(preferences: store),
-                    preferences: store
+                    albums: StoredAlbums(preferences: store, repository: dependencies.albumRepository),
+                    preferences: store,
+                    dependencies: dependencies
                 )
             } else if authorizationDenied {
                 authorizationDeniedView()

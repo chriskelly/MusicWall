@@ -59,6 +59,7 @@ struct LayoutContainer<Content: View>: View {
 
 struct GridLayout: View {
     @Environment(StoredAlbums.self) private var albums
+    @Environment(\.playback) private var playback
     @State private var selectedAlbumID: String?
     
     private static let size = CGFloat(150)
@@ -74,10 +75,16 @@ struct GridLayout: View {
                             onDeleteSnackbar: onDeleteSnackbar,
                             onEdit: onEdit
                         )
-                        .onTapGesture {onAlbumTapped(
-                            album: album,
-                            selectedAlbumIdBinding: $selectedAlbumID
-                        )}
+                        .onTapGesture {
+                            Task {
+                                await AlbumTapPlayback.handleTap(
+                                    albumID: AlbumID(rawValue: album.id.rawValue),
+                                    rawSelectedID: selectedAlbumID,
+                                    setSelected: { selectedAlbumID = $0 },
+                                    playback: playback
+                                )
+                            }
+                        }
                     }
                 }
                 .padding(20)
@@ -163,6 +170,7 @@ struct GridLayout: View {
 
 struct ListLayout: View {
     @Environment(StoredAlbums.self) private var albums
+    @Environment(\.playback) private var playback
     @State private var selectedAlbumID: String?
     
     var body: some View {
@@ -170,10 +178,16 @@ struct ListLayout: View {
             List {
                 ForEach(albums.items) { album in
                     listItem(album)
-                        .onTapGesture {onAlbumTapped(
-                            album: album, 
-                            selectedAlbumIdBinding: $selectedAlbumID
-                        )}
+                        .onTapGesture {
+                            Task {
+                                await AlbumTapPlayback.handleTap(
+                                    albumID: AlbumID(rawValue: album.id.rawValue),
+                                    rawSelectedID: selectedAlbumID,
+                                    setSelected: { selectedAlbumID = $0 },
+                                    playback: playback
+                                )
+                            }
+                        }
                         .swipeActions(edge: .leading) {
                             Button {
                                 onEdit(album)
@@ -208,26 +222,11 @@ struct ListLayout: View {
     }
 }
 
-private func onAlbumTapped(album: StoredAlbum, selectedAlbumIdBinding: Binding<String?>) {
-    if selectedAlbumIdBinding.wrappedValue == album.id.rawValue {
-        album.pause()
-        selectedAlbumIdBinding.wrappedValue = nil
-    } else {
-        selectedAlbumIdBinding.wrappedValue = album.id.rawValue
-        Task {
-            do {
-                try await album.play()
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-    }
-}
-
 struct AlbumArtwork: View {
     let album: StoredAlbum
     let viewSize: CGFloat
-    
+
+    @Environment(\.albumRepository) private var albumRepository
     @State private var imageURL: URL?
     
     var body: some View {
@@ -242,7 +241,7 @@ struct AlbumArtwork: View {
         .task {
             let scale = UIScreen.main.scale   // @2x for most iPhones, @3x on latest pro/max models
             let pixelSize = Int((viewSize * scale).rounded())
-            imageURL = await ImageCache().getArtwork(
+            imageURL = await ImageCache(repository: albumRepository).getArtwork(
                 albumID: album.id.rawValue,
                 size: pixelSize
             )
@@ -288,11 +287,18 @@ struct LayoutMenu: View {
 #Preview {
     @Previewable @State var layout: LayoutMenu.Option = .grid
     let deps = AppDependencies.preview()
-    let albums = StoredAlbums.dummyData(preferences: deps.preferencesStore)
+    let albums = StoredAlbums.dummyData(
+        preferences: deps.preferencesStore,
+        repository: deps.albumRepository
+    )
     LayoutMenu(currentLayout: $layout, preferences: deps.preferencesStore)
     ListLayout()
         .environment(albums)
+        .environment(\.albumRepository, deps.albumRepository)
+        .environment(\.playback, deps.playbackController)
     GridLayout()
         .environment(albums)
+        .environment(\.albumRepository, deps.albumRepository)
+        .environment(\.playback, deps.playbackController)
 }
 

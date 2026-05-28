@@ -14,9 +14,6 @@ struct StoredAlbum: Identifiable, Codable {
     let title: String
     let artistName: String
     let releaseDate: Date?
-    
-    func play() async throws { try await MusicService.playAlbum(id: id) }
-    func pause() { MusicService.pauseAlbum() }
 }
 
 extension StoredAlbum {
@@ -28,13 +25,17 @@ extension StoredAlbum {
     }
 }
 
+typealias MusicKitAlbum = MusicKit.Album
+
 @Observable
 class StoredAlbums {
     private let preferences: PreferencesStore
+    private let repository: any AlbumRepository
     fileprivate let collection: AlbumCollection
 
-    init(preferences: PreferencesStore) {
+    init(preferences: PreferencesStore, repository: any AlbumRepository) {
         self.preferences = preferences
+        self.repository = repository
         self.collection = Self.makeCollection(preferences: preferences)
     }
 
@@ -72,9 +73,9 @@ class StoredAlbums {
         guard collection.items.isEmpty else { return }
 
         let backupIDs = preferences.load([String].self, for: .backupAlbumIDs) ?? []
-        guard let albums = try? await MusicService.fetchAlbums(ids: backupIDs) else { return }
+        let ids = backupIDs.map { AlbumID(rawValue: $0) }
+        guard let records = try? await repository.fetch(ids: ids) else { return }
 
-        let records = albums.map { StoredAlbum(from: $0).asAlbumRecord }
         collection.replaceAll(records, persist: true)
         refreshItems()
     }
@@ -159,10 +160,10 @@ class StoredAlbums {
     func importAlbums(from ids: [String]) async throws {
         guard !ids.isEmpty else { return }
         
-        let fetchedAlbums = try await MusicService.fetchAlbums(ids: ids)
+        let albumIDs = ids.map { AlbumID(rawValue: $0) }
+        let fetched = try await repository.fetch(ids: albumIDs)
         collection.performWithoutPersist {
-            for album in fetchedAlbums {
-                let record = StoredAlbum(from: album).asAlbumRecord
+            for record in fetched {
                 if !collection.contains(id: record.id) {
                     _ = collection.add(record)
                 }
@@ -171,8 +172,8 @@ class StoredAlbums {
         applySort()
     }
     
-    static func dummyData(preferences: PreferencesStore) -> StoredAlbums {
-        let storedAlbums = StoredAlbums(preferences: preferences)
+    static func dummyData(preferences: PreferencesStore, repository: any AlbumRepository) -> StoredAlbums {
+        let storedAlbums = StoredAlbums(preferences: preferences, repository: repository)
         let samples = [
             StoredAlbum(id: MusicItemID("\(UUID())"), title: "Take Care", artistName: "Drake", releaseDate: Date()),
             StoredAlbum(id: MusicItemID("\(UUID())"), title: "Born Sinners", artistName: "J. Cole", releaseDate: nil),

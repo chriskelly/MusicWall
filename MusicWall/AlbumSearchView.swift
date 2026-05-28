@@ -6,17 +6,17 @@
 //
 
 import SwiftUI
-import MusicKit
 
 struct AlbumSearchView: View {
+    let repository: any AlbumRepository
+    var onSelect: (AlbumRecord) -> Void
+
     @State private var query = ""
-    @State private var catalogSearchResults: [MusicKitAlbum] = []
-    @State private var librarySearchResults: [MusicKitAlbum] = []
+    @State private var catalogSearchResults: [AlbumRecord] = []
+    @State private var librarySearchResults: [AlbumRecord] = []
     @State private var isSearching = false
     @FocusState private var isSearchFieldFocused: Bool
-    
-    var onSelect: (MusicKitAlbum) -> Void
-    
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -38,51 +38,50 @@ struct AlbumSearchView: View {
             .navigationTitle("Find Album")
         }
     }
-    
+
     private func resultsView() -> some View {
-        return List {
-            Section(header: Text("Library")){
-                ForEach(librarySearchResults, id: \.id) { album in
-                    SearchResultButton(onSelect: onSelect, album: album)
+        List {
+            Section(header: Text("Library")) {
+                ForEach(librarySearchResults, id: \.id) { record in
+                    SearchResultButton(onSelect: onSelect, record: record)
                 }
             }
-            Section(header: Text("Apple Music")){
-                ForEach(catalogSearchResults, id: \.id) { album in
-                    SearchResultButton(onSelect: onSelect, album: album)
+            Section(header: Text("Apple Music")) {
+                ForEach(catalogSearchResults, id: \.id) { record in
+                    SearchResultButton(onSelect: onSelect, record: record)
                 }
             }
-            
         }
     }
-    
-    struct SearchResultButton:View {
+
+    struct SearchResultButton: View {
         @Environment(\.dismiss) var dismiss
-        
-        var onSelect: (MusicKitAlbum) -> Void
-        var album: MusicKitAlbum
-        
+
+        var onSelect: (AlbumRecord) -> Void
+        var record: AlbumRecord
+
         var body: some View {
             Button {
-                onSelect(album)
+                onSelect(record)
                 dismiss()
             } label: {
                 HStack {
-                    if album.contentRating == .explicit {
+                    if record.isExplicit {
                         Image(systemName: "e.square.fill")
                     }
-                    Text("\(album.title) — \(album.artistName)")
+                    Text("\(record.title) — \(record.artistName)")
                 }
             }
         }
     }
-    
+
     func searchAlbums() async {
         guard !query.isEmpty else { return }
         isSearching = true
         defer { isSearching = false }
         do {
-            catalogSearchResults = try await MusicService.searchAlbums(query: query, location: .catalog)
-            librarySearchResults = try await MusicService.searchAlbums(query: query, location: .library)
+            catalogSearchResults = try await repository.search(query: query, source: .catalog)
+            librarySearchResults = try await repository.search(query: query, source: .library)
         } catch {
             print(error.localizedDescription)
         }
@@ -90,7 +89,6 @@ struct AlbumSearchView: View {
 }
 
 #Preview {
-    AlbumSearchView(onSelect: { album in
-        print(album)
-    })
+    let deps = AppDependencies.preview()
+    AlbumSearchView(repository: deps.albumRepository, onSelect: { _ in })
 }

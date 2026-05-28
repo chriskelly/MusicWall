@@ -12,11 +12,18 @@ paths:
 # PR 6 — Load, migration, repository wiring
 
 **Requires:** PR 5 merged  
-**Blocks:** PR 8, PR 9
+**Blocks:** PR 8, PR 9  
+**Design (PR 5):** [docs/specs/2026-05-27-pr-05-repository-playback-design.md](../../../docs/specs/2026-05-27-pr-05-repository-playback-design.md)
 
 ## Goal
 
 Safe on-disk migration and async hydration via `AlbumRepository` with comprehensive tests.
+
+## Prerequisites from PR 5
+
+- `StoredAlbums` already takes `any AlbumRepository` for backup fetch / `importAlbums`.
+- `AlbumRecord` includes `isExplicit`; hydration uses repository `fetch` → `[AlbumRecord]` (no `MusicService`).
+- Do **not** re-introduce static `MusicService` or `StoredAlbum.play()`.
 
 ## In scope
 
@@ -32,12 +39,14 @@ Safe on-disk migration and async hydration via `AlbumRepository` with comprehens
 
 - Home/Auth ViewModels (PR 8–9).
 - Coverage gates (PR 14).
+- `AlbumRepository` / `PlaybackController` protocol design (done in PR 5).
 
 ## Acceptance criteria
 
 - [ ] Existing simulator UserDefaults data migrates without data loss (document manual QA).
 - [ ] `ContentView` / `HomePageView` use `AlbumCollection` not `StoredAlbums()`.
 - [ ] Backup ID keys still updated on item changes (compat with pre-refactor backups).
+- [ ] Hydration uses injected `AlbumRepository` only.
 
 ## Human QA
 

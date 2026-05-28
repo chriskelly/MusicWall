@@ -6,12 +6,12 @@
 //
 
 import SwiftUI
-import MusicKit
 import UIKit
 
 struct HomePageView: View {
     @State var albums: StoredAlbums
     let preferences: PreferencesStore
+    let dependencies: AppDependencies
     @State private var showingAddView = false
     @State private var currentLayout: LayoutMenu.Option
     @State private var showingAlbumAddSnackbar = false
@@ -21,9 +21,10 @@ struct HomePageView: View {
     @State private var showingImportSnackbar = false
     @State private var importSnackbarMessage = ""
 
-    init(albums: StoredAlbums, preferences: PreferencesStore) {
+    init(albums: StoredAlbums, preferences: PreferencesStore, dependencies: AppDependencies) {
         self._albums = State(initialValue: albums)
         self.preferences = preferences
+        self.dependencies = dependencies
         self._currentLayout = State(
             initialValue: LayoutMenu.loadLayout(using: preferences) ?? .grid
         )
@@ -37,8 +38,13 @@ struct HomePageView: View {
             .background(Color(.systemGray6))
         }
         .environment(albums)
+        .environment(\.albumRepository, dependencies.albumRepository)
+        .environment(\.playback, dependencies.playbackController)
         .sheet(isPresented: $showingAddView) {
-            AlbumSearchView(onSelect: onSearchSelect)
+            AlbumSearchView(
+                repository: dependencies.albumRepository,
+                onSelect: onSearchSelect
+            )
         }
         .snackbar(isPresented: $showingAlbumAddSnackbar, message: "Album successfully added!")
         .snackbar(isPresented: $showingImportSnackbar, message: importSnackbarMessage)
@@ -87,8 +93,8 @@ struct HomePageView: View {
         }
     }
     
-    private func onSearchSelect(_ album: MusicKitAlbum) {
-        albums.addAlbum(StoredAlbum(from: album))
+    private func onSearchSelect(_ record: AlbumRecord) {
+        albums.addAlbum(StoredAlbum(from: record))
         showingAlbumAddSnackbar = true
     }
     
@@ -209,8 +215,9 @@ struct ShareSheet: UIViewControllerRepresentable {
 #Preview {
     let deps = AppDependencies.preview()
     HomePageView(
-        albums: StoredAlbums.dummyData(preferences: deps.preferencesStore),
-        preferences: deps.preferencesStore
+        albums: StoredAlbums.dummyData(preferences: deps.preferencesStore, repository: deps.albumRepository),
+        preferences: deps.preferencesStore,
+        dependencies: deps
     )
 }
 
@@ -219,8 +226,9 @@ struct ShareSheet: UIViewControllerRepresentable {
     let deps = AppDependencies.preview()
     NavigationStack {
         HomePageView(
-            albums: StoredAlbums.dummyData(preferences: deps.preferencesStore),
-            preferences: deps.preferencesStore
+            albums: StoredAlbums.dummyData(preferences: deps.preferencesStore, repository: deps.albumRepository),
+            preferences: deps.preferencesStore,
+            dependencies: deps
         )
     }
 }

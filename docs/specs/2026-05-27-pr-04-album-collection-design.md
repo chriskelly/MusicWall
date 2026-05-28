@@ -272,7 +272,7 @@ No workflow changes. PR must pass `ci-tests` (`fastlane ci_tests`).
 
 | PR | Relationship |
 |----|----------------|
-| PR 5 | `AlbumRepository`; remove static `MusicService` from fetch paths |
+| PR 5 | `AlbumRepository` + `PlaybackController`; `AlbumRecord.isExplicit`; hybrid injection — [design](2026-05-27-pr-05-repository-playback-design.md) |
 | PR 6 | `AlbumCollection.load()`, `AlbumRecord` migration, environment → `AlbumCollection`, delete `StoredAlbums` |
 | PR 9 | `HomeViewModel` owns sort actions against collection |
 | PR 14 | Coverage gates; delete legacy patterns |

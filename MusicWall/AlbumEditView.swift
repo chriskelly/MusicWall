@@ -89,7 +89,10 @@ struct AlbumEditView: View {
 #Preview {
     let deps = AppDependencies.preview()
     AlbumEditView(
-        album: StoredAlbums.dummyData(preferences: deps.preferencesStore).items.first!,
+        album: StoredAlbums.dummyData(
+            preferences: deps.preferencesStore,
+            repository: deps.albumRepository
+        ).items.first!,
         onSave: { _ in }
     )
 }

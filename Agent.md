@@ -52,12 +52,12 @@ docs/plans/                # Implementation plans
 ### Architecture
 
 - **SwiftUI** for UI; use `@Observable`, `@State`, `@Environment` consistently with existing files.
-- **MVVM-style separation:** views in `*View.swift`, Apple Music access in `MusicService.swift`, persistence in `UserDefaultsManager.swift` / `BackupService.swift`.
+- **MVVM-style separation:** views in `*View.swift`, Apple Music access via `AlbumRepository` / `PlaybackController` (`AppDependencies.live`), persistence via `PreferencesStore` / `BackupService.swift`.
 - Keep views thin; move testable logic into types/functions that do not require `MusicPlayer` when possible.
 
 ### MusicKit
 
-- Use `MusicService` for catalog/library search — do not duplicate request types across views.
+- Use `AlbumRepository` for catalog/library search and fetch — do not duplicate MusicKit request types across views.
 - Respect authorization flow in `ContentView` / entry points before calling catalog APIs.
 - Do not log user tokens or private listening data.
 
