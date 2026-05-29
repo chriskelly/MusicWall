@@ -6,16 +6,22 @@
 //
 
 import SwiftUI
-import MusicKit
 
 struct ContentView: View {
     let dependencies: AppDependencies
-    @State private var isAuthorized = false
-    @State private var authorizationDenied = false
-    
+    @State private var viewModel: AuthViewModel
+
+    init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
+        _viewModel = State(
+            initialValue: AuthViewModel(authorization: dependencies.musicAuthorization)
+        )
+    }
+
     var body: some View {
         Group {
-            if isAuthorized {
+            switch viewModel.state {
+            case .authorized:
                 let store = dependencies.preferencesStore
                 HomePageView(
                     store: AlbumStore(
@@ -25,48 +31,31 @@ struct ContentView: View {
                     preferences: store,
                     dependencies: dependencies
                 )
-            } else if authorizationDenied {
+            case .denied:
                 authorizationDeniedView()
-            } else {
+            case .loading:
                 ProgressView("Requesting Music Access…")
             }
         }
         .task {
-            await requestAuthorization()
+            await viewModel.checkAuthorization()
         }
     }
-    
+
     private func authorizationDeniedView() -> some View {
-        return VStack {
+        VStack {
             Text("Apple Music access is required to use this app.")
                 .multilineTextAlignment(.center)
                 .padding()
             Button("Try Again") {
                 Task {
-                    await requestAuthorization()
+                    await viewModel.retry()
                 }
             }
         }
     }
-    
-    private func requestAuthorization() async {
-        let status = await MusicAuthorization.request()
-        switch status {
-        case .authorized:
-            isAuthorized = true
-        case .denied, .restricted, .notDetermined:
-            isAuthorized = false
-            authorizationDenied = true
-        @unknown default:
-            isAuthorized = false
-            authorizationDenied = true
-        }
-    }
 }
 
-
-
-
 #Preview {
-    ContentView(dependencies: .live)
+    ContentView(dependencies: .preview())
 }

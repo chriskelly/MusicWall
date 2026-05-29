@@ -58,7 +58,7 @@ docs/plans/                # Implementation plans
 ### MusicKit
 
 - Use `AlbumRepository` for catalog/library search and fetch — do not duplicate MusicKit request types across views.
-- Respect authorization flow in `ContentView` / entry points before calling catalog APIs.
+- Authorization via `AuthViewModel` + `MusicAuthorizationProviding` (`AppDependencies.musicAuthorization`); `ContentView` in `Features/Auth/` binds to VM state only.
 - Do not log user tokens or private listening data.
 
 ### UI

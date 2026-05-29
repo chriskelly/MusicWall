@@ -9,6 +9,14 @@ struct SmokeTests {
         _ = dependencies.albumRepository
         _ = dependencies.playbackController
         _ = dependencies.albumBackupService
+        _ = dependencies.musicAuthorization
+        #expect(true)
+    }
+
+    @Test
+    func appDependenciesPreviewConstructs() {
+        let dependencies = AppDependencies.preview()
+        _ = dependencies.musicAuthorization
         #expect(true)
     }
 }
