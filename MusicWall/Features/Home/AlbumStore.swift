@@ -124,7 +124,13 @@ final class AlbumStore {
         guard !ids.isEmpty else { return }
 
         let albumIDs = ids.map { AlbumID(rawValue: $0) }
-        let fetched = try await repository.fetch(ids: albumIDs)
+        let missingIDs = albumIDs.filter { !collection.contains(id: $0) }
+        guard !missingIDs.isEmpty else {
+            applySort()
+            return
+        }
+
+        let fetched = try await repository.fetch(ids: missingIDs)
         collection.performWithoutPersist {
             for record in fetched where !collection.contains(id: record.id) {
                 _ = collection.add(record)

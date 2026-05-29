@@ -25,6 +25,7 @@
 		A0F1B2C3D4E60718293A4B5D0 /* FileExportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1C2D3E4F60718293A4B5D0 /* FileExportServiceTests.swift */; };
 		A1F2B3C4D5E70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B2C3D4E5F70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift */; };
 		A2F3B4C5D6E80718293A4B5D2 /* DirectFileReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2B3C4D5E6F80718293A4B5D2 /* DirectFileReader.swift */; };
+		A3F4B5C6D7E90718293A4B5D3 /* AlbumStoreImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B4C5D6E7F90718293A4B5D3 /* AlbumStoreImportTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,6 +59,7 @@
 		F0B1C2D3E4F60718293A4B5D0 /* FileExportServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FileExportServiceTests.swift; sourceTree = "<group>"; };
 		F1B2C3D4E5F70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LiveAlbumBackupServiceTests.swift; sourceTree = "<group>"; };
 		F2B3C4D5E6F80718293A4B5D2 /* DirectFileReader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DirectFileReader.swift; sourceTree = "<group>"; };
+		F3B4C5D6E7F90718293A4B5D3 /* AlbumStoreImportTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumStoreImportTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -116,6 +118,7 @@
 				F5A6B7C8D9E00718293A4B5C5 /* AlbumRecordCodableTests.swift */,
 				F6A7B8C9D0E10718293A4B5C6 /* AlbumLibraryLoaderTests.swift */,
 				F0A1B2C3D4E50718293A4B5C9 /* BackupCodecTests.swift */,
+				F3B4C5D6E7F90718293A4B5D3 /* AlbumStoreImportTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -291,6 +294,7 @@
 				A0F1B2C3D4E60718293A4B5D0 /* FileExportServiceTests.swift in Sources */,
 				A1F2B3C4D5E70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift in Sources */,
 				A2F3B4C5D6E80718293A4B5D2 /* DirectFileReader.swift in Sources */,
+				A3F4B5C6D7E90718293A4B5D3 /* AlbumStoreImportTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
