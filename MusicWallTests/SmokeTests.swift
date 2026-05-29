@@ -8,6 +8,7 @@ struct SmokeTests {
         _ = dependencies.preferencesStore
         _ = dependencies.albumRepository
         _ = dependencies.playbackController
+        _ = dependencies.albumBackupService
         #expect(true)
     }
 }

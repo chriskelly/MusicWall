@@ -114,7 +114,7 @@ struct HomePageView: View {
     @MainActor
     private func importAlbums(from url: URL) async {
         do {
-            let ids = try BackupService.importAlbumIDs(from: url)
+            let ids = try dependencies.albumBackupService.importAlbumIDs(from: url)
             try await store.importAlbums(from: ids)
             importSnackbarMessage = "Successfully imported \(ids.count) album(s)!"
             showingImportSnackbar = true
@@ -128,7 +128,7 @@ struct HomePageView: View {
         let ids = store.exportAlbumIDs()
         
         do {
-            let url = try BackupService.exportAlbumIDs(ids)
+            let url = try dependencies.albumBackupService.exportAlbumIDs(ids)
             exportedFileURL = url
             showingExportShareSheet = true
         } catch {

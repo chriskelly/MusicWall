@@ -52,7 +52,7 @@ docs/plans/                # Implementation plans
 ### Architecture
 
 - **SwiftUI** for UI; use `@Observable`, `@State`, `@Environment` consistently with existing files.
-- **MVVM-style separation:** views in `*View.swift`, Apple Music access via `AlbumRepository` / `PlaybackController` (`AppDependencies.live`), persistence via `PreferencesStore` / `BackupService.swift`.
+- **MVVM-style separation:** views in `*View.swift`, Apple Music access via `AlbumRepository` / `PlaybackController` (`AppDependencies.live`), persistence via `PreferencesStore` / `AlbumBackupService`.
 - Keep views thin; move testable logic into types/functions that do not require `MusicPlayer` when possible.
 
 ### MusicKit
@@ -70,7 +70,7 @@ docs/plans/                # Implementation plans
 ### Data & persistence
 
 - Album collections use **UserDefaults** and backup JSON — preserve backward compatibility when changing encoded shapes.
-- Version export/import via `BackupService` — test round-trip when changing `Album` model.
+- Version export/import via `AlbumBackupService` (`LiveAlbumBackupService` + `BackupCodec`) — test round-trip when changing `Album` model.
 
 ### Code quality
 
