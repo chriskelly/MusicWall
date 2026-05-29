@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct ContentView: View {
     let dependencies: AppDependencies
     @State private var viewModel: AuthViewModel
+    @Environment(\.openURL) private var openURL
 
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
@@ -43,16 +45,27 @@ struct ContentView: View {
     }
 
     private func authorizationDeniedView() -> some View {
-        VStack {
+        VStack(spacing: 16) {
             Text("Apple Music access is required to use this app.")
                 .multilineTextAlignment(.center)
-                .padding()
+                .padding(.horizontal)
+            Text("If you previously denied access, enable Apple Music in Settings, then tap Try Again.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    openURL(url)
+                }
+            }
             Button("Try Again") {
                 Task {
                     await viewModel.retry()
                 }
             }
         }
+        .padding()
     }
 }
 
