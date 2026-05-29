@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct AlbumEditView: View {
-    let album: StoredAlbum
-    let onSave: (StoredAlbum) -> Void
+    let album: AlbumRecord
+    let onSave: (AlbumRecord) -> Void
     @Environment(\.dismiss) private var dismiss
     
     @State private var title: String
     @State private var artistName: String
     @State private var releaseDate: Date?
     
-    init(album: StoredAlbum, onSave: @escaping (StoredAlbum) -> Void) {
+    init(album: AlbumRecord, onSave: @escaping (AlbumRecord) -> Void) {
         self.album = album
         self.onSave = onSave
         _title = State(initialValue: album.title)
@@ -75,11 +75,12 @@ struct AlbumEditView: View {
     }
     
     private func saveAlbum() {
-        let updatedAlbum = StoredAlbum(
+        let updatedAlbum = AlbumRecord(
             id: album.id,
             title: title.trimmingCharacters(in: .whitespacesAndNewlines),
             artistName: artistName.trimmingCharacters(in: .whitespacesAndNewlines),
-            releaseDate: releaseDate
+            releaseDate: releaseDate,
+            isExplicit: album.isExplicit
         )
         onSave(updatedAlbum)
         dismiss()
@@ -89,11 +90,10 @@ struct AlbumEditView: View {
 #Preview {
     let deps = AppDependencies.preview()
     AlbumEditView(
-        album: StoredAlbums.dummyData(
+        album: AlbumStore.dummyData(
             preferences: deps.preferencesStore,
             repository: deps.albumRepository
         ).items.first!,
         onSave: { _ in }
     )
 }
-
