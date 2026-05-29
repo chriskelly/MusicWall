@@ -5,6 +5,7 @@ struct AppDependencies {
     let albumRepository: any AlbumRepository
     let playbackController: any PlaybackController
     let albumBackupService: any AlbumBackupService
+    let musicAuthorization: any MusicAuthorizationProviding
 
     static let live: AppDependencies = {
         let repository = MusicKitAlbumRepository()
@@ -12,7 +13,8 @@ struct AppDependencies {
             preferencesStore: UserDefaultsPreferencesStore(userDefaults: .standard),
             albumRepository: repository,
             playbackController: SystemMusicPlayerAdapter(repository: repository),
-            albumBackupService: LiveAlbumBackupService()
+            albumBackupService: LiveAlbumBackupService(),
+            musicAuthorization: LiveMusicAuthorizationProvider()
         )
     }()
 
@@ -23,7 +25,8 @@ struct AppDependencies {
             preferencesStore: UserDefaultsPreferencesStore(userDefaults: defaults),
             albumRepository: PreviewAlbumRepository(),
             playbackController: PreviewPlaybackController(),
-            albumBackupService: LiveAlbumBackupService()
+            albumBackupService: LiveAlbumBackupService(),
+            musicAuthorization: PreviewMusicAuthorizationProvider(status: .authorized)
         )
     }
 }

@@ -26,6 +26,8 @@
 		A1F2B3C4D5E70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1B2C3D4E5F70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift */; };
 		A2F3B4C5D6E80718293A4B5D2 /* DirectFileReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2B3C4D5E6F80718293A4B5D2 /* DirectFileReader.swift */; };
 		A3F4B5C6D7E90718293A4B5D3 /* AlbumStoreImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B4C5D6E7F90718293A4B5D3 /* AlbumStoreImportTests.swift */; };
+		A4F5B6C7D8E90818293A4B5D4 /* AuthViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B5C6D7E8F90818293A4B5D4 /* AuthViewModelTests.swift */; };
+		A5F6B7C8D9E90918293A4B5D5 /* MockMusicAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B6C7D8E9F90918293A4B5D5 /* MockMusicAuthorizationProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,6 +62,8 @@
 		F1B2C3D4E5F70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LiveAlbumBackupServiceTests.swift; sourceTree = "<group>"; };
 		F2B3C4D5E6F80718293A4B5D2 /* DirectFileReader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DirectFileReader.swift; sourceTree = "<group>"; };
 		F3B4C5D6E7F90718293A4B5D3 /* AlbumStoreImportTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumStoreImportTests.swift; sourceTree = "<group>"; };
+		F4B5C6D7E8F90818293A4B5D4 /* AuthViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModelTests.swift; sourceTree = "<group>"; };
+		F5B6C7D8E9F90918293A4B5D5 /* MockMusicAuthorizationProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockMusicAuthorizationProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -128,10 +132,27 @@
 			children = (
 				F1A2B3C4D5E60718293A4B5C /* MockAlbumRepository.swift */,
 				F2A3B4C5D6E70718293A4B5D /* MockPlaybackController.swift */,
+				F5B6C7D8E9F90918293A4B5D5 /* MockMusicAuthorizationProvider.swift */,
 				F8A9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift */,
 				F2B3C4D5E6F80718293A4B5D2 /* DirectFileReader.swift */,
 			);
 			path = TestSupport;
+			sourceTree = "<group>";
+		};
+		E6F708192A3B4C5D6E7F8091A /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				F4B5C6D7E8F90818293A4B5D4 /* AuthViewModelTests.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		D6E7F8091A2B3C4D5E6F7081 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				E6F708192A3B4C5D6E7F8091A /* Auth */,
+			);
+			path = Features;
 			sourceTree = "<group>";
 		};
 		C3D4E5F60718293A4B5C6D7F /* Adapters */ = {
@@ -148,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				C3D4E5F60718293A4B5C6D7F /* Adapters */,
+				D6E7F8091A2B3C4D5E6F7081 /* Features */,
 				3E7B2A9C5F1D8046A2C9E1B4 /* Fixtures */,
 				2F8A1C4E9D6B3A7051E8C2D0 /* Core */,
 				D5E6F708192A3B4C5D6E7F809 /* TestSupport */,
@@ -295,6 +317,8 @@
 				A1F2B3C4D5E70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift in Sources */,
 				A2F3B4C5D6E80718293A4B5D2 /* DirectFileReader.swift in Sources */,
 				A3F4B5C6D7E90718293A4B5D3 /* AlbumStoreImportTests.swift in Sources */,
+				A4F5B6C7D8E90818293A4B5D4 /* AuthViewModelTests.swift in Sources */,
+				A5F6B7C8D9E90918293A4B5D5 /* MockMusicAuthorizationProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
