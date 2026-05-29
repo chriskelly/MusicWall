@@ -9,7 +9,7 @@ import SwiftUI
 import UIKit
 
 struct HomePageView: View {
-    @State var albums: StoredAlbums
+    @State var store: AlbumStore
     let preferences: PreferencesStore
     let dependencies: AppDependencies
     @State private var showingAddView = false
@@ -21,8 +21,8 @@ struct HomePageView: View {
     @State private var showingImportSnackbar = false
     @State private var importSnackbarMessage = ""
 
-    init(albums: StoredAlbums, preferences: PreferencesStore, dependencies: AppDependencies) {
-        self._albums = State(initialValue: albums)
+    init(store: AlbumStore, preferences: PreferencesStore, dependencies: AppDependencies) {
+        self._store = State(initialValue: store)
         self.preferences = preferences
         self.dependencies = dependencies
         self._currentLayout = State(
@@ -37,7 +37,7 @@ struct HomePageView: View {
             .toolbar {toolbarView()}
             .background(Color(.systemGray6))
         }
-        .environment(albums)
+        .environment(store)
         .environment(\.albumRepository, dependencies.albumRepository)
         .environment(\.playback, dependencies.playbackController)
         .sheet(isPresented: $showingAddView) {
@@ -60,7 +60,7 @@ struct HomePageView: View {
                 ShareSheet(activityItems: [url])
             }
         }
-        .task {await albums.load()}
+        .task { await store.load() }
     }
     
     private func layoutView() -> some View {
@@ -84,7 +84,7 @@ struct HomePageView: View {
             )
             Button("Shuffle albums temporarily", systemImage: "shuffle.circle") {
                 withAnimation {
-                    albums.temporarilyShuffle()
+                    store.temporarilyShuffle()
                 }
             }
             Button("Add album", systemImage: "plus") {
@@ -94,7 +94,7 @@ struct HomePageView: View {
     }
     
     private func onSearchSelect(_ record: AlbumRecord) {
-        albums.addAlbum(StoredAlbum(from: record))
+        store.addAlbum(record)
         showingAlbumAddSnackbar = true
     }
     
@@ -115,7 +115,7 @@ struct HomePageView: View {
     private func importAlbums(from url: URL) async {
         do {
             let ids = try BackupService.importAlbumIDs(from: url)
-            try await albums.importAlbums(from: ids)
+            try await store.importAlbums(from: ids)
             importSnackbarMessage = "Successfully imported \(ids.count) album(s)!"
             showingImportSnackbar = true
         } catch {
@@ -125,7 +125,7 @@ struct HomePageView: View {
     }
     
     private func exportAlbums() {
-        let ids = albums.exportAlbumIDs()
+        let ids = store.exportAlbumIDs()
         
         do {
             let url = try BackupService.exportAlbumIDs(ids)
@@ -156,24 +156,24 @@ struct HomePageMenu: View {
 }
 
 struct SortMenu: View {
-    @Environment(StoredAlbums.self) private var albums
+    @Environment(AlbumStore.self) private var store
     
     var body: some View {
         Section {
-            ForEach(StoredAlbums.SortOptions.allCases) {option in
+            ForEach(AlbumStore.SortOption.allCases) { option in
                 Button {
-                    if albums.currentSort == option {
-                        albums.toggleSortDirection(for: option)
+                    if store.currentSort == option {
+                        store.toggleSortDirection(for: option)
                     } else {
-                        albums.currentSort = option
+                        store.currentSort = option
                     }
                     withAnimation {
-                        albums.applySort()
+                        store.applySort()
                     }
                 } label: {
                     HStack {
-                        if albums.currentSort == option {
-                            Image(systemName: albums.isAscending(for: option) ? "arrow.down" : "arrow.up")
+                        if store.currentSort == option {
+                            Image(systemName: store.isAscending(for: option) ? "arrow.down" : "arrow.up")
                                 .foregroundColor(.accentColor)
                         }
                         Text(option.rawValue)
@@ -215,7 +215,10 @@ struct ShareSheet: UIViewControllerRepresentable {
 #Preview {
     let deps = AppDependencies.preview()
     HomePageView(
-        albums: StoredAlbums.dummyData(preferences: deps.preferencesStore, repository: deps.albumRepository),
+        store: AlbumStore.dummyData(
+            preferences: deps.preferencesStore,
+            repository: deps.albumRepository
+        ),
         preferences: deps.preferencesStore,
         dependencies: deps
     )
@@ -226,7 +229,10 @@ struct ShareSheet: UIViewControllerRepresentable {
     let deps = AppDependencies.preview()
     NavigationStack {
         HomePageView(
-            albums: StoredAlbums.dummyData(preferences: deps.preferencesStore, repository: deps.albumRepository),
+            store: AlbumStore.dummyData(
+                preferences: deps.preferencesStore,
+                repository: deps.albumRepository
+            ),
             preferences: deps.preferencesStore,
             dependencies: deps
         )

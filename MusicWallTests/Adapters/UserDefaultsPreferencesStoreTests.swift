@@ -11,24 +11,40 @@ struct UserDefaultsPreferencesStoreTests {
     }
 
     @Test
-    func roundTripStoredAlbumsItems() {
+    func roundTripAlbumRecordsItems() {
         let (store, suiteName) = makeStore()
         defer { UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName) }
 
         let albums = [
-            StoredAlbum(
-                id: MusicItemID("fixture-round-trip"),
+            AlbumFixtures.record(
+                id: "fixture-round-trip",
+                title: "Take Care",
+                artistName: "Drake",
+                isExplicit: true
+            ),
+        ]
+        store.save(albums, for: .albumRecordsItems)
+        let loaded = store.load([AlbumRecord].self, for: .albumRecordsItems)
+        #expect(loaded == albums)
+    }
+
+    @Test
+    func roundTripLegacyStoredAlbumsItems() {
+        let (store, suiteName) = makeStore()
+        defer { UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName) }
+
+        let legacy = [
+            LegacyStoredAlbum(
+                id: MusicItemID("legacy-round-trip"),
                 title: "Take Care",
                 artistName: "Drake",
                 releaseDate: nil
             ),
         ]
-        store.save(albums, for: .storedAlbumsItems)
-        let loaded = store.load([StoredAlbum].self, for: .storedAlbumsItems)
+        store.save(legacy, for: .storedAlbumsItems)
+        let loaded = store.load([LegacyStoredAlbum].self, for: .storedAlbumsItems)
         #expect(loaded?.count == 1)
-        #expect(loaded?.first?.id.rawValue == "fixture-round-trip")
-        #expect(loaded?.first?.title == "Take Care")
-        #expect(loaded?.first?.artistName == "Drake")
+        #expect(loaded?.first?.id.rawValue == "legacy-round-trip")
     }
 
     @Test
@@ -46,9 +62,9 @@ struct UserDefaultsPreferencesStoreTests {
         let (store, suiteName) = makeStore()
         defer { UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName) }
 
-        let value: [StoredAlbums.SortOptions: Bool] = [.artist: true, .title: false]
+        let value: [AlbumStore.SortOption: Bool] = [.artist: true, .title: false]
         store.save(value, for: .sortDirection)
-        #expect(store.load([StoredAlbums.SortOptions: Bool].self, for: .sortDirection) == value)
+        #expect(store.load([AlbumStore.SortOption: Bool].self, for: .sortDirection) == value)
     }
 
     @Test
@@ -56,8 +72,8 @@ struct UserDefaultsPreferencesStoreTests {
         let (store, suiteName) = makeStore()
         defer { UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName) }
 
-        store.save(StoredAlbums.SortOptions.artist, for: .currentSort)
-        #expect(store.load(StoredAlbums.SortOptions.self, for: .currentSort) == .artist)
+        store.save(AlbumStore.SortOption.artist, for: .currentSort)
+        #expect(store.load(AlbumStore.SortOption.self, for: .currentSort) == .artist)
     }
 
     @Test

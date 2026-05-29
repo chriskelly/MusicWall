@@ -16,6 +16,11 @@
 		A2F3B4C5D6E70718293A4B5C2 /* MockPlaybackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A3B4C5D6E70718293A4B5D /* MockPlaybackController.swift */; };
 		A3F4B5C6D7E80718293A4B5C3 /* AlbumRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A4B5C6D7E80718293A4B5C /* AlbumRepositoryTests.swift */; };
 		A4F5B6C7D8E90718293A4B5C4 /* AlbumTapPlaybackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A5B6C7D8E90718293A4B5D /* AlbumTapPlaybackTests.swift */; };
+		A5F6B7C8D9E00718293A4B5C5 /* AlbumRecordCodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5A6B7C8D9E00718293A4B5C5 /* AlbumRecordCodableTests.swift */; };
+		A6F7B8C9D0E10718293A4B5C6 /* AlbumLibraryLoaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A7B8C9D0E10718293A4B5C6 /* AlbumLibraryLoaderTests.swift */; };
+		A7F8B9C0D1E20718293A4B5C7 /* LegacyFixtureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A8B9C0D1E20718293A4B5C7 /* LegacyFixtureTests.swift */; };
+		A8F9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift */; };
+		B9C0D1E2F30818293A4B5C9 /* legacy_stored_albums_v1.json in Resources */ = {isa = PBXBuildFile; fileRef = F9C0D1E2F30818293A4B5C9 /* legacy_stored_albums_v1.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +45,11 @@
 		F2A3B4C5D6E70718293A4B5D /* MockPlaybackController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockPlaybackController.swift; sourceTree = "<group>"; };
 		F3A4B5C6D7E80718293A4B5C /* AlbumRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumRepositoryTests.swift; sourceTree = "<group>"; };
 		F4A5B6C7D8E90718293A4B5D /* AlbumTapPlaybackTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumTapPlaybackTests.swift; sourceTree = "<group>"; };
+		F5A6B7C8D9E00718293A4B5C5 /* AlbumRecordCodableTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumRecordCodableTests.swift; sourceTree = "<group>"; };
+		F6A7B8C9D0E10718293A4B5C6 /* AlbumLibraryLoaderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumLibraryLoaderTests.swift; sourceTree = "<group>"; };
+		F7A8B9C0D1E20718293A4B5C7 /* LegacyFixtureTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LegacyFixtureTests.swift; sourceTree = "<group>"; };
+		F8A9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = InMemoryPreferencesStore.swift; sourceTree = "<group>"; };
+		F9C0D1E2F30818293A4B5C9 /* legacy_stored_albums_v1.json */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.json; path = legacy_stored_albums_v1.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -95,6 +105,8 @@
 				F4A5B6C7D8E90718293A4B5D /* AlbumTapPlaybackTests.swift */,
 				E5F60718293A4B5C6D7E8F9A0B1 /* AlbumCollectionTests.swift */,
 				C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */,
+				F5A6B7C8D9E00718293A4B5C5 /* AlbumRecordCodableTests.swift */,
+				F6A7B8C9D0E10718293A4B5C6 /* AlbumLibraryLoaderTests.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -104,6 +116,7 @@
 			children = (
 				F1A2B3C4D5E60718293A4B5C /* MockAlbumRepository.swift */,
 				F2A3B4C5D6E70718293A4B5D /* MockPlaybackController.swift */,
+				F8A9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift */,
 			);
 			path = TestSupport;
 			sourceTree = "<group>";
@@ -133,6 +146,8 @@
 			isa = PBXGroup;
 			children = (
 				4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */,
+				F7A8B9C0D1E20718293A4B5C7 /* LegacyFixtureTests.swift */,
+				F9C0D1E2F30818293A4B5C9 /* legacy_stored_albums_v1.json */,
 			);
 			path = Fixtures;
 			sourceTree = "<group>";
@@ -229,6 +244,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B9C0D1E2F30818293A4B5C9 /* legacy_stored_albums_v1.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -255,6 +271,10 @@
 				A2F3B4C5D6E70718293A4B5C2 /* MockPlaybackController.swift in Sources */,
 				A3F4B5C6D7E80718293A4B5C3 /* AlbumRepositoryTests.swift in Sources */,
 				A4F5B6C7D8E90718293A4B5C4 /* AlbumTapPlaybackTests.swift in Sources */,
+				A5F6B7C8D9E00718293A4B5C5 /* AlbumRecordCodableTests.swift in Sources */,
+				A6F7B8C9D0E10718293A4B5C6 /* AlbumLibraryLoaderTests.swift in Sources */,
+				A7F8B9C0D1E20718293A4B5C7 /* LegacyFixtureTests.swift in Sources */,
+				A8F9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -8,29 +8,29 @@
 import SwiftUI
 
 struct LayoutContainer<Content: View>: View {
-    @Environment(StoredAlbums.self) private var albums
-    @State private var deletedAlbum: StoredAlbum?
+    @Environment(AlbumStore.self) private var store
+    @State private var deletedAlbum: AlbumRecord?
     @State private var showAlbumDeleteSnackbar = false
-    @State private var editingAlbum: StoredAlbum?
+    @State private var editingAlbum: AlbumRecord?
     
     private let content: (
-        _ onDeleteSnackbar: @escaping (StoredAlbum) -> Void,
-        _ onEdit: @escaping (StoredAlbum) -> Void
+        _ onDeleteSnackbar: @escaping (AlbumRecord) -> Void,
+        _ onEdit: @escaping (AlbumRecord) -> Void
     ) -> Content
     
     init(@ViewBuilder content: @escaping (
-        _ onDeleteSnackbar: @escaping (StoredAlbum) -> Void, 
-        _ onEdit: @escaping (StoredAlbum) -> Void
+        _ onDeleteSnackbar: @escaping (AlbumRecord) -> Void, 
+        _ onEdit: @escaping (AlbumRecord) -> Void
     ) -> Content) {
         self.content = content
     }
     
-    private func handleDeleteSnackbar(album: StoredAlbum) {
+    private func handleDeleteSnackbar(album: AlbumRecord) {
         deletedAlbum = album
         showAlbumDeleteSnackbar = true
     }
     
-    private func handleEdit(album: StoredAlbum) {
+    private func handleEdit(album: AlbumRecord) {
         editingAlbum = album
     }
     
@@ -45,20 +45,20 @@ struct LayoutContainer<Content: View>: View {
             actionLabel: "Undo",
             action: {
                 if let album = deletedAlbum {
-                    albums.addAlbum(album)
+                    store.addAlbum(album)
                 }
             }
         )
         .sheet(item: $editingAlbum) { album in
             AlbumEditView(album: album) { updatedAlbum in
-                albums.updateAlbum(updatedAlbum)
+                store.updateAlbum(updatedAlbum)
             }
         }
     }
 }
 
 struct GridLayout: View {
-    @Environment(StoredAlbums.self) private var albums
+    @Environment(AlbumStore.self) private var store
     @Environment(\.playback) private var playback
     @State private var selectedAlbumID: String?
     
@@ -68,7 +68,7 @@ struct GridLayout: View {
         LayoutContainer { onDeleteSnackbar, onEdit in
             ScrollView {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: GridLayout.size))]) {
-                    ForEach(albums.items) { album in
+                    ForEach(store.items) { album in
                         AlbumTile(
                             album: album,
                             isSelected: selectedAlbumID == album.id.rawValue,
@@ -93,13 +93,13 @@ struct GridLayout: View {
     }
     
     struct AlbumTile: View {
-        let album: StoredAlbum
+        let album: AlbumRecord
         let isSelected: Bool
-        let onDeleteSnackbar: (StoredAlbum) -> Void
-        let onEdit: (StoredAlbum) -> Void
+        let onDeleteSnackbar: (AlbumRecord) -> Void
+        let onEdit: (AlbumRecord) -> Void
         
         @State private var animationID = UUID()
-        @Environment(StoredAlbums.self) private var albums
+        @Environment(AlbumStore.self) private var store
         
         var body: some View {
             VStack {
@@ -158,7 +158,7 @@ struct GridLayout: View {
                 }
                 
                 Button(role: .destructive) {
-                    albums.remove(album: album)
+                    store.remove(album: album)
                     onDeleteSnackbar(album)
                 } label: {
                     Label("Remove Album", systemImage: "trash")
@@ -169,14 +169,14 @@ struct GridLayout: View {
 }
 
 struct ListLayout: View {
-    @Environment(StoredAlbums.self) private var albums
+    @Environment(AlbumStore.self) private var store
     @Environment(\.playback) private var playback
     @State private var selectedAlbumID: String?
     
     var body: some View {
         LayoutContainer { onDeleteSnackbar, onEdit in
             List {
-                ForEach(albums.items) { album in
+                ForEach(store.items) { album in
                     listItem(album)
                         .onTapGesture {
                             Task {
@@ -198,8 +198,8 @@ struct ListLayout: View {
                         }
                 }
                 .onDelete { indexSet in
-                    let deletedAlbum = indexSet.first.map { albums.items[$0] }
-                    albums.remove(atOffsets: indexSet)
+                    let deletedAlbum = indexSet.first.map { store.items[$0] }
+                    store.remove(atOffsets: indexSet)
                     if let deletedAlbum {
                         onDeleteSnackbar(deletedAlbum)
                     }
@@ -208,7 +208,7 @@ struct ListLayout: View {
         }
     }
     
-    private func listItem(_ album: StoredAlbum) -> some View {
+    private func listItem(_ album: AlbumRecord) -> some View {
         return HStack {
             VStack(alignment: .leading) {
                 Text(album.title)
@@ -223,7 +223,7 @@ struct ListLayout: View {
 }
 
 struct AlbumArtwork: View {
-    let album: StoredAlbum
+    let album: AlbumRecord
     let viewSize: CGFloat
 
     @Environment(\.albumRepository) private var albumRepository
@@ -287,17 +287,17 @@ struct LayoutMenu: View {
 #Preview {
     @Previewable @State var layout: LayoutMenu.Option = .grid
     let deps = AppDependencies.preview()
-    let albums = StoredAlbums.dummyData(
+    let store = AlbumStore.dummyData(
         preferences: deps.preferencesStore,
         repository: deps.albumRepository
     )
     LayoutMenu(currentLayout: $layout, preferences: deps.preferencesStore)
     ListLayout()
-        .environment(albums)
+        .environment(store)
         .environment(\.albumRepository, deps.albumRepository)
         .environment(\.playback, deps.playbackController)
     GridLayout()
-        .environment(albums)
+        .environment(store)
         .environment(\.albumRepository, deps.albumRepository)
         .environment(\.playback, deps.playbackController)
 }
