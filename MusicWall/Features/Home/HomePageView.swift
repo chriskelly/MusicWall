@@ -9,35 +9,21 @@ import SwiftUI
 import UIKit
 
 struct HomePageView: View {
-    @State var store: AlbumStore
-    let preferences: PreferencesStore
+    @Bindable var viewModel: HomeViewModel
     let dependencies: AppDependencies
     @State private var showingAddView = false
-    @State private var currentLayout: LayoutMenu.Option
-    @State private var showingAlbumAddSnackbar = false
     @State private var showingFileImporter = false
     @State private var exportedFileURL: URL?
     @State private var showingExportShareSheet = false
-    @State private var showingImportSnackbar = false
-    @State private var importSnackbarMessage = ""
 
-    init(store: AlbumStore, preferences: PreferencesStore, dependencies: AppDependencies) {
-        self._store = State(initialValue: store)
-        self.preferences = preferences
-        self.dependencies = dependencies
-        self._currentLayout = State(
-            initialValue: LayoutMenu.loadLayout(using: preferences) ?? .grid
-        )
-    }
-    
     var body: some View {
         NavigationStack {
             layoutView()
-            .navigationTitle("My Albums")
-            .toolbar {toolbarView()}
-            .background(Color(.systemGray6))
+                .navigationTitle("My Albums")
+                .toolbar { toolbarView() }
+                .background(Color(.systemGray6))
         }
-        .environment(store)
+        .environment(viewModel.store)
         .environment(\.albumRepository, dependencies.albumRepository)
         .environment(\.playback, dependencies.playbackController)
         .sheet(isPresented: $showingAddView) {
@@ -46,8 +32,13 @@ struct HomePageView: View {
                 onSelect: onSearchSelect
             )
         }
-        .snackbar(isPresented: $showingAlbumAddSnackbar, message: "Album successfully added!")
-        .snackbar(isPresented: $showingImportSnackbar, message: importSnackbarMessage)
+        .snackbar(
+            isPresented: Binding(
+                get: { viewModel.snackbar != nil },
+                set: { if !$0 { viewModel.snackbar = nil } }
+            ),
+            message: viewModel.snackbar?.message ?? ""
+        )
         .fileImporter(
             isPresented: $showingFileImporter,
             allowedContentTypes: [.json, .text],
@@ -60,12 +51,12 @@ struct HomePageView: View {
                 ShareSheet(activityItems: [url])
             }
         }
-        .task { await store.load() }
+        .task { await viewModel.load() }
     }
-    
+
     private func layoutView() -> some View {
-        return Group {
-            switch currentLayout {
+        Group {
+            switch viewModel.currentLayout {
             case .grid:
                 GridLayout()
             case .list:
@@ -73,18 +64,17 @@ struct HomePageView: View {
             }
         }
     }
-    
+
     private func toolbarView() -> some View {
-        return Group {
+        Group {
             HomePageMenu(
-                currentLayout: $currentLayout,
+                viewModel: viewModel,
                 showingFileImporter: $showingFileImporter,
-                preferences: preferences,
-                onExport: exportAlbums
+                onExport: handleExport
             )
             Button("Shuffle albums temporarily", systemImage: "shuffle.circle") {
                 withAnimation {
-                    store.temporarilyShuffle()
+                    viewModel.shuffleAlbums()
                 }
             }
             Button("Add album", systemImage: "plus") {
@@ -92,62 +82,44 @@ struct HomePageView: View {
             }
         }
     }
-    
+
     private func onSearchSelect(_ record: AlbumRecord) {
-        store.addAlbum(record)
-        showingAlbumAddSnackbar = true
+        viewModel.store.addAlbum(record)
+        viewModel.albumAdded()
     }
-    
+
     private func handleFileImport(result: Result<[URL], Error>) {
         switch result {
         case .success(let urls):
             guard let url = urls.first else { return }
             Task {
-                await importAlbums(from: url)
+                await viewModel.importAlbums(from: url)
             }
         case .failure(let error):
-            importSnackbarMessage = "Import failed: \(error.localizedDescription)"
-            showingImportSnackbar = true
+            viewModel.importFailed(error)
         }
     }
-    
-    @MainActor
-    private func importAlbums(from url: URL) async {
-        do {
-            let ids = try dependencies.albumBackupService.importAlbumIDs(from: url)
-            try await store.importAlbums(from: ids)
-            importSnackbarMessage = "Successfully imported \(ids.count) album(s)!"
-            showingImportSnackbar = true
-        } catch {
-            importSnackbarMessage = "Import failed: \(error.localizedDescription)"
-            showingImportSnackbar = true
-        }
-    }
-    
-    private func exportAlbums() {
-        let ids = store.exportAlbumIDs()
-        
-        do {
-            let url = try dependencies.albumBackupService.exportAlbumIDs(ids)
+
+    private func handleExport() {
+        switch viewModel.exportAlbums() {
+        case .success(let url):
             exportedFileURL = url
             showingExportShareSheet = true
-        } catch {
-            importSnackbarMessage = "Export failed: \(error.localizedDescription)"
-            showingImportSnackbar = true
+        case .snackbar(let state):
+            viewModel.snackbar = state
         }
     }
 }
 
 struct HomePageMenu: View {
-    @Binding var currentLayout: LayoutMenu.Option
+    @Bindable var viewModel: HomeViewModel
     @Binding var showingFileImporter: Bool
-    let preferences: PreferencesStore
     let onExport: () -> Void
-    
+
     var body: some View {
         Menu {
-            LayoutMenu(currentLayout: $currentLayout, preferences: preferences)
-            SortMenu()
+            LayoutMenu(viewModel: viewModel)
+            SortMenu(viewModel: viewModel)
             BackupMenu(showingFileImporter: $showingFileImporter, onExport: onExport)
         } label: {
             Label("Options", systemImage: "line.3.horizontal.decrease.circle")
@@ -156,24 +128,19 @@ struct HomePageMenu: View {
 }
 
 struct SortMenu: View {
-    @Environment(AlbumStore.self) private var store
-    
+    @Bindable var viewModel: HomeViewModel
+
     var body: some View {
         Section {
             ForEach(AlbumStore.SortOption.allCases) { option in
                 Button {
-                    if store.currentSort == option {
-                        store.toggleSortDirection(for: option)
-                    } else {
-                        store.currentSort = option
-                    }
                     withAnimation {
-                        store.applySort()
+                        viewModel.selectSort(option)
                     }
                 } label: {
                     HStack {
-                        if store.currentSort == option {
-                            Image(systemName: store.isAscending(for: option) ? "arrow.down" : "arrow.up")
+                        if viewModel.currentSort == option {
+                            Image(systemName: viewModel.isAscending(for: option) ? "arrow.down" : "arrow.up")
                                 .foregroundColor(.accentColor)
                         }
                         Text(option.rawValue)
@@ -187,7 +154,7 @@ struct SortMenu: View {
 struct BackupMenu: View {
     @Binding var showingFileImporter: Bool
     let onExport: () -> Void
-    
+
     var body: some View {
         Section("Backup") {
             Button("Export Album IDs", systemImage: "square.and.arrow.up") {
@@ -200,41 +167,24 @@ struct BackupMenu: View {
     }
 }
 
-
 struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
-    
+
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        let controller = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-        return controller
+        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
     }
-    
+
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 #Preview {
     let deps = AppDependencies.preview()
-    HomePageView(
-        store: AlbumStore.dummyData(
-            preferences: deps.preferencesStore,
-            repository: deps.albumRepository
-        ),
-        preferences: deps.preferencesStore,
-        dependencies: deps
-    )
+    HomePageView(viewModel: .preview(dependencies: deps), dependencies: deps)
 }
-
 
 #Preview {
     let deps = AppDependencies.preview()
     NavigationStack {
-        HomePageView(
-            store: AlbumStore.dummyData(
-                preferences: deps.preferencesStore,
-                repository: deps.albumRepository
-            ),
-            preferences: deps.preferencesStore,
-            dependencies: deps
-        )
+        HomePageView(viewModel: .preview(dependencies: deps), dependencies: deps)
     }
 }

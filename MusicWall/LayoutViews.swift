@@ -250,54 +250,42 @@ struct AlbumArtwork: View {
 }
 
 struct LayoutMenu: View {
-    @Binding var currentLayout: Option
-    let preferences: PreferencesStore
-    
+    @Bindable var viewModel: HomeViewModel
+
     enum Option: String, CaseIterable, Identifiable, Codable {
         var id: String { rawValue }
-        
+
         case grid = "Grid"
         case list = "List"
     }
-    
+
     var body: some View {
         Section {
             ForEach(LayoutMenu.Option.allCases) { option in
                 Button {
-                    currentLayout = option
-                    preferences.save(currentLayout, for: .homePageLayout)
+                    viewModel.setLayout(option)
                 } label: {
                     HStack {
-                        if currentLayout == option {
+                        if viewModel.currentLayout == option {
                             Image(systemName: "checkmark")
                         }
                         Text(option.rawValue)
                     }
                 }
-                
             }
         }
-    }
-    
-    static func loadLayout(using preferences: PreferencesStore) -> Option? {
-        preferences.load(Option.self, for: .homePageLayout)
     }
 }
 
 #Preview {
-    @Previewable @State var layout: LayoutMenu.Option = .grid
     let deps = AppDependencies.preview()
-    let store = AlbumStore.dummyData(
-        preferences: deps.preferencesStore,
-        repository: deps.albumRepository
-    )
-    LayoutMenu(currentLayout: $layout, preferences: deps.preferencesStore)
+    LayoutMenu(viewModel: .preview(dependencies: deps))
     ListLayout()
-        .environment(store)
+        .environment(HomeViewModel.preview(dependencies: deps).store)
         .environment(\.albumRepository, deps.albumRepository)
         .environment(\.playback, deps.playbackController)
     GridLayout()
-        .environment(store)
+        .environment(HomeViewModel.preview(dependencies: deps).store)
         .environment(\.albumRepository, deps.albumRepository)
         .environment(\.playback, deps.playbackController)
 }
