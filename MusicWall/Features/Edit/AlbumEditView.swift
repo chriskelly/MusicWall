@@ -8,48 +8,46 @@
 import SwiftUI
 
 struct AlbumEditView: View {
-    let album: AlbumRecord
     let onSave: (AlbumRecord) -> Void
     @Environment(\.dismiss) private var dismiss
-    
-    @State private var title: String
-    @State private var artistName: String
-    @State private var releaseDate: Date?
-    
+
+    @State private var viewModel: AlbumEditViewModel
+
     init(album: AlbumRecord, onSave: @escaping (AlbumRecord) -> Void) {
-        self.album = album
         self.onSave = onSave
-        _title = State(initialValue: album.title)
-        _artistName = State(initialValue: album.artistName)
-        _releaseDate = State(initialValue: album.releaseDate)
+        _viewModel = State(initialValue: AlbumEditViewModel(album: album))
     }
-    
+
+    var body: some View {
+        AlbumEditContent(viewModel: viewModel, onSave: onSave, dismiss: dismiss)
+    }
+}
+
+private struct AlbumEditContent: View {
+    @Bindable var viewModel: AlbumEditViewModel
+    let onSave: (AlbumRecord) -> Void
+    let dismiss: DismissAction
+
     var body: some View {
         NavigationStack {
             Form {
                 Section("Changes made here are local and may be overridden by Apple Music") {
-                    TextField("Title", text: $title)
-                    TextField("Artist Name", text: $artistName)
+                    TextField("Title", text: $viewModel.title)
+                    TextField("Artist Name", text: $viewModel.artistName)
                 }
-                
+
                 Section {
                     Toggle("Set Release Date", isOn: Binding(
-                        get: { releaseDate != nil },
-                        set: { hasDate in
-                            if hasDate {
-                                releaseDate = album.releaseDate ?? Date()
-                            } else {
-                                releaseDate = nil
-                            }
-                        }
+                        get: { viewModel.releaseDate != nil },
+                        set: { viewModel.setReleaseDateEnabled($0) }
                     ))
-                    
-                    if releaseDate != nil {
+
+                    if viewModel.releaseDate != nil {
                         DatePicker(
                             "Release Date",
                             selection: Binding(
-                                get: { releaseDate ?? Date() },
-                                set: { releaseDate = $0 }
+                                get: { viewModel.releaseDate ?? Date() },
+                                set: { viewModel.releaseDate = $0 }
                             ),
                             displayedComponents: .date
                         )
@@ -66,24 +64,13 @@ struct AlbumEditView: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
-                        saveAlbum()
+                        onSave(viewModel.makeSavedRecord())
+                        dismiss()
                     }
-                    .disabled(title.isEmpty || artistName.isEmpty)
+                    .disabled(!viewModel.canSave)
                 }
             }
         }
-    }
-    
-    private func saveAlbum() {
-        let updatedAlbum = AlbumRecord(
-            id: album.id,
-            title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-            artistName: artistName.trimmingCharacters(in: .whitespacesAndNewlines),
-            releaseDate: releaseDate,
-            isExplicit: album.isExplicit
-        )
-        onSave(updatedAlbum)
-        dismiss()
     }
 }
 

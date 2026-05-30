@@ -8,30 +8,52 @@
 import SwiftUI
 
 struct AlbumSearchView: View {
-    let repository: any AlbumRepository
-    var onSelect: (AlbumRecord) -> Void
+    let onSelect: (AlbumRecord) -> Void
 
-    @State private var query = ""
-    @State private var catalogSearchResults: [AlbumRecord] = []
-    @State private var librarySearchResults: [AlbumRecord] = []
-    @State private var isSearching = false
+    @State private var viewModel: SearchViewModel
     @FocusState private var isSearchFieldFocused: Bool
+
+    init(repository: any AlbumRepository, onSelect: @escaping (AlbumRecord) -> Void) {
+        self.onSelect = onSelect
+        _viewModel = State(initialValue: SearchViewModel(repository: repository))
+    }
+
+    var body: some View {
+        AlbumSearchContent(
+            viewModel: viewModel,
+            onSelect: onSelect,
+            isSearchFieldFocused: $isSearchFieldFocused
+        )
+    }
+}
+
+private struct AlbumSearchContent: View {
+    @Bindable var viewModel: SearchViewModel
+    var onSelect: (AlbumRecord) -> Void
+    @FocusState.Binding var isSearchFieldFocused: Bool
 
     var body: some View {
         NavigationStack {
             VStack {
-                TextField("Search for an album", text: $query)
+                TextField("Search for an album", text: $viewModel.query)
                     .textFieldStyle(.roundedBorder)
                     .padding()
                     .focused($isSearchFieldFocused)
                 Button("Search") {
                     isSearchFieldFocused = false
-                    Task { await searchAlbums() }
+                    Task { await viewModel.search() }
                 }
-                .disabled(isSearching)
-                if isSearching {
+                .disabled(viewModel.isSearching)
+                if viewModel.isSearching {
                     ProgressView("Searching…")
                         .padding(.vertical, 4)
+                }
+                if let message = viewModel.errorMessage {
+                    Text(message)
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                 }
                 resultsView()
             }
@@ -42,18 +64,20 @@ struct AlbumSearchView: View {
     private func resultsView() -> some View {
         List {
             Section(header: Text("Library")) {
-                ForEach(librarySearchResults, id: \.id) { record in
-                    SearchResultButton(onSelect: onSelect, record: record)
+                ForEach(viewModel.libraryResults, id: \.id) { record in
+                    AlbumSearchView.SearchResultButton(onSelect: onSelect, record: record)
                 }
             }
             Section(header: Text("Apple Music")) {
-                ForEach(catalogSearchResults, id: \.id) { record in
-                    SearchResultButton(onSelect: onSelect, record: record)
+                ForEach(viewModel.catalogResults, id: \.id) { record in
+                    AlbumSearchView.SearchResultButton(onSelect: onSelect, record: record)
                 }
             }
         }
     }
+}
 
+extension AlbumSearchView {
     struct SearchResultButton: View {
         @Environment(\.dismiss) var dismiss
 
@@ -72,18 +96,6 @@ struct AlbumSearchView: View {
                     Text("\(record.title) — \(record.artistName)")
                 }
             }
-        }
-    }
-
-    func searchAlbums() async {
-        guard !query.isEmpty else { return }
-        isSearching = true
-        defer { isSearching = false }
-        do {
-            catalogSearchResults = try await repository.search(query: query, source: .catalog)
-            librarySearchResults = try await repository.search(query: query, source: .library)
-        } catch {
-            print(error.localizedDescription)
         }
     }
 }
