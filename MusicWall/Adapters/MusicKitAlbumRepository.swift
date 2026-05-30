@@ -26,11 +26,6 @@ struct MusicKitAlbumRepository: AlbumRepository, Sendable {
         return albums.map(AlbumMapper.record(from:))
     }
 
-    func artworkURL(for id: AlbumID, width: Int, height: Int) async -> URL? {
-        guard let album = try? await musicKitAlbum(for: id) else { return nil }
-        return album.artwork?.url(width: width, height: height)
-    }
-
     func musicKitAlbum(for id: AlbumID) async throws -> MusicKit.Album {
         let albums = try await fetchMusicKitAlbums(ids: [id])
         guard let album = albums.first else { throw AlbumRepositoryError.albumNotFound }

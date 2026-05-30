@@ -2,21 +2,26 @@
 //  ImageCache.swift
 //  MusicWall
 //
-//  Created by Chris Kelly on 8/29/25.
-//
 
 import Foundation
 
 struct ImageCache {
-    private let repository: any AlbumRepository
-    private let fileManager = FileManager.default
+    private let artworkProvider: any ArtworkProvider
+    private let session: any URLSessionDataProviding
+    private let fileManager: FileManager
+    private let cacheDirectory: URL
 
-    init(repository: any AlbumRepository) {
-        self.repository = repository
-    }
-
-    private var cacheDirectory: URL {
-        fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
+    init(
+        artworkProvider: any ArtworkProvider,
+        session: any URLSessionDataProviding = URLSession.shared,
+        fileManager: FileManager = .default,
+        cacheDirectory: URL? = nil
+    ) {
+        self.artworkProvider = artworkProvider
+        self.session = session
+        self.fileManager = fileManager
+        self.cacheDirectory = cacheDirectory
+            ?? fileManager.urls(for: .cachesDirectory, in: .userDomainMask).first!
     }
 
     /// Get cached artwork for an album ID and size, or fetch and cache it
@@ -29,12 +34,12 @@ struct ImageCache {
         }
 
         let id = AlbumID(rawValue: albumID)
-        guard let artworkURL = await repository.artworkURL(for: id, width: size, height: size) else {
+        guard let artworkURL = await artworkProvider.artworkURL(for: id, width: size, height: size) else {
             return nil
         }
 
         do {
-            let (data, _) = try await URLSession.shared.data(from: artworkURL)
+            let (data, _) = try await session.data(from: artworkURL)
             try data.write(to: localURL)
             return localURL
         } catch {

@@ -52,7 +52,7 @@ docs/plans/                # Implementation plans
 ### Architecture
 
 - **SwiftUI** for UI; use `@Observable`, `@State`, `@Environment` consistently with existing files.
-- **MVVM-style separation:** views in `*View.swift`, Apple Music access via `AlbumRepository` / `PlaybackController` (`AppDependencies.live`), persistence via `PreferencesStore` / `AlbumBackupService`. Home orchestration via `HomeViewModel` in `Features/Home/`; search via `SearchViewModel` in `Features/Search/`; album edit via `AlbumEditViewModel` in `Features/Edit/`. Search errors surface as inline `errorMessage` in the search sheet (not snackbar). `HomePageView` has no direct `albumBackupService` calls.
+- **MVVM-style separation:** views in `*View.swift`, Apple Music access via `AlbumRepository` / `PlaybackController` (`AppDependencies.live`), album artwork via `ArtworkProvider` + `ImageCache`, tap-to-play via `AlbumTapCoordinator` + `PlaybackController`, persistence via `PreferencesStore` / `AlbumBackupService`. Home orchestration via `HomeViewModel` in `Features/Home/`; search via `SearchViewModel` in `Features/Search/`; album edit via `AlbumEditViewModel` in `Features/Edit/`. Search errors surface as inline `errorMessage` in the search sheet (not snackbar). `HomePageView` has no direct `albumBackupService` calls.
 - Keep views thin; move testable logic into types/functions that do not require `MusicPlayer` when possible.
 
 ### MusicKit

@@ -28,5 +28,4 @@ enum AlbumRepositoryError: Error, LocalizedError, Equatable {
 protocol AlbumRepository: Sendable {
     func search(query: String, source: AlbumSearchSource) async throws -> [AlbumRecord]
     func fetch(ids: [AlbumID]) async throws -> [AlbumRecord]
-    func artworkURL(for id: AlbumID, width: Int, height: Int) async -> URL?
 }
