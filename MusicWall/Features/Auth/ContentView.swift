@@ -11,6 +11,7 @@ import UIKit
 struct ContentView: View {
     let dependencies: AppDependencies
     @State private var viewModel: AuthViewModel
+    @State private var homeViewModel: HomeViewModel
     @Environment(\.openURL) private var openURL
 
     init(dependencies: AppDependencies) {
@@ -18,21 +19,20 @@ struct ContentView: View {
         _viewModel = State(
             initialValue: AuthViewModel(authorization: dependencies.musicAuthorization)
         )
+        _homeViewModel = State(
+            initialValue: HomeViewModel(
+                preferences: dependencies.preferencesStore,
+                repository: dependencies.albumRepository,
+                backup: dependencies.albumBackupService
+            )
+        )
     }
 
     var body: some View {
         Group {
             switch viewModel.state {
             case .authorized:
-                let store = dependencies.preferencesStore
-                HomePageView(
-                    store: AlbumStore(
-                        preferences: store,
-                        repository: dependencies.albumRepository
-                    ),
-                    preferences: store,
-                    dependencies: dependencies
-                )
+                HomePageView(viewModel: homeViewModel, dependencies: dependencies)
             case .denied:
                 authorizationDeniedView()
             case .loading:

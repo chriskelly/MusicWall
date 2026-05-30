@@ -28,6 +28,8 @@
 		A3F4B5C6D7E90718293A4B5D3 /* AlbumStoreImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3B4C5D6E7F90718293A4B5D3 /* AlbumStoreImportTests.swift */; };
 		A4F5B6C7D8E90818293A4B5D4 /* AuthViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B5C6D7E8F90818293A4B5D4 /* AuthViewModelTests.swift */; };
 		A5F6B7C8D9E90918293A4B5D5 /* MockMusicAuthorizationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5B6C7D8E9F90918293A4B5D5 /* MockMusicAuthorizationProvider.swift */; };
+		A6F7B8C9D0E90918293A4B5D6 /* MockAlbumBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6B7C8D9E0F90918293A4B5D6 /* MockAlbumBackupService.swift */; };
+		A7F8B9C0D1E90918293A4B5D7 /* HomeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A8B9C0D1E90918293A4B5D7 /* HomeViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +66,8 @@
 		F3B4C5D6E7F90718293A4B5D3 /* AlbumStoreImportTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumStoreImportTests.swift; sourceTree = "<group>"; };
 		F4B5C6D7E8F90818293A4B5D4 /* AuthViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModelTests.swift; sourceTree = "<group>"; };
 		F5B6C7D8E9F90918293A4B5D5 /* MockMusicAuthorizationProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockMusicAuthorizationProvider.swift; sourceTree = "<group>"; };
+		F6B7C8D9E0F90918293A4B5D6 /* MockAlbumBackupService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockAlbumBackupService.swift; sourceTree = "<group>"; };
+		F7A8B9C0D1E90918293A4B5D7 /* HomeViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -133,6 +137,7 @@
 				F1A2B3C4D5E60718293A4B5C /* MockAlbumRepository.swift */,
 				F2A3B4C5D6E70718293A4B5D /* MockPlaybackController.swift */,
 				F5B6C7D8E9F90918293A4B5D5 /* MockMusicAuthorizationProvider.swift */,
+				F6B7C8D9E0F90918293A4B5D6 /* MockAlbumBackupService.swift */,
 				F8A9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift */,
 				F2B3C4D5E6F80718293A4B5D2 /* DirectFileReader.swift */,
 			);
@@ -147,10 +152,19 @@
 			path = Auth;
 			sourceTree = "<group>";
 		};
+		E7F8091A2B3C4D5E6F7081B /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				F7A8B9C0D1E90918293A4B5D7 /* HomeViewModelTests.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
 		D6E7F8091A2B3C4D5E6F7081 /* Features */ = {
 			isa = PBXGroup;
 			children = (
 				E6F708192A3B4C5D6E7F8091A /* Auth */,
+				E7F8091A2B3C4D5E6F7081B /* Home */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -319,6 +333,8 @@
 				A3F4B5C6D7E90718293A4B5D3 /* AlbumStoreImportTests.swift in Sources */,
 				A4F5B6C7D8E90818293A4B5D4 /* AuthViewModelTests.swift in Sources */,
 				A5F6B7C8D9E90918293A4B5D5 /* MockMusicAuthorizationProvider.swift in Sources */,
+				A6F7B8C9D0E90918293A4B5D6 /* MockAlbumBackupService.swift in Sources */,
+				A7F8B9C0D1E90918293A4B5D7 /* HomeViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
