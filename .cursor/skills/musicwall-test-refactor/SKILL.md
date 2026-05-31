@@ -12,7 +12,7 @@ paths:
   - Packages/**
   - fastlane/**
   - .github/workflows/**
-  - docs/testing.md
+  - MusicWallTests/Agent.md
 metadata:
   project: MusicWall
   program-version: "1"
@@ -29,7 +29,7 @@ This skill describes a **multi-PR refactor** of the MusicWall SwiftUI + MusicKit
 3. Branch from `main`: `cursor/test-refactor-pr-05-<short-topic>-c3d5` (or team convention).
 4. Read [references/architecture.md](references/architecture.md) for north-star rules.
 5. Ship one PR; CI must pass `ci-tests` (and `testflight-release` unless `no-deploy` is applied).
-6. Update `docs/testing.md` when behavior or coverage policy changes.
+6. Update `MusicWallTests/Agent.md` when behavior or coverage policy changes.
 
 ## North star (summary)
 
@@ -84,7 +84,7 @@ Dependency graph: [references/pr-dependencies.md](references/pr-dependencies.md)
 
 Exclusions: real catalog search success, `SystemMusicPlayer` integration, vinyl animations, `glassEffect()` branches unless snapshotted.
 
-## Decisions (lock in PR 1, document in `docs/testing.md`)
+## Decisions (lock in PR 1, document in `MusicWallTests/Agent.md`)
 
 | Decision | Options | Default if unset |
 |----------|---------|------------------|
