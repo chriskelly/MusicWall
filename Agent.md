@@ -94,6 +94,7 @@ CI runs `Scripts/check_core_imports.sh` — `MusicWall/Core/` must not import Mu
 | Protocol or domain type | `MusicWall/Core/` |
 | UserDefaults, files, security-scoped I/O | `MusicWall/Adapters/` (no MusicKit unless mapping Apple types) |
 | MusicKit search, playback, authorization, artwork | `MusicWall/Adapters/` |
+| CarPlay templates, scene delegate | `MusicWall/Adapters/CarPlay/` |
 | Screen logic or async UI state | `MusicWall/Features/<Area>/*ViewModel.swift` |
 | SwiftUI layout | `MusicWall/Features/<Area>/*View.swift` or shared design-system files |
 | Test doubles | `MusicWallTests/TestSupport/` |
@@ -109,6 +110,7 @@ CI runs `Scripts/check_core_imports.sh` — `MusicWall/Core/` must not import Mu
 - Live `MusicAuthorization` on device
 - Catalog/library search with live Apple Music
 - `SystemMusicPlayer` playback
+- CarPlay Audio (requires Apple entitlement approval + physical device or CarPlay simulator; see `docs/specs/2026-05-31-carplay-design.md`)
 - Internal TestFlight build (existing CI loop)
 
 ### MusicKit

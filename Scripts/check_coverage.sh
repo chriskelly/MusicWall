@@ -43,6 +43,10 @@ EXCLUDED_ADAPTERS = {
     "AlbumMapper.swift",
     "SecurityScopedResourceReader.swift",
     "LiveMusicAuthorizationProvider.swift",
+    "CarPlaySceneDelegate.swift",
+    "CarPlayCoordinator.swift",
+    "CarPlayGridBuilder.swift",
+    "CarPlaySetupTemplate.swift",
 }
 
 THRESHOLDS = {

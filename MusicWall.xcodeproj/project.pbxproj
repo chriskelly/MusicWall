@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7A3C9E2F1B4D8A605E92F3C1 /* AlbumFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */; };
 		9F2E5C8A3D1B7F406A8E2D59 /* AlbumSorterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */; };
+		A0D1E2F31418293A4B5F0 /* DomainErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D1E2F31418293A4B5F0 /* DomainErrorTests.swift */; };
 		A0F1B2C3D4E60718293A4B5D0 /* FileExportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1C2D3E4F60718293A4B5D0 /* FileExportServiceTests.swift */; };
 		A1B2C3D4E5F60718293A4B5D /* UserDefaultsPreferencesStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F60718293A4B5C6E /* UserDefaultsPreferencesStoreTests.swift */; };
 		A1F2B3C4D5E60718293A4B5C1 /* MockAlbumRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2B3C4D5E60718293A4B5C /* MockAlbumRepository.swift */; };
@@ -27,7 +28,6 @@
 		A8F9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift */; };
 		A8F9B0C1D2E90918293A4B5D8 /* SearchViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A9B0C1D2E90918293A4B5D8 /* SearchViewModelTests.swift */; };
 		A9F0B1C2D3E40718293A4B5C9 /* BackupCodecTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A1B2C3D4E50718293A4B5C9 /* BackupCodecTests.swift */; };
-		A0D1E2F31418293A4B5F0 /* DomainErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D1E2F31418293A4B5F0 /* DomainErrorTests.swift */; };
 		A9F0B1C2D3E90918293A4B5D9 /* AlbumEditViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B0C1D2E3F90918293A4B5D9 /* AlbumEditViewModelTests.swift */; };
 		B0C1D2E3F40918293A4B5DA /* ImageCacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0C1D2E3F40918293A4B5DA /* ImageCacheTests.swift */; };
 		B0D1E2F30418293A4B5E0 /* ViewInspector+MusicWall.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D1E2F30418293A4B5E0 /* ViewInspector+MusicWall.swift */; };
@@ -40,6 +40,9 @@
 		BBAE99B1FA45969122576159 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B203760B33EAD816D6FDCB94 /* SmokeTests.swift */; };
 		C0DE001122334455667788CC /* MusicWallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE001122334455667788BB /* MusicWallUITests.swift */; };
 		C0DE00112233445566779907 /* AppDependenciesUITestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00112233445566779906 /* AppDependenciesUITestTests.swift */; };
+		C4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift */; };
+		C5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift */; };
+		C6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift */; };
 		D4E5F60718293A4B5C6D7E8F9 /* AlbumCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F60718293A4B5C6D7E8F9A0B1 /* AlbumCollectionTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,10 +75,10 @@
 		C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumSorterTests.swift; sourceTree = "<group>"; };
 		E5F60718293A4B5C6D7E8F9A0B1 /* AlbumCollectionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumCollectionTests.swift; sourceTree = "<group>"; };
 		F0A1B2C3D4E50718293A4B5C9 /* BackupCodecTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BackupCodecTests.swift; sourceTree = "<group>"; };
-		F0D1E2F31418293A4B5F0 /* DomainErrorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DomainErrorTests.swift; sourceTree = "<group>"; };
 		F0B1C2D3E4F60718293A4B5D0 /* FileExportServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FileExportServiceTests.swift; sourceTree = "<group>"; };
 		F0C1D2E3F40918293A4B5DA /* ImageCacheTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ImageCacheTests.swift; sourceTree = "<group>"; };
 		F0D1E2F30418293A4B5E0 /* ViewInspector+MusicWall.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "ViewInspector+MusicWall.swift"; sourceTree = "<group>"; };
+		F0D1E2F31418293A4B5F0 /* DomainErrorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DomainErrorTests.swift; sourceTree = "<group>"; };
 		F1A2B3C4D5E60718293A4B5C /* MockAlbumRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockAlbumRepository.swift; sourceTree = "<group>"; };
 		F1B2C3D4E5F70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LiveAlbumBackupServiceTests.swift; sourceTree = "<group>"; };
 		F1C2D3E4F50918293A4B5DB /* MockArtworkProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockArtworkProvider.swift; sourceTree = "<group>"; };
@@ -97,6 +100,9 @@
 		F8A9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = InMemoryPreferencesStore.swift; sourceTree = "<group>"; };
 		F8A9B0C1D2E90918293A4B5D8 /* SearchViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SearchViewModelTests.swift; sourceTree = "<group>"; };
 		F9B0C1D2E3F90918293A4B5D9 /* AlbumEditViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumEditViewModelTests.swift; sourceTree = "<group>"; };
+		F4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayAlbumPaginatorTests.swift; sourceTree = "<group>"; };
+		F5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayConnectPlannerTests.swift; sourceTree = "<group>"; };
+		F6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayCoordinatorShuffleTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -204,11 +210,22 @@
 		C3D4E5F60718293A4B5C6D7F /* Adapters */ = {
 			isa = PBXGroup;
 			children = (
+				CP1A2B3C4D5E60718293A4B5E5 /* CarPlay */,
 				B2C3D4E5F60718293A4B5C6E /* UserDefaultsPreferencesStoreTests.swift */,
 				F0B1C2D3E4F60718293A4B5D0 /* FileExportServiceTests.swift */,
 				F1B2C3D4E5F70718293A4B5D1 /* LiveAlbumBackupServiceTests.swift */,
 			);
 			path = Adapters;
+			sourceTree = "<group>";
+		};
+		CP1A2B3C4D5E60718293A4B5E5 /* CarPlay */ = {
+			isa = PBXGroup;
+			children = (
+				F4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift */,
+				F5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift */,
+				F6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift */,
+			);
+			path = CarPlay;
 			sourceTree = "<group>";
 		};
 		D5E6F708192A3B4C5D6E7F809 /* TestSupport */ = {
@@ -465,6 +482,9 @@
 				B2D3E4F50618293A4B5E2 /* SortMenuViewTests.swift in Sources */,
 				B3D4E5F60718293A4B5E3 /* AlbumEditViewTests.swift in Sources */,
 				C0DE00112233445566779907 /* AppDependenciesUITestTests.swift in Sources */,
+				C4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift in Sources */,
+				C5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift in Sources */,
+				C6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -614,11 +634,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Config/MusicWall.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CD8XP2U645;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/MusicWall-Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Allow access to launch albums";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -644,11 +666,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Config/MusicWall.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CD8XP2U645;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/MusicWall-Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Allow access to launch albums";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
