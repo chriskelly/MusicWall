@@ -184,4 +184,33 @@ struct HomeViewModelTests {
         viewModel.albumAdded()
         #expect(viewModel.snackbar?.message == "Album successfully added!")
     }
+
+    @Test @MainActor
+    func load_hydratesFromSavedPreferences() async {
+        let preferences = InMemoryPreferencesStore()
+        let records = [AlbumFixtures.record(id: "loaded", title: "Loaded", artistName: "Artist")]
+        preferences.save(records, for: .albumRecordsItems)
+        let viewModel = HomeViewModel(
+            preferences: preferences,
+            repository: MockAlbumRepository(),
+            backup: MockAlbumBackupService()
+        )
+
+        await viewModel.load()
+
+        #expect(viewModel.store.items == records)
+    }
+
+    @Test @MainActor
+    func shuffleAlbums_preservesItemCount() {
+        let (viewModel, _, _, _) = makeViewModel()
+        for fixture in AlbumFixtures.baseTrio {
+            viewModel.store.addAlbum(fixture)
+        }
+        let count = viewModel.store.items.count
+
+        viewModel.shuffleAlbums()
+
+        #expect(viewModel.store.items.count == count)
+    }
 }
