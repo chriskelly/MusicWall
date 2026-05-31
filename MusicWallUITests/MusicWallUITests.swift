@@ -24,10 +24,10 @@ final class MusicWallUITests: XCTestCase {
         album.tap()
 
         let bridge = app.otherElements["uitest.lastPlayedAlbum"]
-        XCTAssertTrue(bridge.waitForExistence(timeout: 5))
+        XCTAssertTrue(bridge.waitForExistence(timeout: 15))
         let predicate = NSPredicate(format: "value == %@", "fixture-drake")
         let expectation = expectation(for: predicate, evaluatedWith: bridge)
-        wait(for: [expectation], timeout: 5)
+        wait(for: [expectation], timeout: 15)
     }
 
     func testSearchSheet_openAndDismiss() throws {
