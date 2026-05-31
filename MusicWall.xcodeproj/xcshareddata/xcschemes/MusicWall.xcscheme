@@ -40,6 +40,16 @@
                ReferencedContainer = "container:MusicWall.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "C0DE00112233445566778899"
+               BuildableName = "MusicWallUITests.xctest"
+               BlueprintName = "MusicWallUITests"
+               ReferencedContainer = "container:MusicWall.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

@@ -9,11 +9,19 @@ import SwiftUI
 
 @main
 struct MusicWallApp: App {
-    private let dependencies = AppDependencies.live
+    private let dependencies = MusicWallApp.resolveDependencies()
 
     var body: some Scene {
         WindowGroup {
             ContentView(dependencies: dependencies)
         }
+    }
+
+    private static func resolveDependencies() -> AppDependencies {
+        guard UITestConfiguration.isEnabled else {
+            return .live
+        }
+        let scenario = UITestLoadScenario.fromLaunchArguments() ?? .savedLibrary
+        return .uiTest(scenario: scenario)
     }
 }

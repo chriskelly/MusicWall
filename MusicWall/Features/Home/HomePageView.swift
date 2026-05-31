@@ -81,6 +81,7 @@ struct HomePageView: View {
             Button("Add album", systemImage: "plus") {
                 showingAddView = true
             }
+            .accessibilityIdentifier("home.addAlbum")
         }
     }
 
