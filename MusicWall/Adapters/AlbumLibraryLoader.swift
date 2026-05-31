@@ -17,14 +17,6 @@ enum AlbumLibraryLoader {
             return LoadResult(records: records, shouldPersistCanonical: false)
         }
 
-        if let legacy = preferences.load([LegacyStoredAlbum].self, for: .storedAlbumsItems),
-           !legacy.isEmpty {
-            return LoadResult(
-                records: legacy.map { $0.asAlbumRecord() },
-                shouldPersistCanonical: true
-            )
-        }
-
         let backupIDs = preferences.load([String].self, for: .backupAlbumIDs) ?? []
         guard !backupIDs.isEmpty else {
             return LoadResult(records: [], shouldPersistCanonical: false)

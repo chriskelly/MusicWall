@@ -1,40 +1,109 @@
 # Agent guide — MusicWallTests
 
-`MusicWallTests` is the deterministic unit-test target for MusicWall. It runs through the shared `MusicWall` scheme on the iPhone 17 simulator.
+`MusicWallTests` is the deterministic test target for MusicWall. UI smoke tests live in `MusicWallUITests`. Both run through the shared `MusicWall` scheme on the iPhone 17 simulator.
 
-## Fixtures
+## Test pyramid
 
-- `MusicWallTests/Fixtures/AlbumFixtures.swift` — canonical `AlbumRecord` samples (`baseTrio`, UTC date helpers). Reused across sort/collection tests; PR 6 adds JSON migration fixtures in the same folder.
+| Layer | Target | Framework |
+|-------|--------|-----------|
+| Core / Adapters / ViewModels | `MusicWallTests` | Swift Testing |
+| SwiftUI views (Snackbar, SortMenu, AlbumEdit) | `MusicWallTests` | Swift Testing + ViewInspector |
+| End-to-end smoke | `MusicWallUITests` | XCTest / XCUITest |
 
-## Framework
+North-star architecture: `.cursor/skills/musicwall-test-refactor/references/architecture.md`
 
-- Default: Swift Testing
-- Fallback: switch this target to XCTest only if Swift Testing causes scheme or CI instability disproportionate to PR 1
+## Commands
 
-## View tests (ViewInspector)
+Run all tests (unit + UI + coverage gate):
 
-PR 12 adds [ViewInspector](https://github.com/nalexn/ViewInspector) (MIT) for high-value SwiftUI unit tests without XCUITest cost. Linked to **MusicWallTests only** — not the app target.
+```bash
+bundle exec fastlane ci_tests
+```
 
-### Test pyramid
+Run unit tests only:
 
-| Layer | Framework | Hosting |
-|-------|-----------|---------|
-| Core / Adapters / ViewModels | Swift Testing | None |
-| SwiftUI views (`SnackbarView`, `SortMenu`, `AlbumEditView`) | Swift Testing + ViewInspector | Sync for simple views; `ViewHosting.host` for `@State` / `@Environment` |
+```bash
+xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -only-testing:MusicWallTests
+```
+
+Run UI tests only:
+
+```bash
+xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -only-testing:MusicWallUITests
+```
+
+Run a single UI test:
+
+```bash
+xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -only-testing:MusicWallUITests/MusicWallUITests/testLaunch_savedLibrary_showsFixtureTitles
+```
+
+Inspect coverage gate only (after a test run produced a bundle):
+
+```bash
+xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  -resultBundlePath build/MusicWallTestResults.xcresult
+Scripts/check_coverage.sh build/MusicWallTestResults.xcresult
+```
+
+Set `FAIL_CI=false` to print the report without failing locally:
+
+```bash
+FAIL_CI=false Scripts/check_coverage.sh build/MusicWallTestResults.xcresult
+```
+
+## UI tests
+
+### Launch arguments
+
+| Argument | Required | Values |
+|----------|----------|--------|
+| `-UITestMockMusic` | Yes (flag) | Enables mock dependencies (no MusicKit / Apple ID) |
+| `-UITestLoadScenario` | Yes when mock enabled | `savedLibrary` \| `restoreFromBackup` |
+
+**savedLibrary** — pre-seeded album records in isolated UserDefaults (typical returning user).
+
+**restoreFromBackup** — pre-seeded backup IDs only; mock repository returns fixture albums on fetch.
+
+Production launch omits both arguments and uses `AppDependencies.live`.
+
+### Adding a UI test
+
+1. Launch with `launchArguments` (see helpers in `MusicWallUITests.swift`).
+2. Prefer `accessibilityIdentifier` over label text (`home.addAlbum`, `search.cancel`).
+3. Use `waitForExistence` — avoid fixed `sleep`.
+4. Use a fresh `launch()` per scenario; do not switch load mode mid-session.
+
+### Accessibility identifiers
+
+| Identifier | Element |
+|------------|---------|
+| `home.addAlbum` | Add album toolbar button |
+| `search.cancel` | Search sheet Cancel |
+| `uitest.lastPlayedAlbum` | Hidden playback bridge (mock launch only) |
+
+## ViewInspector (PR 12)
+
+PR 12 adds [ViewInspector](https://github.com/nalexn/ViewInspector) (MIT) for high-value SwiftUI unit tests without XCUITest cost. Linked to **MusicWallTests only**.
 
 ### Adding a view test
 
-1. `import ViewInspector` and `@testable import MusicWall` in the test file.
-2. Annotate tests `@MainActor` and `throws` (or `async throws` for hosted views).
+1. `import ViewInspector` and `@testable import MusicWall`.
+2. Annotate `@MainActor` and `throws` (or `async throws` for hosted views).
 3. Prefer `find(text:)` / `find(button:)` over deep hierarchy chains.
-4. Test views **in isolation** — e.g. `SortMenu` directly, not inside `Menu`.
+4. Test views in isolation.
 
 ### Inspection pattern (`@State` / `@Environment`)
 
-Views with `@State` or `@Environment` need the Inspection helper:
-
 - **Main target:** `MusicWall/TestSupport/Inspection.swift`
-- **Test target:** `MusicWallTests/TestSupport/ViewInspector+MusicWall.swift` (`InspectionEmissary`)
+- **Test target:** `MusicWallTests/TestSupport/ViewInspector+MusicWall.swift`
 - **View under test:** `internal let inspection = Inspection<Self>()` + `.onReceive(inspection.notice) { … }`
 
 Hosted async example:
@@ -51,12 +120,12 @@ See the [ViewInspector guide](https://github.com/nalexn/ViewInspector/blob/maste
 
 ### Stability rules
 
-- No animation timing or auto-dismiss assertions (do not test `.snackbar(isPresented:)` modifier).
+- No animation timing or auto-dismiss assertions.
 - No snapshot reference images.
 - No `glassEffect()` branch coverage unless trivial.
 - Avoid inspecting content inside `Menu` / `contextMenu` wrappers.
 
-### View test inventory (PR 12)
+### View test inventory
 
 | Suite | File | Coverage |
 |-------|------|----------|
@@ -64,21 +133,44 @@ See the [ViewInspector guide](https://github.com/nalexn/ViewInspector/blob/maste
 | Sort menu | `UI/SortMenuViewTests.swift` | direction arrow on active sort |
 | Edit album | `UI/AlbumEditViewTests.swift` | Save disabled when title whitespace-only |
 
-## Commands
+## Coverage policy
 
-- `bundle exec fastlane ci_tests`
-- `xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall -destination 'platform=iOS Simulator,name=iPhone 17'`
+CI enforces line coverage via `Scripts/check_coverage.sh` after every `bundle exec fastlane ci_tests` run.
 
-## Coverage
+| Layer | Path rule | Threshold |
+|-------|-----------|-----------|
+| Core / Persistence | `MusicWall/Core/**` | ≥ 95% |
+| ViewModels | `MusicWall/Features/**/*ViewModel.swift` | ≥ 90% |
+| Adapters | `MusicWall/Adapters/**` minus exclusions | ≥ 80% |
 
-- Keep `MusicWallTests` in the shared `MusicWall` scheme `TestAction`
-- Keep scheme coverage gathering enabled
+### Adapter exclusions (live / device-only)
 
-## Exclusions
+These files are omitted from the adapter denominator:
 
-These remain human-verified or future-test work, not deterministic CI coverage:
+| File | Reason |
+|------|--------|
+| `MusicKitAlbumRepository.swift` | Live catalog/library search |
+| `SystemMusicPlayerAdapter.swift` | Live playback |
+| `MusicKitArtworkProvider.swift` | Live artwork fetch |
+| `AlbumMapper.swift` | MusicKit mapping (tested via mocks) |
+| `SecurityScopedResourceReader.swift` | Security-scoped file picker I/O |
+| `LiveMusicAuthorizationProvider.swift` | Live authorization dialog |
 
-- live MusicKit authorization
-- live Apple Music catalog or library responses
-- `SystemMusicPlayer` playback behavior
-- device-only behavior that cannot be reproduced on the simulator
+### Human-verified (not CI-gated)
+
+- Live MusicKit authorization success paths
+- Live Apple Music catalog or library responses
+- `SystemMusicPlayer` playback on device
+- SwiftUI animations, vinyl effects, snackbar auto-dismiss timing
+
+Keep `MusicWallTests` and `MusicWallUITests` in the shared `MusicWall` scheme `TestAction`. Keep scheme coverage gathering enabled.
+
+## Fixtures
+
+- `MusicWallTests/Fixtures/AlbumFixtures.swift` — canonical `AlbumRecord` samples (`baseTrio`, UTC date helpers).
+- `MusicWall/UITestSupport/UITestFixtures.swift` — must match `AlbumFixtures.baseTrio` IDs/titles for UI tests.
+
+## Framework
+
+- Default: Swift Testing
+- UI tests: XCTest / XCUITest only

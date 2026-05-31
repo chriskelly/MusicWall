@@ -54,6 +54,8 @@ docs/plans/                # Implementation plans
 - **SwiftUI** for UI; use `@Observable`, `@State`, `@Environment` consistently with existing files.
 - **MVVM-style separation:** views in `*View.swift`, Apple Music access via `AlbumRepository` / `PlaybackController` (`AppDependencies.live`), album artwork via `ArtworkProvider` + `ImageCache`, tap-to-play via `AlbumTapCoordinator` + `PlaybackController`, persistence via `PreferencesStore` / `AlbumBackupService`. Home orchestration via `HomeViewModel` in `Features/Home/`; search via `SearchViewModel` in `Features/Search/`; album edit via `AlbumEditViewModel` in `Features/Edit/`. Search errors surface as inline `errorMessage` in the search sheet (not snackbar). `HomePageView` has no direct `albumBackupService` calls.
 - Keep views thin; move testable logic into types/functions that do not require `MusicPlayer` when possible.
+- **Testing & coverage:** see `MusicWallTests/Agent.md` (commands, UI launch args, ViewInspector, coverage thresholds).
+- **Layered architecture (north star):** `.cursor/skills/musicwall-test-refactor/references/architecture.md`.
 
 ### MusicKit
 
@@ -144,7 +146,7 @@ Agents: reference secret **names** only; never print or commit values.
 
 - Design: `docs/specs/2026-05-24-ios-cicd-design.md`
 - Implementation plan: `docs/plans/2026-05-24-ios-cicd.md`
-- **Test refactor program (agent skills):** `.cursor/skills/musicwall-test-refactor/` — overview; invoke one PR per session via `/musicwall-test-refactor-pr-01` … `/musicwall-test-refactor-pr-14` (optional PR 15 for SPM split).
+- **Test refactor program (agent skills):** `.cursor/skills/musicwall-test-refactor/` — overview; invoke one PR per session via `/musicwall-test-refactor-pr-01` … `/musicwall-test-refactor-pr-14` (optional PR 15 for SPM split). Testing and coverage policy: `MusicWallTests/Agent.md`.
 
 ## Common failures
 

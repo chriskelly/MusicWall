@@ -10,4 +10,9 @@
 
 - [ ] Tested internal TestFlight build **#_____** (or N/A — label `no-deploy` used for docs-only)
 
+## Tests
+
+- [ ] Unit tests added/updated where logic changed
+- [ ] `bundle exec fastlane ci_tests` passes locally (including coverage gate)
+
 <!-- Preview workflow posts build number on this PR -->

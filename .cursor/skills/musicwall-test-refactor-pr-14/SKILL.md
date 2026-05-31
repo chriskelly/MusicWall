@@ -11,7 +11,7 @@ paths:
   - fastlane/**
   - .github/workflows/**
   - Agent.md
-  - docs/testing.md
+  - MusicWallTests/Agent.md
 ---
 
 # PR 14 — Coverage gates + legacy cleanup
@@ -29,14 +29,14 @@ Enforce coverage policy; remove dead code from pre-refactor architecture.
   - Core/Persistence: **≥ 95%**
   - ViewModels: **≥ 90%**
   - Adapters: **≥ 80%**
-- Implement via `xccov` / Slather / custom script — upload summary to PR (optional)
+- Implement via `xccov` / custom script — upload summary to PR (optional)
 - **Delete** (if fully replaced):
   - `StoredAlbum` / `StoredAlbums` (if not already)
   - Static `MusicService` enum
   - `UserDefaultsManager` class
   - Legacy `BackupService` monolith
-- Update **`Agent.md`**: architecture section points to layered model + `docs/testing.md`
-- Update **`docs/testing.md`**: exclusions, commands, threshold table
+- Update **`Agent.md`**: architecture section points to layered model + `MusicWallTests/Agent.md`
+- Update **`MusicWallTests/Agent.md`**: exclusions, commands, threshold table
 - PR template checkbox: unit tests + coverage (optional)
 
 ## Out of scope
