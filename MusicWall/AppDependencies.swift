@@ -32,4 +32,28 @@ struct AppDependencies {
             musicAuthorization: PreviewMusicAuthorizationProvider(status: .authorized)
         )
     }
+
+    static func uiTest(scenario: UITestLoadScenario) -> AppDependencies {
+        let suiteName = "com.musicwall.uitest.\(scenario.rawValue).\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        let preferences = UserDefaultsPreferencesStore(userDefaults: defaults)
+        let playback = UITestPlaybackController()
+        let repository = UITestAlbumRepository()
+
+        switch scenario {
+        case .savedLibrary:
+            preferences.save(UITestFixtures.baseTrio, for: .albumRecordsItems)
+        case .restoreFromBackup:
+            preferences.save(UITestFixtures.backupIDs, for: .backupAlbumIDs)
+        }
+
+        return AppDependencies(
+            preferencesStore: preferences,
+            albumRepository: repository,
+            artworkProvider: PreviewArtworkProvider(),
+            playbackController: playback,
+            albumBackupService: LiveAlbumBackupService(),
+            musicAuthorization: PreviewMusicAuthorizationProvider(status: .authorized)
+        )
+    }
 }

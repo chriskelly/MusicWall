@@ -31,6 +31,7 @@ private struct AlbumSearchContent: View {
     @Bindable var viewModel: SearchViewModel
     var onSelect: (AlbumRecord) -> Void
     @FocusState.Binding var isSearchFieldFocused: Bool
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
@@ -58,6 +59,14 @@ private struct AlbumSearchContent: View {
                 resultsView()
             }
             .navigationTitle("Find Album")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .accessibilityIdentifier("search.cancel")
+                }
+            }
         }
     }
 
