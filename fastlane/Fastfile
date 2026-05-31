@@ -192,7 +192,16 @@ platform :ios do
 
   desc "CI Tests workflow: unit tests on iOS Simulator"
   lane :ci_tests do
-    sh("xcodebuild test -project ../#{XCODEPROJ} -scheme #{SCHEME} -destination 'platform=iOS Simulator,name=iPhone 17'")
+    result_bundle = "../build/MusicWallTestResults.xcresult"
+    sh("rm -rf #{result_bundle}")
+    sh("mkdir -p ../build")
+    sh(
+      "xcodebuild test -project ../#{XCODEPROJ} -scheme #{SCHEME} " \
+      "-destination 'platform=iOS Simulator,name=iPhone 17' " \
+      "-enableCodeCoverage YES " \
+      "-resultBundlePath #{result_bundle}"
+    )
+    sh("../Scripts/check_coverage.sh #{result_bundle}")
   end
 
   desc "TestFlight Release workflow: internal TestFlight upload"
