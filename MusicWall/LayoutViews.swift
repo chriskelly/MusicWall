@@ -77,7 +77,7 @@ struct GridLayout: View {
                         )
                         .onTapGesture {
                             Task {
-                                await AlbumTapPlayback.handleTap(
+                                await AlbumTapCoordinator.handleTap(
                                     albumID: AlbumID(rawValue: album.id.rawValue),
                                     rawSelectedID: selectedAlbumID,
                                     setSelected: { selectedAlbumID = $0 },
@@ -180,7 +180,7 @@ struct ListLayout: View {
                     listItem(album)
                         .onTapGesture {
                             Task {
-                                await AlbumTapPlayback.handleTap(
+                                await AlbumTapCoordinator.handleTap(
                                     albumID: AlbumID(rawValue: album.id.rawValue),
                                     rawSelectedID: selectedAlbumID,
                                     setSelected: { selectedAlbumID = $0 },
@@ -226,7 +226,8 @@ struct AlbumArtwork: View {
     let album: AlbumRecord
     let viewSize: CGFloat
 
-    @Environment(\.albumRepository) private var albumRepository
+    @Environment(\.artworkProvider) private var artworkProvider
+    @Environment(\.displayScale) private var displayScale
     @State private var imageURL: URL?
     
     var body: some View {
@@ -239,12 +240,9 @@ struct AlbumArtwork: View {
             ProgressView()
         }
         .task {
-            let scale = UIScreen.main.scale   // @2x for most iPhones, @3x on latest pro/max models
-            let pixelSize = Int((viewSize * scale).rounded())
-            imageURL = await ImageCache(repository: albumRepository).getArtwork(
-                albumID: album.id.rawValue,
-                size: pixelSize
-            )
+            let pixelSize = Int((viewSize * displayScale).rounded())
+            imageURL = await ImageCache(artworkProvider: artworkProvider)
+                .getArtwork(albumID: album.id.rawValue, size: pixelSize)
         }
     }
 }
@@ -284,9 +282,11 @@ struct LayoutMenu: View {
         .environment(HomeViewModel.preview(dependencies: deps).store)
         .environment(\.albumRepository, deps.albumRepository)
         .environment(\.playback, deps.playbackController)
+        .environment(\.artworkProvider, deps.artworkProvider)
     GridLayout()
         .environment(HomeViewModel.preview(dependencies: deps).store)
         .environment(\.albumRepository, deps.albumRepository)
         .environment(\.playback, deps.playbackController)
+        .environment(\.artworkProvider, deps.artworkProvider)
 }
 

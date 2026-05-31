@@ -3,6 +3,7 @@ import Foundation
 struct AppDependencies {
     let preferencesStore: PreferencesStore
     let albumRepository: any AlbumRepository
+    let artworkProvider: any ArtworkProvider
     let playbackController: any PlaybackController
     let albumBackupService: any AlbumBackupService
     let musicAuthorization: any MusicAuthorizationProviding
@@ -12,6 +13,7 @@ struct AppDependencies {
         return AppDependencies(
             preferencesStore: UserDefaultsPreferencesStore(userDefaults: .standard),
             albumRepository: repository,
+            artworkProvider: MusicKitArtworkProvider(repository: repository),
             playbackController: SystemMusicPlayerAdapter(repository: repository),
             albumBackupService: LiveAlbumBackupService(),
             musicAuthorization: LiveMusicAuthorizationProvider()
@@ -24,6 +26,7 @@ struct AppDependencies {
         return AppDependencies(
             preferencesStore: UserDefaultsPreferencesStore(userDefaults: defaults),
             albumRepository: PreviewAlbumRepository(),
+            artworkProvider: PreviewArtworkProvider(),
             playbackController: PreviewPlaybackController(),
             albumBackupService: LiveAlbumBackupService(),
             musicAuthorization: PreviewMusicAuthorizationProvider(status: .authorized)

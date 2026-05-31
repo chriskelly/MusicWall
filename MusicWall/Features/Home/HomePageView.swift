@@ -26,6 +26,7 @@ struct HomePageView: View {
         .environment(viewModel.store)
         .environment(\.albumRepository, dependencies.albumRepository)
         .environment(\.playback, dependencies.playbackController)
+        .environment(\.artworkProvider, dependencies.artworkProvider)
         .sheet(isPresented: $showingAddView) {
             AlbumSearchView(
                 repository: dependencies.albumRepository,

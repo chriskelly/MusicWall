@@ -2,13 +2,13 @@ import Foundation
 import Testing
 @testable import MusicWall
 
-@Suite struct AlbumTapPlaybackTests {
+@Suite struct AlbumTapCoordinatorTests {
     @Test func deselectPausesAndClearsSelection() async {
         let playback = MockPlaybackController()
         let albumID = AlbumID(rawValue: "album-1")
         var selected: String? = "album-1"
 
-        await AlbumTapPlayback.handleTap(
+        await AlbumTapCoordinator.handleTap(
             albumID: albumID,
             rawSelectedID: selected,
             setSelected: { selected = $0 },
@@ -25,7 +25,7 @@ import Testing
         let albumID = AlbumID(rawValue: "album-2")
         var selected: String? = nil
 
-        await AlbumTapPlayback.handleTap(
+        await AlbumTapCoordinator.handleTap(
             albumID: albumID,
             rawSelectedID: selected,
             setSelected: { selected = $0 },
