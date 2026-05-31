@@ -192,6 +192,7 @@ platform :ios do
 
   desc "CI Tests workflow: unit tests on iOS Simulator"
   lane :ci_tests do
+    sh("../Scripts/check_core_imports.sh")
     result_bundle = "../build/MusicWallTestResults.xcresult"
     sh("rm -rf #{result_bundle}")
     sh("mkdir -p ../build")

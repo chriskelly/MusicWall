@@ -55,7 +55,61 @@ docs/plans/                # Implementation plans
 - **MVVM-style separation:** views in `*View.swift`, Apple Music access via `AlbumRepository` / `PlaybackController` (`AppDependencies.live`), album artwork via `ArtworkProvider` + `ImageCache`, tap-to-play via `AlbumTapCoordinator` + `PlaybackController`, persistence via `PreferencesStore` / `AlbumBackupService`. Home orchestration via `HomeViewModel` in `Features/Home/`; search via `SearchViewModel` in `Features/Search/`; album edit via `AlbumEditViewModel` in `Features/Edit/`. Search errors surface as inline `errorMessage` in the search sheet (not snackbar). `HomePageView` has no direct `albumBackupService` calls.
 - Keep views thin; move testable logic into types/functions that do not require `MusicPlayer` when possible.
 - **Testing & coverage:** see `MusicWallTests/Agent.md` (commands, UI launch args, ViewInspector, coverage thresholds).
-- **Layered architecture (north star):** `.cursor/skills/musicwall-test-refactor/references/architecture.md`.
+
+#### Layers and folders
+
+```
+MusicWall App (SwiftUI, ViewModels, AppDependencies)
+    │
+    ├── Core/           Foundation only — domain types + protocols
+    ├── Adapters/       I/O and MusicKit implementations
+    └── Features/       *ViewModel.swift + views per feature area
+```
+
+| Folder | Put here | Examples |
+|--------|----------|----------|
+| `MusicWall/Core/` | App-owned types, pure logic, protocols | `AlbumRecord`, `AlbumSorter`, `BackupCodec`, `AlbumRepository`, `PreferencesStore`, `ArtworkProvider` |
+| `MusicWall/Adapters/` | Side effects, platform APIs, MusicKit | **Persistence:** `UserDefaultsPreferencesStore`, `FileExportService`, `LiveAlbumBackupService`, `AlbumLibraryLoader`, `SecurityScopedResourceReader`. **MusicKit:** `MusicKitAlbumRepository`, `AlbumMapper`, `SystemMusicPlayerAdapter`, `MusicKitArtworkProvider`, `LiveMusicAuthorizationProvider` |
+| `MusicWall/Features/<Area>/` | Screen state and UI for one flow | `HomeViewModel`, `HomePageView`, `SearchViewModel`, `AuthViewModel` |
+| `MusicWall/` (root) | App shell, design system, composition | `MusicWallApp`, `AppDependencies`, `ImageCache`, `LayoutViews`, `SnackbarView` |
+
+CI runs `Scripts/check_core_imports.sh` — `MusicWall/Core/` must not import MusicKit, SwiftUI, or UIKit.
+
+#### Design rules
+
+| Rule | Rationale |
+|------|-----------|
+| Core has zero MusicKit / SwiftUI / UIKit imports | Fast, deterministic unit tests |
+| Domain types are app-owned (`AlbumID`, `AlbumRecord`) | Tests do not construct `MusicKit.Album` |
+| No playback on model types | Use `PlaybackController` + `AlbumTapCoordinator` |
+| Views do not call repositories directly | ViewModels own async work; views bind only |
+| Single composition root (`AppDependencies.live`) | Previews and tests swap fakes; leaf views may use `@Environment` for services |
+| Side effects at adapter boundaries | Core logic stays testable without I/O |
+| Map MusicKit errors to domain errors in adapters only | ViewModels surface user-visible errors |
+
+#### Where new code goes
+
+| You are adding… | Location |
+|-----------------|----------|
+| Protocol or domain type | `MusicWall/Core/` |
+| UserDefaults, files, security-scoped I/O | `MusicWall/Adapters/` (no MusicKit unless mapping Apple types) |
+| MusicKit search, playback, authorization, artwork | `MusicWall/Adapters/` |
+| Screen logic or async UI state | `MusicWall/Features/<Area>/*ViewModel.swift` |
+| SwiftUI layout | `MusicWall/Features/<Area>/*View.swift` or shared design-system files |
+| Test doubles | `MusicWallTests/TestSupport/` |
+
+#### Composition and injection
+
+- **Production:** `AppDependencies.live` wires live adapters; install services on the SwiftUI tree from `HomePageView` (environment keys for `albumRepository`, `playback`, etc.).
+- **Previews / unit tests:** `AppDependencies.preview()` or mocks in `MusicWallTests/TestSupport/` — never require live MusicKit in unit tests.
+- **`AlbumRecord` fields:** `id`, `title`, `artistName`, `releaseDate`, `isExplicit`.
+
+#### Human verification (not unit-tested)
+
+- Live `MusicAuthorization` on device
+- Catalog/library search with live Apple Music
+- `SystemMusicPlayer` playback
+- Internal TestFlight build (existing CI loop)
 
 ### MusicKit
 
@@ -146,7 +200,7 @@ Agents: reference secret **names** only; never print or commit values.
 
 - Design: `docs/specs/2026-05-24-ios-cicd-design.md`
 - Implementation plan: `docs/plans/2026-05-24-ios-cicd.md`
-- **Test refactor program (agent skills):** `.cursor/skills/musicwall-test-refactor/` — overview; invoke one PR per session via `/musicwall-test-refactor-pr-01` … `/musicwall-test-refactor-pr-14` (optional PR 15 for SPM split). Testing and coverage policy: `MusicWallTests/Agent.md`.
+- **Testability refactor (completed):** layered `Core/` / `Adapters/` / `Features/` — history in `docs/specs/2026-05-27-pr-02-core-album-sorter-design.md` through `docs/specs/2026-05-31-pr-14-coverage-cleanup-design.md`. Active policy: this file (architecture) and `MusicWallTests/Agent.md` (tests and coverage).
 
 ## Common failures
 

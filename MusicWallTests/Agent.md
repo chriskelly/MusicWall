@@ -10,7 +10,7 @@
 | SwiftUI views (Snackbar, SortMenu, AlbumEdit) | `MusicWallTests` | Swift Testing + ViewInspector |
 | End-to-end smoke | `MusicWallUITests` | XCTest / XCUITest |
 
-North-star architecture: `.cursor/skills/musicwall-test-refactor/references/architecture.md`
+Layer rules and file placement: `Agent.md` (Architecture section). CI also enforces `Scripts/check_core_imports.sh`.
 
 ## Commands
 
