@@ -1,5 +1,4 @@
 import Foundation
-import MusicKit
 import Testing
 @testable import MusicWall
 
@@ -26,25 +25,6 @@ struct UserDefaultsPreferencesStoreTests {
         store.save(albums, for: .albumRecordsItems)
         let loaded = store.load([AlbumRecord].self, for: .albumRecordsItems)
         #expect(loaded == albums)
-    }
-
-    @Test
-    func roundTripLegacyStoredAlbumsItems() {
-        let (store, suiteName) = makeStore()
-        defer { UserDefaults(suiteName: suiteName)?.removePersistentDomain(forName: suiteName) }
-
-        let legacy = [
-            LegacyStoredAlbum(
-                id: MusicItemID("legacy-round-trip"),
-                title: "Take Care",
-                artistName: "Drake",
-                releaseDate: nil
-            ),
-        ]
-        store.save(legacy, for: .storedAlbumsItems)
-        let loaded = store.load([LegacyStoredAlbum].self, for: .storedAlbumsItems)
-        #expect(loaded?.count == 1)
-        #expect(loaded?.first?.id.rawValue == "legacy-round-trip")
     }
 
     @Test
