@@ -12,6 +12,7 @@ struct AlbumEditView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var viewModel: AlbumEditViewModel
+    internal let inspection = Inspection<Self>()
 
     init(album: AlbumRecord, onSave: @escaping (AlbumRecord) -> Void) {
         self.onSave = onSave
@@ -20,6 +21,7 @@ struct AlbumEditView: View {
 
     var body: some View {
         AlbumEditContent(viewModel: viewModel, onSave: onSave, dismiss: dismiss)
+            .onReceive(inspection.notice) { self.inspection.visit(self, $0) }
     }
 }
 
