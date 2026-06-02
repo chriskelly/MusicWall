@@ -13,12 +13,14 @@ final class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegat
             dependencies: .live
         )
         self.coordinator = coordinator
-        Task { await coordinator.connect() }
+        Task { @MainActor in
+            await coordinator.connect()
+        }
     }
 
     func templateApplicationScene(
         _ templateApplicationScene: CPTemplateApplicationScene,
-        didDisconnect interfaceController: CPInterfaceController
+        didDisconnectInterfaceController interfaceController: CPInterfaceController
     ) {
         coordinator = nil
     }

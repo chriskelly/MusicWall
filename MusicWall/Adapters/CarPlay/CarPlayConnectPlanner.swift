@@ -10,8 +10,13 @@ enum CarPlayConnectPlanner {
         authorizationStatus: MusicAuthorizationStatus,
         albums: [AlbumRecord]
     ) -> CarPlayRootScreen {
-        guard authorizationStatus == .authorized else { return .setupRequired }
-        guard !albums.isEmpty else { return .setupRequired }
-        return .albumGrid(pages: CarPlayAlbumPaginator.pages(from: albums))
+        guard authorizationStatus == .authorized else {
+            return .setupRequired
+        }
+        guard !albums.isEmpty else {
+            return .setupRequired
+        }
+        let pages = CarPlayAlbumPaginator.pages(from: albums)
+        return .albumGrid(pages: pages)
     }
 }

@@ -42,7 +42,7 @@
 		C0DE00112233445566779907 /* AppDependenciesUITestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE00112233445566779906 /* AppDependenciesUITestTests.swift */; };
 		C4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift */; };
 		C5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift */; };
-		C6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift */; };
+		C6E7F8091A2B3C4D5E6F7082 /* CarPlayShuffleDoesNotPersistTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E7F8091A2B3C4D5E6F7082 /* CarPlayShuffleDoesNotPersistTests.swift */; };
 		D4E5F60718293A4B5C6D7E8F9 /* AlbumCollectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F60718293A4B5C6D7E8F9A0B1 /* AlbumCollectionTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -92,17 +92,17 @@
 		F3D4E5F60718293A4B5E3 /* AlbumEditViewTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumEditViewTests.swift; sourceTree = "<group>"; };
 		F4A5B6C7D8E90718293A4B5D /* AlbumTapCoordinatorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumTapCoordinatorTests.swift; sourceTree = "<group>"; };
 		F4B5C6D7E8F90818293A4B5D4 /* AuthViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModelTests.swift; sourceTree = "<group>"; };
+		F4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayAlbumPaginatorTests.swift; sourceTree = "<group>"; };
 		F5A6B7C8D9E00718293A4B5C5 /* AlbumRecordCodableTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumRecordCodableTests.swift; sourceTree = "<group>"; };
 		F5B6C7D8E9F90918293A4B5D5 /* MockMusicAuthorizationProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockMusicAuthorizationProvider.swift; sourceTree = "<group>"; };
+		F5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayConnectPlannerTests.swift; sourceTree = "<group>"; };
 		F6A7B8C9D0E10718293A4B5C6 /* AlbumLibraryLoaderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumLibraryLoaderTests.swift; sourceTree = "<group>"; };
 		F6B7C8D9E0F90918293A4B5D6 /* MockAlbumBackupService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MockAlbumBackupService.swift; sourceTree = "<group>"; };
+		F6E7F8091A2B3C4D5E6F7082 /* CarPlayShuffleDoesNotPersistTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayShuffleDoesNotPersistTests.swift; sourceTree = "<group>"; };
 		F7A8B9C0D1E90918293A4B5D7 /* HomeViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeViewModelTests.swift; sourceTree = "<group>"; };
 		F8A9B0C1D2E30718293A4B5C8 /* InMemoryPreferencesStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = InMemoryPreferencesStore.swift; sourceTree = "<group>"; };
 		F8A9B0C1D2E90918293A4B5D8 /* SearchViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SearchViewModelTests.swift; sourceTree = "<group>"; };
 		F9B0C1D2E3F90918293A4B5D9 /* AlbumEditViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumEditViewModelTests.swift; sourceTree = "<group>"; };
-		F4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayAlbumPaginatorTests.swift; sourceTree = "<group>"; };
-		F5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayConnectPlannerTests.swift; sourceTree = "<group>"; };
-		F6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CarPlayCoordinatorShuffleTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -223,7 +223,7 @@
 			children = (
 				F4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift */,
 				F5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift */,
-				F6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift */,
+				F6E7F8091A2B3C4D5E6F7082 /* CarPlayShuffleDoesNotPersistTests.swift */,
 			);
 			path = CarPlay;
 			sourceTree = "<group>";
@@ -484,7 +484,7 @@
 				C0DE00112233445566779907 /* AppDependenciesUITestTests.swift in Sources */,
 				C4E5F60718293A4B5C6D8F0 /* CarPlayAlbumPaginatorTests.swift in Sources */,
 				C5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift in Sources */,
-				C6E7F8091A2B3C4D5E6F7082 /* CarPlayCoordinatorShuffleTests.swift in Sources */,
+				C6E7F8091A2B3C4D5E6F7082 /* CarPlayShuffleDoesNotPersistTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -635,15 +635,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Config/MusicWall.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CD8XP2U645;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Config/MusicWall-Info.plist;
+				INFOPLIST_FILE = "Config/MusicWall-Info.plist";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Allow access to launch albums";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -655,6 +655,7 @@
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = chris.MusicWall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -667,15 +668,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Config/MusicWall.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = CD8XP2U645;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Config/MusicWall-Info.plist;
+				INFOPLIST_FILE = "Config/MusicWall-Info.plist";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSAppleMusicUsageDescription = "Allow access to launch albums";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -687,6 +688,7 @@
 				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = chris.MusicWall;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

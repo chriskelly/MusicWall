@@ -8,7 +8,7 @@ enum CarPlayGridBuilder {
         imageForAlbum: (AlbumID) -> UIImage,
         onSelectAlbum: @escaping @MainActor (AlbumID) -> Void
     ) -> [CPGridTemplate] {
-        pages.enumerated().map { pageIndex, pageAlbums in
+        pages.map { pageAlbums in
             let buttons = pageAlbums.map { album in
                 CPGridButton(
                     titleVariants: [album.title],
@@ -17,8 +17,10 @@ enum CarPlayGridBuilder {
                     onSelectAlbum(album.id)
                 }
             }
-            let title = pages.count > 1 ? "Albums \(pageIndex + 1)/\(pages.count)" : "Albums"
-            return CPGridTemplate(title: title, gridButtons: buttons)
+            return CPGridTemplate(
+                title: CarPlayCopy.appName,
+                gridButtons: buttons
+            )
         }
     }
 

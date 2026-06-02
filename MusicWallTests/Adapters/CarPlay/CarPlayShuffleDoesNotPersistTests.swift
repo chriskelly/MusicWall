@@ -2,8 +2,9 @@ import Foundation
 import Testing
 @testable import MusicWall
 
+/// CarPlay spec: shuffle must not persist saved album order (session-only).
 @MainActor
-struct CarPlayCoordinatorShuffleTests {
+struct CarPlayShuffleDoesNotPersistTests {
     @Test
     func shuffleDoesNotPersistSavedOrder() async {
         let preferences = UserDefaultsPreferencesStore(

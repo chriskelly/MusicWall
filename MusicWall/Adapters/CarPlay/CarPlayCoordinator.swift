@@ -3,94 +3,121 @@ import UIKit
 
 @MainActor
 final class CarPlayCoordinator {
+    private static let artworkPixelSize = 200
+
     private let interfaceController: CPInterfaceController
     private let dependencies: AppDependencies
     private let store: AlbumStore
+    private let imageCache: ImageCache
     private var gridTemplates: [CPGridTemplate] = []
+    private var artworkByAlbumID: [AlbumID: UIImage] = [:]
 
-    init(interfaceController: CPInterfaceController, dependencies: AppDependencies) {
+    init(
+        interfaceController: CPInterfaceController,
+        dependencies: AppDependencies
+    ) {
         self.interfaceController = interfaceController
         self.dependencies = dependencies
         self.store = AlbumStore(
             preferences: dependencies.preferencesStore,
             repository: dependencies.albumRepository
         )
+        self.imageCache = ImageCache(artworkProvider: dependencies.artworkProvider)
     }
 
     func connect() async {
+        let authorizationStatus = dependencies.musicAuthorization
+            .authorizationStatus
+
+        let albums: [AlbumRecord]
+        if authorizationStatus == .authorized {
+            await store.load()
+            albums = store.items
+        } else {
+            albums = []
+        }
+
         let screen = CarPlayConnectPlanner.rootScreen(
-            authorizationStatus: dependencies.musicAuthorization.authorizationStatus,
-            albums: await loadedAlbums()
+            authorizationStatus: authorizationStatus,
+            albums: albums
         )
         switch screen {
         case .setupRequired:
-            try? await interfaceController.setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
+            await setRootTemplate(CarPlaySetupTemplate.make())
         case .albumGrid(let pages):
             await presentGrid(pages: pages)
         }
     }
 
-    private func loadedAlbums() async -> [AlbumRecord] {
-        guard dependencies.musicAuthorization.authorizationStatus == .authorized else {
-            return []
-        }
-        await store.load()
-        return store.items
-    }
-
     private func presentGrid(pages: [[AlbumRecord]]) async {
         let placeholder = CarPlayGridBuilder.placeholderImage()
-        let artwork = await loadArtwork(for: pages.flatMap(\.self))
+        let flatAlbums = pages.flatMap(\.self)
+        await ensureArtworkLoaded(for: flatAlbums)
+
         gridTemplates = CarPlayGridBuilder.makeTemplates(
             pages: pages,
-            imageForAlbum: { artwork[$0] ?? placeholder },
+            imageForAlbum: { [artworkByAlbumID] albumID in
+                artworkByAlbumID[albumID] ?? placeholder
+            },
             onSelectAlbum: { [weak self] albumID in
-                Task { await self?.play(albumID: albumID) }
+                guard let self else { return }
+                Task { await self.play(albumID: albumID) }
             }
         )
         guard let first = gridTemplates.first else {
-            try? await interfaceController.setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
+            await setRootTemplate(CarPlaySetupTemplate.make())
             return
         }
-        attachNavigation(to: first, pageIndex: 0)
-        attachShuffleBarButton(to: first)
-        try? await interfaceController.setRootTemplate(first, animated: true)
+        configureBarButtons(for: first, pageIndex: 0)
+        await setRootTemplate(first)
     }
 
-    private func attachShuffleBarButton(to template: CPGridTemplate) {
-        let shuffle = CPBarButton(type: .text) { [weak self] _ in
-            Task { await self?.shuffleAndRefresh() }
-        }
-        shuffle.title = "Shuffle"
-        template.trailingNavigationBarButtons = [shuffle]
-    }
+    private func configureBarButtons(
+        for template: CPGridTemplate,
+        pageIndex: Int
+    ) {
+        template.backButton = nil
 
-    private func attachNavigation(to template: CPGridTemplate, pageIndex: Int) {
-        guard gridTemplates.count > 1 else { return }
-        var leadingButtons: [CPBarButton] = template.leadingNavigationBarButtons ?? []
-        if pageIndex > 0 {
-            let previous = CPBarButton(type: .text) { [weak self] _ in
-                self?.interfaceController.popTemplate(animated: true)
-            }
-            previous.title = "Back"
-            leadingButtons.append(previous)
-        }
-        template.leadingNavigationBarButtons = leadingButtons
+        let isSinglePageGrid = gridTemplates.count == 1
+        template.leadingNavigationBarButtons =
+            pageIndex == 0 && isSinglePageGrid
+            ? [CarPlayBarButtons.layoutSpacer()]
+            : []
 
+        // trailingNavigationBarButtons are outermost-first: forward (next page) is
+        // rightmost; shuffle sits to its left (toward the title).
+        var trailing: [CPBarButton] = []
         if pageIndex < gridTemplates.count - 1 {
-            let next = CPBarButton(type: .text) { [weak self] _ in
-                guard let self else { return }
-                let nextIndex = pageIndex + 1
-                let nextTemplate = self.gridTemplates[nextIndex]
-                self.attachNavigation(to: nextTemplate, pageIndex: nextIndex)
-                self.attachShuffleBarButton(to: nextTemplate)
-                Task {
-                    try? await self.interfaceController.pushTemplate(nextTemplate, animated: true)
+            trailing.append(
+                CarPlayBarButtons.forward { [weak self] _ in
+                    guard let self else { return }
+                    let nextIndex = pageIndex + 1
+                    let nextTemplate = self.gridTemplates[nextIndex]
+                    self.configureBarButtons(
+                        for: nextTemplate,
+                        pageIndex: nextIndex
+                    )
+                    Task {
+                        try? await self.interfaceController.pushTemplate(
+                            nextTemplate,
+                            animated: true
+                        )
+                    }
                 }
-            }
-            next.title = "Next"
-            template.trailingNavigationBarButtons = (template.trailingNavigationBarButtons ?? []) + [next]
+            )
         }
+
+        trailing.append(
+            CarPlayBarButtons.shuffle { [weak self] _ in
+                guard let self else { return }
+                Task { await self.shuffleAndRefresh() }
+            },
+        )
+        template.trailingNavigationBarButtons = trailing
+    }
+
+    private func setRootTemplate(_ template: CPTemplate) async {
+        try? await interfaceController.setRootTemplate(template, animated: true)
     }
 
     private func shuffleAndRefresh() async {
@@ -100,19 +127,21 @@ final class CarPlayCoordinator {
     }
 
     private func play(albumID: AlbumID) async {
-        _ = try? await dependencies.playbackController.play(albumId: albumID)
+        try? await dependencies.playbackController.play(albumId: albumID)
     }
 
-    private func loadArtwork(for albums: [AlbumRecord]) async -> [AlbumID: UIImage] {
-        let cache = ImageCache(artworkProvider: dependencies.artworkProvider)
-        let pixelSize = 200
-        var images: [AlbumID: UIImage] = [:]
+    private func ensureArtworkLoaded(for albums: [AlbumRecord]) async {
         for album in albums {
-            guard let url = await cache.getArtwork(albumID: album.id.rawValue, size: pixelSize),
-                  let data = try? Data(contentsOf: url),
-                  let image = UIImage(data: data) else { continue }
-            images[album.id] = image
+            guard artworkByAlbumID[album.id] == nil else { continue }
+            guard
+                let url = await imageCache.getArtwork(
+                    albumID: album.id.rawValue,
+                    size: Self.artworkPixelSize
+                ),
+                let data = try? Data(contentsOf: url),
+                let image = UIImage(data: data)
+            else { continue }
+            artworkByAlbumID[album.id] = image
         }
-        return images
     }
 }

@@ -3,9 +3,14 @@ import CarPlay
 enum CarPlaySetupTemplate {
     static func make() -> CPInformationTemplate {
         let item = CPInformationItem(
-            title: "MusicWall",
-            detail: "Open MusicWall on your iPhone to set up your album wall."
+            title: CarPlayCopy.appName,
+            detail: CarPlayCopy.setupDetail
         )
-        return CPInformationTemplate(title: "MusicWall", layout: .leading, items: [item], actions: [])
+        return CPInformationTemplate(
+            title: CarPlayCopy.appName,
+            layout: .leading,
+            items: [item],
+            actions: []
+        )
     }
 }
