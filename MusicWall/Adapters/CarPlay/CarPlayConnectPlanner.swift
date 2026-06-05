@@ -2,7 +2,7 @@ import Foundation
 
 enum CarPlayRootScreen: Equatable {
     case setupRequired
-    case albumGrid(pages: [[AlbumRecord]])
+    case albumLibrary(albums: [AlbumRecord])
 }
 
 enum CarPlayConnectPlanner {
@@ -16,7 +16,6 @@ enum CarPlayConnectPlanner {
         guard !albums.isEmpty else {
             return .setupRequired
         }
-        let pages = CarPlayAlbumPaginator.pages(from: albums)
-        return .albumGrid(pages: pages)
+        return .albumLibrary(albums: albums)
     }
 }

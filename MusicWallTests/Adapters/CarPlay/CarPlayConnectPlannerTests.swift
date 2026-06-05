@@ -22,12 +22,12 @@ struct CarPlayConnectPlannerTests {
     }
 
     @Test
-    func authorizedWithAlbums_returnsGrid() {
+    func authorizedWithAlbums_returnsAlbumLibrary() {
         let albums = AlbumFixtures.baseTrio
         let screen = CarPlayConnectPlanner.rootScreen(
             authorizationStatus: .authorized,
             albums: albums
         )
-        #expect(screen == .albumGrid(pages: CarPlayAlbumPaginator.pages(from: albums)))
+        #expect(screen == .albumLibrary(albums: albums))
     }
 }

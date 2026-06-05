@@ -3,14 +3,17 @@ import UIKit
 
 @MainActor
 final class CarPlayCoordinator {
-    private static let artworkPixelSize = 200
+    private struct ArtworkCacheKey: Hashable {
+        let albumID: AlbumID
+        let pixelSize: Int
+    }
 
     private let interfaceController: CPInterfaceController
     private let dependencies: AppDependencies
     private let store: AlbumStore
     private let imageCache: ImageCache
-    private var gridTemplates: [CPGridTemplate] = []
-    private var artworkByAlbumID: [AlbumID: UIImage] = [:]
+    private var artworkByKey: [ArtworkCacheKey: UIImage] = [:]
+    private var loadedArtworkPixelSize: Int?
 
     init(
         interfaceController: CPInterfaceController,
@@ -44,76 +47,62 @@ final class CarPlayCoordinator {
         switch screen {
         case .setupRequired:
             await setRootTemplate(CarPlaySetupTemplate.make())
-        case .albumGrid(let pages):
-            await presentGrid(pages: pages)
+        case .albumLibrary(let albums):
+            await presentAlbumLibrary(albums)
         }
     }
 
-    private func presentGrid(pages: [[AlbumRecord]]) async {
-        let placeholder = CarPlayGridBuilder.placeholderImage()
-        let flatAlbums = pages.flatMap(\.self)
-        await ensureArtworkLoaded(for: flatAlbums)
-
-        gridTemplates = CarPlayGridBuilder.makeTemplates(
-            pages: pages,
-            imageForAlbum: { [artworkByAlbumID] albumID in
-                artworkByAlbumID[albumID] ?? placeholder
-            },
-            onSelectAlbum: { [weak self] albumID in
-                guard let self else { return }
-                Task { await self.play(albumID: albumID) }
-            }
-        )
-        guard let first = gridTemplates.first else {
+    private func presentAlbumLibrary(_ albums: [AlbumRecord]) async {
+        guard #available(iOS 26.0, *) else {
             await setRootTemplate(CarPlaySetupTemplate.make())
             return
         }
-        configureBarButtons(for: first, pageIndex: 0)
-        await setRootTemplate(first)
-    }
 
-    private func configureBarButtons(
-        for template: CPGridTemplate,
-        pageIndex: Int
-    ) {
-        template.backButton = nil
+        let placeholder = CarPlayImageRowBuilder.placeholderImage()
+        let pixelSize = artworkPixelSize()
+        await ensureArtworkLoaded(for: albums, pixelSize: pixelSize)
 
-        let isSinglePageGrid = gridTemplates.count == 1
-        template.leadingNavigationBarButtons =
-            pageIndex == 0 && isSinglePageGrid
-            ? [CarPlayBarButtons.layoutSpacer()]
-            : []
-
-        // trailingNavigationBarButtons are outermost-first: forward (next page) is
-        // rightmost; shuffle sits to its left (toward the title).
-        var trailing: [CPBarButton] = []
-        if pageIndex < gridTemplates.count - 1 {
-            trailing.append(
-                CarPlayBarButtons.forward { [weak self] _ in
-                    guard let self else { return }
-                    let nextIndex = pageIndex + 1
-                    let nextTemplate = self.gridTemplates[nextIndex]
-                    self.configureBarButtons(
-                        for: nextTemplate,
-                        pageIndex: nextIndex
-                    )
-                    Task {
-                        try? await self.interfaceController.pushTemplate(
-                            nextTemplate,
-                            animated: true
-                        )
-                    }
-                }
-            )
+        let imageForAlbum: (AlbumID) -> UIImage = { [artworkByKey] albumID in
+            let key = ArtworkCacheKey(albumID: albumID, pixelSize: pixelSize)
+            return artworkByKey[key] ?? placeholder
+        }
+        let onSelectAlbum: @MainActor (AlbumID) -> Void = { [weak self] albumID in
+            guard let self else { return }
+            Task { await self.play(albumID: albumID) }
         }
 
-        trailing.append(
+        guard
+            let template = CarPlayImageRowBuilder.makeAlbumLibraryTemplate(
+                albums: albums,
+                imageForAlbum: imageForAlbum,
+                onSelectAlbum: onSelectAlbum
+            )
+        else {
+            await setRootTemplate(CarPlaySetupTemplate.make())
+            return
+        }
+
+        configureBarButtons(for: template)
+        await setRootTemplate(template)
+    }
+
+    @available(iOS 26.0, *)
+    private func artworkPixelSize() -> Int {
+        let traits = interfaceController.carTraitCollection
+        let scale = traits.displayScale
+        let pt = CPListImageRowItemCardElement.maximumImageSize
+        return max(1, Int(max(pt.width, pt.height) * scale))
+    }
+
+    private func configureBarButtons(for template: CPListTemplate) {
+        template.backButton = nil
+        template.leadingNavigationBarButtons = []
+        template.trailingNavigationBarButtons = [
             CarPlayBarButtons.shuffle { [weak self] _ in
                 guard let self else { return }
                 Task { await self.shuffleAndRefresh() }
             },
-        )
-        template.trailingNavigationBarButtons = trailing
+        ]
     }
 
     private func setRootTemplate(_ template: CPTemplate) async {
@@ -122,26 +111,43 @@ final class CarPlayCoordinator {
 
     private func shuffleAndRefresh() async {
         store.temporarilyShuffle()
-        let pages = CarPlayAlbumPaginator.pages(from: store.items)
-        await presentGrid(pages: pages)
+        await presentAlbumLibrary(store.items)
     }
 
     private func play(albumID: AlbumID) async {
         try? await dependencies.playbackController.play(albumId: albumID)
     }
 
-    private func ensureArtworkLoaded(for albums: [AlbumRecord]) async {
+    private func ensureArtworkLoaded(
+        for albums: [AlbumRecord],
+        pixelSize: Int
+    ) async {
+        if loadedArtworkPixelSize != pixelSize {
+            artworkByKey.removeAll()
+            loadedArtworkPixelSize = pixelSize
+        }
+
         for album in albums {
-            guard artworkByAlbumID[album.id] == nil else { continue }
+            let key = ArtworkCacheKey(
+                albumID: album.id,
+                pixelSize: pixelSize
+            )
+            if artworkByKey[key] != nil {
+                continue
+            }
+
             guard
                 let url = await imageCache.getArtwork(
                     albumID: album.id.rawValue,
-                    size: Self.artworkPixelSize
-                ),
+                    size: pixelSize
+                )
+            else { continue }
+
+            guard
                 let data = try? Data(contentsOf: url),
                 let image = UIImage(data: data)
             else { continue }
-            artworkByAlbumID[album.id] = image
+            artworkByKey[key] = image
         }
     }
 }

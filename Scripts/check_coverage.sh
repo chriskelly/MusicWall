@@ -45,9 +45,9 @@ EXCLUDED_ADAPTERS = {
     "LiveMusicAuthorizationProvider.swift",
     "CarPlayBarButtons.swift",
     "CarPlayCopy.swift",
+    "CarPlayImageRowBuilder.swift",
     "CarPlaySceneDelegate.swift",
     "CarPlayCoordinator.swift",
-    "CarPlayGridBuilder.swift",
     "CarPlaySetupTemplate.swift",
 }
 
