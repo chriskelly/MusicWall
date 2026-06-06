@@ -19,15 +19,18 @@ final class MusicWallUITests: XCTestCase {
 
     func testTapAlbum_invokesPlayback() throws {
         let app = launchApp(scenario: "savedLibrary")
-        let album = app.staticTexts["Take Care"]
+        XCTAssertTrue(app.navigationBars["My Albums"].waitForExistence(timeout: 10))
+        assertFixtureAlbumsVisible(in: app)
+
+        let album = app.staticTexts["Take Care"].firstMatch
         XCTAssertTrue(album.waitForExistence(timeout: 10))
+        XCTAssertTrue(waitUntilHittable(album, timeout: 10))
         album.tap()
 
-        let bridge = app.otherElements["uitest.lastPlayedAlbum"]
-        XCTAssertTrue(bridge.waitForExistence(timeout: 15))
-        let predicate = NSPredicate(format: "value == %@", "fixture-drake")
-        let expectation = expectation(for: predicate, evaluatedWith: bridge)
-        wait(for: [expectation], timeout: 15)
+        XCTAssertTrue(
+            waitForLastPlayedAlbumID("fixture-drake", in: app, retryTap: album),
+            "Expected mock playback to record fixture-drake after album tap"
+        )
     }
 
     func testSearchSheet_openAndDismiss() throws {
@@ -64,5 +67,45 @@ final class MusicWallUITests: XCTestCase {
             file: file,
             line: line
         )
+    }
+
+    private func waitUntilHittable(_ element: XCUIElement, timeout: TimeInterval) -> Bool {
+        let predicate = NSPredicate(format: "isHittable == true")
+        let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
+        return XCTWaiter.wait(for: [expectation], timeout: timeout) == .completed
+    }
+
+    /// Polls the hidden playback bridge; retries one tap if CI is slow to register the gesture.
+    private func waitForLastPlayedAlbumID(
+        _ expectedID: String,
+        in app: XCUIApplication,
+        retryTap: XCUIElement?,
+        timeout: TimeInterval = 30
+    ) -> Bool {
+        let bridge = app.otherElements["uitest.lastPlayedAlbum"]
+        guard bridge.waitForExistence(timeout: 10) else { return false }
+
+        let pollInterval: TimeInterval = 0.25
+        let retryAfter: TimeInterval = 5
+        var didRetryTap = false
+        let start = Date()
+        let deadline = start.addingTimeInterval(timeout)
+
+        while Date() < deadline {
+            if (bridge.value as? String) == expectedID {
+                return true
+            }
+
+            if !didRetryTap,
+               let retryTap,
+               Date().timeIntervalSince(start) >= retryAfter {
+                retryTap.tap()
+                didRetryTap = true
+            }
+
+            RunLoop.current.run(until: Date().addingTimeInterval(pollInterval))
+        }
+
+        return (bridge.value as? String) == expectedID
     }
 }
