@@ -15,15 +15,15 @@ struct LiveAlbumBackupService: AlbumBackupService {
         self.reader = reader
     }
 
-    func exportAlbumIDs(_ ids: [String]) throws -> URL {
-        guard !ids.isEmpty else {
+    func exportAlbums(_ albums: [AlbumRecord]) throws -> URL {
+        guard !albums.isEmpty else {
             throw BackupError.emptyExport
         }
-        let data = try codec.encode(ids)
+        let data = try codec.encode(albums)
         return try exportService.write(data)
     }
 
-    func importAlbumIDs(from url: URL) throws -> [String] {
+    func importBackup(from url: URL) throws -> BackupContents {
         let data = try reader.readData(from: url)
         return try codec.decode(data)
     }

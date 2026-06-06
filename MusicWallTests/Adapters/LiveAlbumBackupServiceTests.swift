@@ -9,23 +9,43 @@ struct LiveAlbumBackupServiceTests {
         }
     }
 
+    private var sampleRecords: [AlbumRecord] {
+        [
+            AlbumFixtures.record(id: "id-a", title: "Album A", artistName: "Artist A"),
+            AlbumFixtures.record(id: "id-b", title: "Album B", artistName: "Artist B"),
+        ]
+    }
+
     @Test
-    func exportEmptyIDsThrowsEmptyExport() {
+    func exportEmptyAlbumsThrowsEmptyExport() {
         let service = LiveAlbumBackupService(reader: DirectFileReader())
         #expect(throws: BackupError.emptyExport) {
-            _ = try service.exportAlbumIDs([])
+            _ = try service.exportAlbums([])
         }
     }
 
     @Test
-    func exportImportRoundTrip() throws {
+    func exportImportV2RoundTrip() throws {
         let service = LiveAlbumBackupService(reader: DirectFileReader())
-        let ids = ["id-a", "id-b"]
-        let url = try service.exportAlbumIDs(ids)
+        let records = sampleRecords
+        let url = try service.exportAlbums(records)
         defer { try? FileManager.default.removeItem(at: url) }
 
-        let imported = try service.importAlbumIDs(from: url)
-        #expect(imported == ids)
+        let imported = try service.importBackup(from: url)
+        #expect(imported == .records(records))
+    }
+
+    @Test
+    func importLegacyIDsRoundTrip() throws {
+        let legacyData = Data(#"["legacy-a","legacy-b"]"#.utf8)
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("legacy-\(UUID().uuidString).json")
+        try legacyData.write(to: tempURL)
+        defer { try? FileManager.default.removeItem(at: tempURL) }
+
+        let service = LiveAlbumBackupService(reader: DirectFileReader())
+        let imported = try service.importBackup(from: tempURL)
+        #expect(imported == .ids(["legacy-a", "legacy-b"]))
     }
 
     @Test
@@ -35,7 +55,7 @@ struct LiveAlbumBackupServiceTests {
             .appendingPathComponent("unused-\(UUID().uuidString).json")
 
         #expect(throws: BackupError.fileAccessDenied) {
-            _ = try service.importAlbumIDs(from: url)
+            _ = try service.importBackup(from: url)
         }
     }
 }

@@ -82,12 +82,12 @@ struct AlbumCollectionTests {
     }
 
     @Test
-    func exportIDsMatchesItemOrder() {
+    func itemsPreserveOrderAfterReplaceAll() {
         let spy = PersistSpy()
         let collection = spy.makeCollection()
         collection.replaceAll(AlbumFixtures.baseTrio, persist: false)
 
-        #expect(collection.exportIDs() == ["fixture-drake", "fixture-cole", "fixture-kendrick"])
+        #expect(collection.items.map(\.id.rawValue) == ["fixture-drake", "fixture-cole", "fixture-kendrick"])
     }
 
     @Test
@@ -114,7 +114,7 @@ struct AlbumCollectionTests {
 
         collection.applySort(key: .artist, ascending: true)
 
-        #expect(collection.exportIDs() == ["fixture-drake", "fixture-cole", "fixture-kendrick"])
+        #expect(collection.items.map(\.id.rawValue) == ["fixture-drake", "fixture-cole", "fixture-kendrick"])
     }
 
     @Test

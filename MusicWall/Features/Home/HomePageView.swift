@@ -159,10 +159,10 @@ struct BackupMenu: View {
 
     var body: some View {
         Section("Backup") {
-            Button("Export Album IDs", systemImage: "square.and.arrow.up") {
+            Button("Export Albums", systemImage: "square.and.arrow.up") {
                 onExport()
             }
-            Button("Import Album IDs", systemImage: "square.and.arrow.down") {
+            Button("Import Albums", systemImage: "square.and.arrow.down") {
                 showingFileImporter = true
             }
         }
