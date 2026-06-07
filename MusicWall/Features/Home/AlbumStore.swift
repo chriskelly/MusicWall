@@ -115,10 +115,6 @@ final class AlbumStore {
         syncItemsFromCollection()
     }
 
-    func exportAlbumIDs() -> [String] {
-        collection.exportIDs()
-    }
-
     @MainActor
     func importAlbums(from ids: [String]) async throws {
         guard !ids.isEmpty else { return }
@@ -137,6 +133,21 @@ final class AlbumStore {
             }
         }
         applySort()
+    }
+
+    @MainActor
+    func importBackup(_ contents: BackupContents) async throws {
+        switch contents {
+        case .records(let records):
+            collection.performWithoutPersist {
+                for record in records where !collection.contains(id: record.id) {
+                    _ = collection.add(record)
+                }
+            }
+            applySort()
+        case .ids(let ids):
+            try await importAlbums(from: ids)
+        }
     }
 
     static func dummyData(

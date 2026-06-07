@@ -66,9 +66,9 @@ final class HomeViewModel {
     }
 
     func exportAlbums() -> HomeExportResult {
-        let ids = store.exportAlbumIDs()
+        let albums = store.items
         do {
-            let url = try backup.exportAlbumIDs(ids)
+            let url = try backup.exportAlbums(albums)
             return .success(url)
         } catch let error as BackupError where error == .emptyExport {
             return .snackbar(SnackbarState(message: "No albums to export"))
@@ -81,9 +81,9 @@ final class HomeViewModel {
 
     func importAlbums(from url: URL) async {
         do {
-            let ids = try backup.importAlbumIDs(from: url)
-            try await store.importAlbums(from: ids)
-            snackbar = SnackbarState(message: "Successfully imported \(ids.count) album(s)!")
+            let contents = try backup.importBackup(from: url)
+            try await store.importBackup(contents)
+            snackbar = SnackbarState(message: "Successfully imported \(contents.count) album(s)!")
         } catch {
             snackbar = SnackbarState(message: "Import failed: \(error.localizedDescription)")
         }

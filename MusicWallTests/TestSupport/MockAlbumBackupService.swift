@@ -2,20 +2,20 @@ import Foundation
 @testable import MusicWall
 
 final class MockAlbumBackupService: AlbumBackupService, @unchecked Sendable {
-    var exportHandler: ([String]) throws -> URL = { _ in
+    var exportHandler: ([AlbumRecord]) throws -> URL = { _ in
         URL(fileURLWithPath: "/tmp/export.json")
     }
-    var importHandler: (URL) throws -> [String] = { _ in [] }
+    var importHandler: (URL) throws -> BackupContents = { _ in .ids([]) }
 
-    private(set) var exportCalls: [[String]] = []
+    private(set) var exportCalls: [[AlbumRecord]] = []
     private(set) var importCalls: [URL] = []
 
-    func exportAlbumIDs(_ ids: [String]) throws -> URL {
-        exportCalls.append(ids)
-        return try exportHandler(ids)
+    func exportAlbums(_ albums: [AlbumRecord]) throws -> URL {
+        exportCalls.append(albums)
+        return try exportHandler(albums)
     }
 
-    func importAlbumIDs(from url: URL) throws -> [String] {
+    func importBackup(from url: URL) throws -> BackupContents {
         importCalls.append(url)
         return try importHandler(url)
     }

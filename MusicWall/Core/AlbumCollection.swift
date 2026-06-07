@@ -38,10 +38,6 @@ final class AlbumCollection {
         items.contains { $0.id == id }
     }
 
-    func exportIDs() -> [String] {
-        items.map(\.id.rawValue)
-    }
-
     func applySort(key: AlbumSortKey, ascending: Bool) {
         items = AlbumSorter.sorted(items, key: key, ascending: ascending)
         persistIfNeeded()

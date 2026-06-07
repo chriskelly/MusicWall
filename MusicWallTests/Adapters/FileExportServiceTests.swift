@@ -11,7 +11,7 @@ struct FileExportServiceTests {
         defer { try? FileManager.default.removeItem(at: url) }
 
         #expect(url.pathExtension == "json")
-        #expect(url.lastPathComponent.hasPrefix("MusicWall_AlbumIDs_"))
+        #expect(url.lastPathComponent.hasPrefix("MusicWall_Backup_"))
         #expect(try Data(contentsOf: url) == payload)
     }
 }

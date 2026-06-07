@@ -32,8 +32,8 @@ struct HomeViewModelTests {
     @Test @MainActor
     func exportEmptyCollection_showsNoAlbumsMessage() {
         let backup = MockAlbumBackupService()
-        backup.exportHandler = { ids in
-            if ids.isEmpty { throw BackupError.emptyExport }
+        backup.exportHandler = { albums in
+            if albums.isEmpty { throw BackupError.emptyExport }
             return URL(fileURLWithPath: "/tmp/export.json")
         }
         let viewModel = HomeViewModel(
@@ -88,7 +88,7 @@ struct HomeViewModelTests {
     @Test @MainActor
     func importSuccess_showsCountMessage() async {
         let backup = MockAlbumBackupService()
-        backup.importHandler = { _ in ["a", "b"] }
+        backup.importHandler = { _ in .ids(["a", "b"]) }
         let repository = MockAlbumRepository()
         repository.fetchHandler = { ids in
             ids.map { AlbumFixtures.record(id: $0.rawValue, title: "T", artistName: "Artist") }
@@ -104,6 +104,33 @@ struct HomeViewModelTests {
 
         #expect(viewModel.snackbar?.message == "Successfully imported 2 album(s)!")
         #expect(viewModel.store.items.count == 2)
+    }
+
+    @Test @MainActor
+    func importV2Records_showsCountWithoutFetch() async {
+        let backup = MockAlbumBackupService()
+        let records = [
+            AlbumFixtures.record(id: "v2-a", title: "Local", artistName: "Artist"),
+            AlbumFixtures.record(id: "v2-b", title: "Local 2", artistName: "Artist 2"),
+        ]
+        backup.importHandler = { _ in .records(records) }
+        let repository = MockAlbumRepository()
+        repository.fetchHandler = { _ in
+            Issue.record("fetch should not be called")
+            return []
+        }
+        let viewModel = HomeViewModel(
+            preferences: InMemoryPreferencesStore(),
+            repository: repository,
+            backup: backup
+        )
+        let fileURL = URL(fileURLWithPath: "/tmp/import-v2.json")
+
+        await viewModel.importAlbums(from: fileURL)
+
+        #expect(viewModel.snackbar?.message == "Successfully imported 2 album(s)!")
+        #expect(viewModel.store.items == records)
+        #expect(repository.fetchCalls.isEmpty)
     }
 
     @Test @MainActor
@@ -125,7 +152,7 @@ struct HomeViewModelTests {
     func importStoreFailure_showsImportFailed() async {
         struct TestError: Error {}
         let backup = MockAlbumBackupService()
-        backup.importHandler = { _ in ["missing"] }
+        backup.importHandler = { _ in .ids(["missing"]) }
         let repository = MockAlbumRepository()
         repository.fetchHandler = { _ in throw TestError() }
         let viewModel = HomeViewModel(
