@@ -252,7 +252,7 @@ struct HomeViewModelTests {
     @Test @MainActor
     func isEmpty_falseAfterImport() async {
         let backup = MockAlbumBackupService()
-        backup.importHandler = { _ in ["a"] }
+        backup.importHandler = { _ in .ids(["a"]) }
         let repository = MockAlbumRepository()
         repository.fetchHandler = { ids in
             ids.map { AlbumFixtures.record(id: $0.rawValue, title: "T", artistName: "Artist") }
