@@ -66,11 +66,13 @@ FAIL_CI=false Scripts/check_coverage.sh build/MusicWallTestResults.xcresult
 | Argument | Required | Values |
 |----------|----------|--------|
 | `-UITestMockMusic` | Yes (flag) | Enables mock dependencies (no MusicKit / Apple ID) |
-| `-UITestLoadScenario` | Yes when mock enabled | `savedLibrary` \| `restoreFromBackup` |
+| `-UITestLoadScenario` | Yes when mock enabled | `savedLibrary` \| `restoreFromBackup` \| `emptyCollection` |
 
 **savedLibrary** — pre-seeded album records in isolated UserDefaults (typical returning user).
 
 **restoreFromBackup** — pre-seeded backup IDs only; mock repository returns fixture albums on fetch.
+
+**emptyCollection** — no seeded albums; home shows the empty welcome screen.
 
 Production launch omits both arguments and uses `AppDependencies.live`.
 
@@ -86,6 +88,9 @@ Production launch omits both arguments and uses `AppDependencies.live`.
 | Identifier | Element |
 |------------|---------|
 | `home.addAlbum` | Add album toolbar button |
+| `home.emptyWelcome` | Empty collection welcome container |
+| `home.emptyWelcome.addAlbum` | Welcome primary button |
+| `home.emptyWelcome.import` | Welcome import button |
 | `search.cancel` | Search sheet Cancel |
 | `uitest.lastPlayedAlbum` | Hidden playback bridge (mock launch only) |
 

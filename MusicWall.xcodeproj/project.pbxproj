@@ -36,6 +36,7 @@
 		B2C3D4E5F60918293A4B5DC /* MockURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2C3D4E5F60918293A4B5DC /* MockURLSession.swift */; };
 		B2D3E4F50618293A4B5E2 /* SortMenuViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D3E4F50618293A4B5E2 /* SortMenuViewTests.swift */; };
 		B3D4E5F60718293A4B5E3 /* AlbumEditViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3D4E5F60718293A4B5E3 /* AlbumEditViewTests.swift */; };
+		B4E5F60718293A4B5E4 /* EmptyAlbumsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4E5F60718293A4B5E4 /* EmptyAlbumsViewTests.swift */; };
 		B4D5E6F70818293A4B5E4 /* ViewInspector in Frameworks */ = {isa = PBXBuildFile; productRef = E4D5E6F70818293A4B5E4 /* ViewInspector */; };
 		BBAE99B1FA45969122576159 /* SmokeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B203760B33EAD816D6FDCB94 /* SmokeTests.swift */; };
 		C0DE001122334455667788CC /* MusicWallUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0DE001122334455667788BB /* MusicWallUITests.swift */; };
@@ -89,6 +90,7 @@
 		F3A4B5C6D7E80718293A4B5C /* AlbumRepositoryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumRepositoryTests.swift; sourceTree = "<group>"; };
 		F3B4C5D6E7F90718293A4B5D3 /* AlbumStoreImportTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumStoreImportTests.swift; sourceTree = "<group>"; };
 		F3D4E5F60718293A4B5E3 /* AlbumEditViewTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumEditViewTests.swift; sourceTree = "<group>"; };
+		F4E5F60718293A4B5E4 /* EmptyAlbumsViewTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EmptyAlbumsViewTests.swift; sourceTree = "<group>"; };
 		F4A5B6C7D8E90718293A4B5D /* AlbumTapCoordinatorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumTapCoordinatorTests.swift; sourceTree = "<group>"; };
 		F4B5C6D7E8F90818293A4B5D4 /* AuthViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuthViewModelTests.swift; sourceTree = "<group>"; };
 		F5A6B7C8D9E00718293A4B5C5 /* AlbumRecordCodableTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumRecordCodableTests.swift; sourceTree = "<group>"; };
@@ -287,6 +289,7 @@
 		F4D5E6F70818293A4B5E5 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				F4E5F60718293A4B5E4 /* EmptyAlbumsViewTests.swift */,
 				F1D2E3F40518293A4B5E1 /* SnackbarViewTests.swift */,
 				F2D3E4F50618293A4B5E2 /* SortMenuViewTests.swift */,
 				F3D4E5F60718293A4B5E3 /* AlbumEditViewTests.swift */,
@@ -478,6 +481,7 @@
 				B1D2E3F40518293A4B5E1 /* SnackbarViewTests.swift in Sources */,
 				B2D3E4F50618293A4B5E2 /* SortMenuViewTests.swift in Sources */,
 				B3D4E5F60718293A4B5E3 /* AlbumEditViewTests.swift in Sources */,
+				B4E5F60718293A4B5E4 /* EmptyAlbumsViewTests.swift in Sources */,
 				C0DE00112233445566779907 /* AppDependenciesUITestTests.swift in Sources */,
 				C5E6F708192A3B4C5D6E7F810 /* CarPlayConnectPlannerTests.swift in Sources */,
 				C6E7F8091A2B3C4D5E6F7082 /* CarPlayShuffleDoesNotPersistTests.swift in Sources */,

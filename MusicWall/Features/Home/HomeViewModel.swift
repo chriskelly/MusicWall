@@ -16,6 +16,11 @@ final class HomeViewModel {
     let store: AlbumStore
     var currentLayout: LayoutMenu.Option
     var snackbar: SnackbarState?
+    private(set) var hasLoaded = false
+
+    var isEmpty: Bool {
+        store.items.isEmpty
+    }
 
     private let preferences: PreferencesStore
     private let backup: any AlbumBackupService
@@ -33,6 +38,7 @@ final class HomeViewModel {
 
     func load() async {
         await store.load()
+        hasLoaded = true
     }
 
     var currentSort: AlbumStore.SortOption {
@@ -95,6 +101,16 @@ final class HomeViewModel {
 }
 
 extension HomeViewModel {
+    static func previewEmpty(dependencies: AppDependencies) -> HomeViewModel {
+        let viewModel = HomeViewModel(
+            preferences: dependencies.preferencesStore,
+            repository: dependencies.albumRepository,
+            backup: dependencies.albumBackupService
+        )
+        viewModel.hasLoaded = true
+        return viewModel
+    }
+
     static func preview(dependencies: AppDependencies) -> HomeViewModel {
         let viewModel = HomeViewModel(
             preferences: dependencies.preferencesStore,

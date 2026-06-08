@@ -57,11 +57,29 @@ struct HomePageView: View {
 
     private func layoutView() -> some View {
         Group {
-            switch viewModel.currentLayout {
-            case .grid:
-                GridLayout()
-            case .list:
-                ListLayout()
+            if !viewModel.hasLoaded {
+                ProgressView()
+            } else {
+                loadedContentView()
+                    .animation(.default, value: viewModel.isEmpty)
+            }
+        }
+    }
+
+    private func loadedContentView() -> some View {
+        Group {
+            if viewModel.isEmpty {
+                EmptyAlbumsView(
+                    onAddAlbum: { showingAddView = true },
+                    onImport: { showingFileImporter = true }
+                )
+            } else {
+                switch viewModel.currentLayout {
+                case .grid:
+                    GridLayout()
+                case .list:
+                    ListLayout()
+                }
             }
         }
     }
@@ -86,8 +104,10 @@ struct HomePageView: View {
     }
 
     private func onSearchSelect(_ record: AlbumRecord) {
-        viewModel.store.addAlbum(record)
-        viewModel.albumAdded()
+        withAnimation {
+            viewModel.store.addAlbum(record)
+            viewModel.albumAdded()
+        }
     }
 
     private func handleFileImport(result: Result<[URL], Error>) {
@@ -184,9 +204,7 @@ struct ShareSheet: UIViewControllerRepresentable {
     HomePageView(viewModel: .preview(dependencies: deps), dependencies: deps)
 }
 
-#Preview {
+#Preview("Empty") {
     let deps = AppDependencies.preview()
-    NavigationStack {
-        HomePageView(viewModel: .preview(dependencies: deps), dependencies: deps)
-    }
+    HomePageView(viewModel: .previewEmpty(dependencies: deps), dependencies: deps)
 }

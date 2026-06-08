@@ -229,6 +229,90 @@ struct HomeViewModelTests {
     }
 
     @Test @MainActor
+    func previewEmpty_isLoadedWithNoAlbums() {
+        let viewModel = HomeViewModel.previewEmpty(dependencies: AppDependencies.preview())
+        #expect(viewModel.hasLoaded)
+        #expect(viewModel.isEmpty)
+    }
+
+    @Test @MainActor
+    func isEmpty_trueWhenStoreEmpty() {
+        let (viewModel, _, _, _) = makeViewModel()
+        #expect(viewModel.isEmpty)
+    }
+
+    @Test @MainActor
+    func load_emptyStore_staysEmptyAfterLoad() async {
+        let (viewModel, _, _, _) = makeViewModel()
+        await viewModel.load()
+        #expect(viewModel.hasLoaded)
+        #expect(viewModel.isEmpty)
+    }
+
+    @Test @MainActor
+    func load_withSavedAlbums_isNotEmpty() async {
+        let preferences = InMemoryPreferencesStore()
+        preferences.save(
+            [AlbumFixtures.record(id: "saved", title: "Saved", artistName: "Artist")],
+            for: .albumRecordsItems
+        )
+        let viewModel = HomeViewModel(
+            preferences: preferences,
+            repository: MockAlbumRepository(),
+            backup: MockAlbumBackupService()
+        )
+
+        await viewModel.load()
+
+        #expect(viewModel.hasLoaded)
+        #expect(!viewModel.isEmpty)
+    }
+
+    @Test @MainActor
+    func currentSort_and_isAscending_reflectStore() {
+        let (viewModel, _, _, _) = makeViewModel()
+        viewModel.store.currentSort = .title
+        viewModel.store.sortDirection[.title] = false
+        #expect(viewModel.currentSort == .title)
+        #expect(!viewModel.isAscending(for: .title))
+    }
+
+    @Test @MainActor
+    func isEmpty_falseAfterAddAlbum() {
+        let (viewModel, _, _, _) = makeViewModel()
+        viewModel.store.addAlbum(AlbumFixtures.record(id: "a", title: "A", artistName: "Artist"))
+        #expect(!viewModel.isEmpty)
+    }
+
+    @Test @MainActor
+    func load_setsHasLoaded() async {
+        let (viewModel, _, _, _) = makeViewModel()
+        #expect(!viewModel.hasLoaded)
+        await viewModel.load()
+        #expect(viewModel.hasLoaded)
+    }
+
+    @Test @MainActor
+    func isEmpty_falseAfterImport() async {
+        let backup = MockAlbumBackupService()
+        backup.importHandler = { _ in .ids(["a"]) }
+        let repository = MockAlbumRepository()
+        repository.fetchHandler = { ids in
+            ids.map { AlbumFixtures.record(id: $0.rawValue, title: "T", artistName: "Artist") }
+        }
+        let viewModel = HomeViewModel(
+            preferences: InMemoryPreferencesStore(),
+            repository: repository,
+            backup: backup
+        )
+        #expect(viewModel.isEmpty)
+
+        await viewModel.importAlbums(from: URL(fileURLWithPath: "/tmp/import.json"))
+
+        #expect(!viewModel.isEmpty)
+    }
+
+    @Test @MainActor
     func shuffleAlbums_preservesItemCount() {
         let (viewModel, _, _, _) = makeViewModel()
         for fixture in AlbumFixtures.baseTrio {
