@@ -138,10 +138,10 @@ CI runs `Scripts/check_core_imports.sh` — `MusicWall/Core/` must not import Mu
 
 ### Warnings policy
 
-- **App target (`MusicWall/`):** zero compiler warnings — `SWIFT_TREAT_WARNINGS_AS_ERRORS` and `GCC_TREAT_WARNINGS_AS_ERRORS` are enabled on the app target. CI fails at compile time if a PR introduces an app warning.
-- **Test targets:** warnings are **reported** by `Scripts/check_warnings.sh` in `ci_tests` but do not fail CI in v1 (ViewInspector Sendable backlog).
-- **Tooling noise:** `appintentsmetadataprocessor` "Metadata extraction skipped" lines are allowlisted.
-- **Future:** phase 2 will gate test-target warnings; phase 3+ evaluates `SWIFT_STRICT_CONCURRENCY` and Swift 6.
+- **All targets (`MusicWall/`, `MusicWallTests/`, `MusicWallUITests/`):** zero compiler warnings — `SWIFT_TREAT_WARNINGS_AS_ERRORS` and `GCC_TREAT_WARNINGS_AS_ERRORS` are enabled on the app and both test targets. CI fails at compile time if a PR introduces a warning in any target.
+- **Tooling noise:** `appintentsmetadataprocessor` "Metadata extraction skipped" lines are allowlisted in `Scripts/check_warnings.sh` (report-only).
+- **Future:** phase 3 evaluates `SWIFT_STRICT_CONCURRENCY` on the app target; phase 4 assesses Swift 6 language mode.
+- **Specs:** Phase 1 — `docs/specs/2026-06-08-swift-warnings-strategy-design.md`; Phase 2 — `docs/specs/2026-06-08-swift-warnings-phase2-design.md`.
 
 ### Xcode project
 

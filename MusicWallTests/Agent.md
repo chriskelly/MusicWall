@@ -70,12 +70,6 @@ Scripts/check_warnings.sh build/xcodebuild.log
 
 Or re-use the log from `bundle exec fastlane ci_tests` (`build/xcodebuild.log`).
 
-Test-target warnings are reported but do not fail CI (`FAIL_ON_TEST_WARNINGS` defaults to `false`). To simulate phase 2 locally:
-
-```bash
-FAIL_ON_TEST_WARNINGS=true Scripts/check_warnings.sh build/xcodebuild.log
-```
-
 ## UI tests
 
 ### Launch arguments
@@ -202,6 +196,6 @@ Keep `MusicWallTests` and `MusicWallUITests` in the shared `MusicWall` scheme `T
 | Target | CI behavior |
 |--------|-------------|
 | `MusicWall/` app source | Compile fails on any warning |
-| `MusicWallTests/`, `MusicWallUITests/` | Reported in `check_warnings.sh` summary; v1 does not fail |
+| `MusicWallTests/`, `MusicWallUITests/` | Compile fails on any warning |
 
-Known test backlog: ViewInspector `Sendable` extensions and unnecessary `try` in view tests. Fix in a follow-on PR before enabling `FAIL_ON_TEST_WARNINGS=true`.
+ViewInspector `InspectionEmissary` shim lives in `TestSupport/ViewInspector+MusicWall.swift` (`@retroactive`, `@unchecked Sendable` if needed). `Scripts/check_warnings.sh` still prints a bucket summary in CI logs but enforcement is compiler-first.
