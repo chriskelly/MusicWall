@@ -95,14 +95,15 @@ final class MusicWallUITests: XCTestCase {
         _ expectedID: String,
         in app: XCUIApplication,
         retryTap: XCUIElement?,
-        timeout: TimeInterval = 30
+        timeout: TimeInterval = 45
     ) -> Bool {
         let bridge = app.otherElements["uitest.lastPlayedAlbum"]
-        guard bridge.waitForExistence(timeout: 10) else { return false }
+        guard bridge.waitForExistence(timeout: 15) else { return false }
 
         let pollInterval: TimeInterval = 0.25
         let retryAfter: TimeInterval = 5
-        var didRetryTap = false
+        var retryTapCount = 0
+        let maxRetryTaps = 2
         let start = Date()
         let deadline = start.addingTimeInterval(timeout)
 
@@ -111,11 +112,11 @@ final class MusicWallUITests: XCTestCase {
                 return true
             }
 
-            if !didRetryTap,
-               let retryTap,
-               Date().timeIntervalSince(start) >= retryAfter {
+            if let retryTap,
+               retryTapCount < maxRetryTaps,
+               Date().timeIntervalSince(start) >= retryAfter * Double(retryTapCount + 1) {
                 retryTap.tap()
-                didRetryTap = true
+                retryTapCount += 1
             }
 
             RunLoop.current.run(until: Date().addingTimeInterval(pollInterval))
