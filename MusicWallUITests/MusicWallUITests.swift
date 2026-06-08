@@ -33,6 +33,21 @@ final class MusicWallUITests: XCTestCase {
         )
     }
 
+    func testLaunch_emptyCollection_showsWelcomeAndAddFlow() throws {
+        let app = launchApp(scenario: "emptyCollection")
+        XCTAssertTrue(app.navigationBars["My Albums"].waitForExistence(timeout: 10))
+
+        let welcome = app.otherElements["home.emptyWelcome"]
+        XCTAssertTrue(welcome.waitForExistence(timeout: 10))
+
+        app.buttons["home.emptyWelcome.addAlbum"].tap()
+        XCTAssertTrue(app.navigationBars["Find Album"].waitForExistence(timeout: 5))
+
+        app.buttons["search.cancel"].tap()
+        XCTAssertTrue(app.navigationBars["My Albums"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.navigationBars["Find Album"].exists)
+    }
+
     func testSearchSheet_openAndDismiss() throws {
         let app = launchApp(scenario: "savedLibrary")
         XCTAssertTrue(app.staticTexts["Take Care"].waitForExistence(timeout: 10))

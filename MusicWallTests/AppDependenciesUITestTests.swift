@@ -29,4 +29,13 @@ struct AppDependenciesUITestTests {
         #expect(records == nil || records?.isEmpty == true)
         #expect(backupIDs == UITestFixtures.backupIDs)
     }
+
+    @Test
+    func uiTest_emptyCollection_seedsNoAlbums() {
+        let deps = AppDependencies.uiTest(scenario: .emptyCollection)
+        let records = deps.preferencesStore.load([AlbumRecord].self, for: .albumRecordsItems)
+        let backupIDs = deps.preferencesStore.load([String].self, for: .backupAlbumIDs)
+        #expect(records == nil || records?.isEmpty == true)
+        #expect(backupIDs == nil || backupIDs?.isEmpty == true)
+    }
 }

@@ -45,6 +45,8 @@ struct AppDependencies {
             preferences.save(UITestFixtures.baseTrio, for: .albumRecordsItems)
         case .restoreFromBackup:
             preferences.save(UITestFixtures.backupIDs, for: .backupAlbumIDs)
+        case .emptyCollection:
+            break
         }
 
         return AppDependencies(
