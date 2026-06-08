@@ -1,5 +1,6 @@
 import CarPlay
 
+@MainActor
 enum CarPlaySetupTemplate {
     static func make() -> CPInformationTemplate {
         let item = CPInformationItem(

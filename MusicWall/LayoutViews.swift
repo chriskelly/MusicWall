@@ -77,10 +77,9 @@ struct GridLayout: View {
                         )
                         .onTapGesture {
                             Task {
-                                await AlbumTapCoordinator.handleTap(
+                                selectedAlbumID = await AlbumTapCoordinator.handleTap(
                                     albumID: AlbumID(rawValue: album.id.rawValue),
                                     rawSelectedID: selectedAlbumID,
-                                    setSelected: { selectedAlbumID = $0 },
                                     playback: playback
                                 )
                             }
@@ -180,10 +179,9 @@ struct ListLayout: View {
                     listItem(album)
                         .onTapGesture {
                             Task {
-                                await AlbumTapCoordinator.handleTap(
+                                selectedAlbumID = await AlbumTapCoordinator.handleTap(
                                     albumID: AlbumID(rawValue: album.id.rawValue),
                                     rawSelectedID: selectedAlbumID,
-                                    setSelected: { selectedAlbumID = $0 },
                                     playback: playback
                                 )
                             }

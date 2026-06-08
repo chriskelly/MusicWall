@@ -6,12 +6,10 @@ import Testing
     @Test func deselectPausesAndClearsSelection() async {
         let playback = MockPlaybackController()
         let albumID = AlbumID(rawValue: "album-1")
-        var selected: String? = "album-1"
 
-        await AlbumTapCoordinator.handleTap(
+        let selected = await AlbumTapCoordinator.handleTap(
             albumID: albumID,
-            rawSelectedID: selected,
-            setSelected: { selected = $0 },
+            rawSelectedID: "album-1",
             playback: playback
         )
 
@@ -23,12 +21,10 @@ import Testing
     @Test func newSelectionPlaysAlbum() async {
         let playback = MockPlaybackController()
         let albumID = AlbumID(rawValue: "album-2")
-        var selected: String? = nil
 
-        await AlbumTapCoordinator.handleTap(
+        let selected = await AlbumTapCoordinator.handleTap(
             albumID: albumID,
-            rawSelectedID: selected,
-            setSelected: { selected = $0 },
+            rawSelectedID: nil,
             playback: playback
         )
 

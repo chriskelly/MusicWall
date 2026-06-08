@@ -1,6 +1,7 @@
 import CarPlay
 import UIKit
 
+@MainActor
 enum CarPlayBarButtons {
     static func shuffle(handler: @escaping @MainActor (CPBarButton) -> Void) -> CPBarButton {
         imageButton(systemName: "shuffle", handler: handler)
@@ -15,7 +16,7 @@ enum CarPlayBarButtons {
         handler: @escaping @MainActor (CPBarButton) -> Void
     ) -> CPBarButton {
         CPBarButton(image: symbolImage(systemName)) { button in
-            Task { @MainActor in
+            MainActor.assumeIsolated {
                 handler(button)
             }
         }
