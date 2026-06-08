@@ -5,7 +5,8 @@
 
 import Foundation
 
-struct ImageCache {
+// FileManager is not Sendable; cache reads/writes use a dedicated directory synchronously.
+struct ImageCache: @unchecked Sendable {
     private let artworkProvider: any ArtworkProvider
     private let session: any URLSessionDataProviding
     private let fileManager: FileManager

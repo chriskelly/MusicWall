@@ -14,6 +14,6 @@
 
 - [ ] Unit tests added/updated where logic changed
 - [ ] `bundle exec fastlane ci_tests` passes locally (including coverage gate)
-- [ ] No new compiler warnings in any target (CI enforces via warnings-as-errors on `MusicWall`, `MusicWallTests`, `MusicWallUITests`)
+- [ ] No new compiler warnings in any target (CI enforces via warnings-as-errors; app target also uses `SWIFT_STRICT_CONCURRENCY = complete`)
 
 <!-- Preview workflow posts build number on this PR -->
