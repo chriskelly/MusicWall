@@ -194,15 +194,17 @@ platform :ios do
   lane :ci_tests do
     sh("../Scripts/check_core_imports.sh")
     result_bundle = "../build/MusicWallTestResults.xcresult"
+    build_log = "../build/xcodebuild.log"
     sh("rm -rf #{result_bundle}")
     sh("mkdir -p ../build")
     sh(
-      "xcodebuild test -project ../#{XCODEPROJ} -scheme #{SCHEME} " \
+      "set -o pipefail && xcodebuild test -project ../#{XCODEPROJ} -scheme #{SCHEME} " \
       "-destination 'platform=iOS Simulator,name=iPhone 17' " \
       "-enableCodeCoverage YES " \
-      "-resultBundlePath #{result_bundle}"
+      "-resultBundlePath #{result_bundle} 2>&1 | tee #{build_log}"
     )
     sh("../Scripts/check_coverage.sh #{result_bundle}")
+    sh("../Scripts/check_warnings.sh #{build_log}")
   end
 
   desc "TestFlight Release workflow: internal TestFlight upload"

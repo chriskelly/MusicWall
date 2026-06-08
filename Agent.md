@@ -136,6 +136,13 @@ CI runs `Scripts/check_core_imports.sh` — `MusicWall/Core/` must not import Mu
 - Prefer compiler-driven safety over force-unwraps.
 - Add **unit tests** under `MusicWallTests/` for pure logic and composition-root smoke coverage — not required for every UI tweak.
 
+### Warnings policy
+
+- **App target (`MusicWall/`):** zero compiler warnings — `SWIFT_TREAT_WARNINGS_AS_ERRORS` and `GCC_TREAT_WARNINGS_AS_ERRORS` are enabled on the app target. CI fails at compile time if a PR introduces an app warning.
+- **Test targets:** warnings are **reported** by `Scripts/check_warnings.sh` in `ci_tests` but do not fail CI in v1 (ViewInspector Sendable backlog).
+- **Tooling noise:** `appintentsmetadataprocessor` "Metadata extraction skipped" lines are allowlisted.
+- **Future:** phase 2 will gate test-target warnings; phase 3+ evaluates `SWIFT_STRICT_CONCURRENCY` and Swift 6.
+
 ### Xcode project
 
 - Target uses **filesystem-synchronized** `MusicWall/` group — new Swift files under `MusicWall/` are picked up automatically.
@@ -203,6 +210,7 @@ Agents: reference secret **names** only; never print or commit values.
 - Design: `docs/specs/2026-05-24-ios-cicd-design.md`
 - Implementation plan: `docs/plans/2026-05-24-ios-cicd.md`
 - **Testability refactor (completed):** layered `Core/` / `Adapters/` / `Features/` — history in `docs/specs/2026-05-27-pr-02-core-album-sorter-design.md` through `docs/specs/2026-05-31-pr-14-coverage-cleanup-design.md`. Active policy: this file (architecture) and `MusicWallTests/Agent.md` (tests and coverage).
+- **Warnings gate:** `docs/specs/2026-06-08-swift-warnings-strategy-design.md`
 
 ## Common failures
 

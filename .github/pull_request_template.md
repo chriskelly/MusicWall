@@ -14,5 +14,6 @@
 
 - [ ] Unit tests added/updated where logic changed
 - [ ] `bundle exec fastlane ci_tests` passes locally (including coverage gate)
+- [ ] No new app compiler warnings (CI enforces via warnings-as-errors on `MusicWall` target)
 
 <!-- Preview workflow posts build number on this PR -->
