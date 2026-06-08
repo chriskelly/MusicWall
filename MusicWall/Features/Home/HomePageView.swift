@@ -8,13 +8,17 @@
 import SwiftUI
 import UIKit
 
+private struct ExportSheetItem: Identifiable {
+    let id = UUID()
+    let url: URL
+}
+
 struct HomePageView: View {
     @Bindable var viewModel: HomeViewModel
     let dependencies: AppDependencies
     @State private var showingAddView = false
     @State private var showingFileImporter = false
-    @State private var exportedFileURL: URL?
-    @State private var showingExportShareSheet = false
+    @State private var exportSheetItem: ExportSheetItem?
 
     var body: some View {
         NavigationStack {
@@ -47,10 +51,8 @@ struct HomePageView: View {
         ) { result in
             handleFileImport(result: result)
         }
-        .sheet(isPresented: $showingExportShareSheet) {
-            if let url = exportedFileURL {
-                ShareSheet(activityItems: [url])
-            }
+        .sheet(item: $exportSheetItem) { item in
+            ShareSheet(activityItems: [item.url])
         }
         .task { await viewModel.load() }
     }
@@ -125,8 +127,7 @@ struct HomePageView: View {
     private func handleExport() {
         switch viewModel.exportAlbums() {
         case .success(let url):
-            exportedFileURL = url
-            showingExportShareSheet = true
+            exportSheetItem = ExportSheetItem(url: url)
         case .snackbar(let state):
             viewModel.snackbar = state
         }
