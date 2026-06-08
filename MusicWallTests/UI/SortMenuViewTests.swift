@@ -25,7 +25,7 @@ struct SortMenuViewTests {
     @MainActor
     private func directionArrowName(in button: InspectableView<ViewType.Button>) throws -> String? {
         let label = try button.labelView()
-        let images = try label.findAll(ViewType.Image.self)
+        let images = label.findAll(ViewType.Image.self)
         guard let image = images.first else { return nil }
         return try image.actualImage().name()
     }

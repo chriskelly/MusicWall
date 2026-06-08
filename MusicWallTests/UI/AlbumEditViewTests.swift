@@ -12,7 +12,8 @@ struct AlbumEditViewTests {
         try await ViewHosting.host(view) {
             try await view.inspection.inspect { inspected in
                 let save = try inspected.find(button: "Save")
-                #expect(try save.isDisabled())
+                let disabled = save.isDisabled()
+                #expect(disabled)
             }
         }
     }
@@ -25,7 +26,8 @@ struct AlbumEditViewTests {
         try await ViewHosting.host(view) {
             try await view.inspection.inspect { inspected in
                 let save = try inspected.find(button: "Save")
-                #expect(try save.isDisabled() == false)
+                let disabled = save.isDisabled()
+                #expect(disabled == false)
             }
         }
     }

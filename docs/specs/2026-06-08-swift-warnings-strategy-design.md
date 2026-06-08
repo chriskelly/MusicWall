@@ -158,7 +158,7 @@ Known warnings to appear in CI report output (~5–8):
 
 | Phase | Action |
 |-------|--------|
-| 2 | Fix test-target warnings; set **`FAIL_ON_TEST_WARNINGS=true`** or extend **`TREAT_WARNINGS_AS_ERRORS`** to test targets |
+| 2 | **Done** — test-target warnings fixed; `TREAT_WARNINGS_AS_ERRORS` on test targets. See `docs/specs/2026-06-08-swift-warnings-phase2-design.md` |
 | 3 | Evaluate **`SWIFT_STRICT_CONCURRENCY = complete`** on app target |
 | 4 | Swift 6 language mode assessment |
 
