@@ -229,9 +229,52 @@ struct HomeViewModelTests {
     }
 
     @Test @MainActor
+    func previewEmpty_isLoadedWithNoAlbums() {
+        let viewModel = HomeViewModel.previewEmpty(dependencies: AppDependencies.preview())
+        #expect(viewModel.hasLoaded)
+        #expect(viewModel.isEmpty)
+    }
+
+    @Test @MainActor
     func isEmpty_trueWhenStoreEmpty() {
         let (viewModel, _, _, _) = makeViewModel()
         #expect(viewModel.isEmpty)
+    }
+
+    @Test @MainActor
+    func load_emptyStore_staysEmptyAfterLoad() async {
+        let (viewModel, _, _, _) = makeViewModel()
+        await viewModel.load()
+        #expect(viewModel.hasLoaded)
+        #expect(viewModel.isEmpty)
+    }
+
+    @Test @MainActor
+    func load_withSavedAlbums_isNotEmpty() async {
+        let preferences = InMemoryPreferencesStore()
+        preferences.save(
+            [AlbumFixtures.record(id: "saved", title: "Saved", artistName: "Artist")],
+            for: .albumRecordsItems
+        )
+        let viewModel = HomeViewModel(
+            preferences: preferences,
+            repository: MockAlbumRepository(),
+            backup: MockAlbumBackupService()
+        )
+
+        await viewModel.load()
+
+        #expect(viewModel.hasLoaded)
+        #expect(!viewModel.isEmpty)
+    }
+
+    @Test @MainActor
+    func currentSort_and_isAscending_reflectStore() {
+        let (viewModel, _, _, _) = makeViewModel()
+        viewModel.store.currentSort = .title
+        viewModel.store.sortDirection[.title] = false
+        #expect(viewModel.currentSort == .title)
+        #expect(!viewModel.isAscending(for: .title))
     }
 
     @Test @MainActor
