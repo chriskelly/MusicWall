@@ -106,7 +106,7 @@ final class CarPlayCoordinator {
     }
 
     private func setRootTemplate(_ template: CPTemplate) async {
-        try? await interfaceController.setRootTemplate(template, animated: true)
+        _ = try? await interfaceController.setRootTemplate(template, animated: true)
     }
 
     private func shuffleAndRefresh() async {

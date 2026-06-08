@@ -59,6 +59,23 @@ Set `FAIL_CI=false` to print the report without failing locally:
 FAIL_CI=false Scripts/check_coverage.sh build/MusicWallTestResults.xcresult
 ```
 
+Inspect warnings report only (after a test run produced a log):
+
+```bash
+xcodebuild test -project MusicWall.xcodeproj -scheme MusicWall \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  2>&1 | tee build/xcodebuild.log
+Scripts/check_warnings.sh build/xcodebuild.log
+```
+
+Or re-use the log from `bundle exec fastlane ci_tests` (`build/xcodebuild.log`).
+
+Test-target warnings are reported but do not fail CI (`FAIL_ON_TEST_WARNINGS` defaults to `false`). To simulate phase 2 locally:
+
+```bash
+FAIL_ON_TEST_WARNINGS=true Scripts/check_warnings.sh build/xcodebuild.log
+```
+
 ## UI tests
 
 ### Launch arguments
@@ -179,3 +196,12 @@ Keep `MusicWallTests` and `MusicWallUITests` in the shared `MusicWall` scheme `T
 
 - Default: Swift Testing
 - UI tests: XCTest / XCUITest only
+
+## Warnings policy
+
+| Target | CI behavior |
+|--------|-------------|
+| `MusicWall/` app source | Compile fails on any warning |
+| `MusicWallTests/`, `MusicWallUITests/` | Reported in `check_warnings.sh` summary; v1 does not fail |
+
+Known test backlog: ViewInspector `Sendable` extensions and unnecessary `try` in view tests. Fix in a follow-on PR before enabling `FAIL_ON_TEST_WARNINGS=true`.
