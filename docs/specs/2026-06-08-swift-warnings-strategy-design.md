@@ -160,7 +160,7 @@ Known warnings to appear in CI report output (~5–8):
 |-------|--------|
 | 2 | **Done** — test-target warnings fixed; `TREAT_WARNINGS_AS_ERRORS` on test targets. See `docs/specs/2026-06-08-swift-warnings-phase2-design.md` |
 | 3 | **Done** — strict concurrency on app target. See `docs/specs/2026-06-08-swift-warnings-phase3-design.md` |
-| 4 | Swift 6 language mode assessment |
+| 4 | **Done** — Swift 6 language mode on all targets. See `docs/specs/2026-06-08-swift-warnings-phase4-design.md` |
 
 ## Documentation
 
