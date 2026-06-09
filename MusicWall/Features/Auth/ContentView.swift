@@ -42,12 +42,6 @@ struct ContentView: View {
         .task {
             await viewModel.checkAuthorization()
         }
-        .overlay {
-            if UITestConfiguration.isEnabled,
-               let playback = dependencies.playbackController as? UITestPlaybackController {
-                UITestStateReader(playback: playback)
-            }
-        }
     }
 
     private func authorizationDeniedView() -> some View {
