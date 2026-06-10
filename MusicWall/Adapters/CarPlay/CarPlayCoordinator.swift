@@ -30,6 +30,8 @@ final class CarPlayCoordinator {
     private var loadedArtworkPixelSize: Int?
     private var albumLibraryTemplate: CPListTemplate?
     private var artworkLoadGeneration = 0
+    private var shuffleBarButton: CPBarButton?
+    private var isShuffling = false
 
     init(
         interfaceController: CPInterfaceController,
@@ -164,12 +166,19 @@ final class CarPlayCoordinator {
     private func configureBarButtons(for template: CPListTemplate) {
         template.backButton = nil
         template.leadingNavigationBarButtons = []
-        template.trailingNavigationBarButtons = [
-            CarPlayBarButtons.shuffle { [weak self] _ in
-                guard let self else { return }
-                Task { await self.shuffleAndRefresh() }
-            },
-        ]
+        let shuffle = CarPlayBarButtons.shuffle { [weak self] _ in
+            guard let self else { return }
+            Task { await self.shuffleAndRefresh() }
+        }
+        shuffleBarButton = shuffle
+        template.trailingNavigationBarButtons = [shuffle]
+    }
+
+    private func setShuffleBarButtonLoading(_ isLoading: Bool) {
+        shuffleBarButton?.isEnabled = !isLoading
+        shuffleBarButton?.image = isLoading
+            ? CarPlayBarButtons.shuffleBusyImage()
+            : CarPlayBarButtons.shuffleImage()
     }
 
     private func setRootTemplate(_ template: CPTemplate, animated: Bool) async {
@@ -177,6 +186,14 @@ final class CarPlayCoordinator {
     }
 
     private func shuffleAndRefresh() async {
+        guard !isShuffling else { return }
+        isShuffling = true
+        setShuffleBarButtonLoading(true)
+        defer {
+            isShuffling = false
+            setShuffleBarButtonLoading(false)
+        }
+
         artworkLoadGeneration += 1
         store.temporarilyShuffle()
         await presentAlbumLibrary(store.items, presentation: .shuffle)
