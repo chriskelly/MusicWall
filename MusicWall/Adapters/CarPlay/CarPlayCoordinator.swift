@@ -5,15 +5,15 @@ import UIKit
 final class CarPlayCoordinator {
     private struct AlbumLibraryPresentation: Equatable {
         let animated: Bool
-        let skipArtworkLoadWhenCached: Bool
+        let loadsArtworkInBackground: Bool
 
         static let connect = AlbumLibraryPresentation(
             animated: true,
-            skipArtworkLoadWhenCached: false
+            loadsArtworkInBackground: true
         )
         static let shuffle = AlbumLibraryPresentation(
             animated: false,
-            skipArtworkLoadWhenCached: true
+            loadsArtworkInBackground: false
         )
     }
 
@@ -29,6 +29,7 @@ final class CarPlayCoordinator {
     private var artworkByKey: [ArtworkCacheKey: UIImage] = [:]
     private var loadedArtworkPixelSize: Int?
     private var albumLibraryTemplate: CPListTemplate?
+    private var artworkLoadGeneration = 0
 
     init(
         interfaceController: CPInterfaceController,
@@ -80,12 +81,47 @@ final class CarPlayCoordinator {
 
         let placeholder = CarPlayImageRowBuilder.placeholderImage()
         let pixelSize = artworkPixelSize()
-        let shouldLoadArtwork = !presentation.skipArtworkLoadWhenCached
-            || !isArtworkCached(for: albums, pixelSize: pixelSize)
-        if shouldLoadArtwork {
-            await ensureArtworkLoaded(for: albums, pixelSize: pixelSize)
+        resetArtworkCacheIfNeeded(pixelSize: pixelSize)
+
+        guard
+            let template = buildAlbumLibraryTemplate(
+                albums: albums,
+                pixelSize: pixelSize,
+                placeholder: placeholder
+            )
+        else {
+            albumLibraryTemplate = nil
+            await setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
+            return
         }
 
+        await applyAlbumLibraryTemplate(template, presentation: presentation)
+
+        guard !isArtworkCached(for: albums, pixelSize: pixelSize) else { return }
+
+        let generation = artworkLoadGeneration
+        if presentation.loadsArtworkInBackground {
+            Task {
+                await loadMissingArtworkAndRefresh(
+                    albums: albums,
+                    pixelSize: pixelSize,
+                    generation: generation
+                )
+            }
+        } else {
+            await loadMissingArtworkAndRefresh(
+                albums: albums,
+                pixelSize: pixelSize,
+                generation: generation
+            )
+        }
+    }
+
+    private func buildAlbumLibraryTemplate(
+        albums: [AlbumRecord],
+        pixelSize: Int,
+        placeholder: UIImage
+    ) -> CPListTemplate? {
         let imageForAlbum: (AlbumID) -> UIImage = { [artworkByKey] albumID in
             let key = ArtworkCacheKey(albumID: albumID, pixelSize: pixelSize)
             return artworkByKey[key] ?? placeholder
@@ -95,19 +131,11 @@ final class CarPlayCoordinator {
             Task { await self.play(albumID: albumID) }
         }
 
-        guard
-            let template = CarPlayImageRowBuilder.makeAlbumLibraryTemplate(
-                albums: albums,
-                imageForAlbum: imageForAlbum,
-                onSelectAlbum: onSelectAlbum
-            )
-        else {
-            albumLibraryTemplate = nil
-            await setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
-            return
-        }
-
-        await applyAlbumLibraryTemplate(template, presentation: presentation)
+        return CarPlayImageRowBuilder.makeAlbumLibraryTemplate(
+            albums: albums,
+            imageForAlbum: imageForAlbum,
+            onSelectAlbum: onSelectAlbum
+        )
     }
 
     private func applyAlbumLibraryTemplate(
@@ -149,8 +177,15 @@ final class CarPlayCoordinator {
     }
 
     private func shuffleAndRefresh() async {
+        artworkLoadGeneration += 1
         store.temporarilyShuffle()
         await presentAlbumLibrary(store.items, presentation: .shuffle)
+    }
+
+    private func resetArtworkCacheIfNeeded(pixelSize: Int) {
+        guard loadedArtworkPixelSize != pixelSize else { return }
+        artworkByKey.removeAll()
+        loadedArtworkPixelSize = pixelSize
     }
 
     private func isArtworkCached(
@@ -166,36 +201,62 @@ final class CarPlayCoordinator {
         try? await dependencies.playbackController.play(albumId: albumID)
     }
 
+    private func loadMissingArtworkAndRefresh(
+        albums: [AlbumRecord],
+        pixelSize: Int,
+        generation: Int
+    ) async {
+        await ensureArtworkLoaded(for: albums, pixelSize: pixelSize)
+        guard generation == artworkLoadGeneration else { return }
+        guard let existing = albumLibraryTemplate else { return }
+
+        let placeholder = CarPlayImageRowBuilder.placeholderImage()
+        guard
+            let template = buildAlbumLibraryTemplate(
+                albums: albums,
+                pixelSize: pixelSize,
+                placeholder: placeholder
+            )
+        else { return }
+
+        existing.updateSections(template.sections)
+        configureBarButtons(for: existing)
+    }
+
     private func ensureArtworkLoaded(
         for albums: [AlbumRecord],
         pixelSize: Int
     ) async {
-        if loadedArtworkPixelSize != pixelSize {
-            artworkByKey.removeAll()
-            loadedArtworkPixelSize = pixelSize
+        let missing = albums.filter { album in
+            artworkByKey[ArtworkCacheKey(albumID: album.id, pixelSize: pixelSize)] == nil
         }
+        guard !missing.isEmpty else { return }
 
-        for album in albums {
-            let key = ArtworkCacheKey(
-                albumID: album.id,
-                pixelSize: pixelSize
-            )
-            if artworkByKey[key] != nil {
-                continue
+        await withTaskGroup(of: (ArtworkCacheKey, UIImage)?.self) { group in
+            for album in missing {
+                let albumID = album.id
+                let key = ArtworkCacheKey(albumID: albumID, pixelSize: pixelSize)
+                group.addTask { [imageCache] in
+                    guard
+                        let url = await imageCache.getArtwork(
+                            albumID: albumID.rawValue,
+                            size: pixelSize
+                        )
+                    else { return nil }
+
+                    guard
+                        let data = try? Data(contentsOf: url),
+                        let image = UIImage(data: data)
+                    else { return nil }
+
+                    return (key, image)
+                }
             }
 
-            guard
-                let url = await imageCache.getArtwork(
-                    albumID: album.id.rawValue,
-                    size: pixelSize
-                )
-            else { continue }
-
-            guard
-                let data = try? Data(contentsOf: url),
-                let image = UIImage(data: data)
-            else { continue }
-            artworkByKey[key] = image
+            for await result in group {
+                guard let (key, image) = result else { continue }
+                artworkByKey[key] = image
+            }
         }
     }
 }
