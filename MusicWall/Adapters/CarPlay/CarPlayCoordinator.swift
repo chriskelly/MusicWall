@@ -3,7 +3,7 @@ import UIKit
 
 @MainActor
 final class CarPlayCoordinator {
-    private struct AlbumLibraryPresentation {
+    private struct AlbumLibraryPresentation: Equatable {
         let animated: Bool
         let skipArtworkLoadWhenCached: Bool
 
@@ -28,6 +28,7 @@ final class CarPlayCoordinator {
     private let imageCache: ImageCache
     private var artworkByKey: [ArtworkCacheKey: UIImage] = [:]
     private var loadedArtworkPixelSize: Int?
+    private var albumLibraryTemplate: CPListTemplate?
 
     init(
         interfaceController: CPInterfaceController,
@@ -60,6 +61,7 @@ final class CarPlayCoordinator {
         )
         switch screen {
         case .setupRequired:
+            albumLibraryTemplate = nil
             await setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
         case .albumLibrary(let albums):
             await presentAlbumLibrary(albums, presentation: .connect)
@@ -71,6 +73,7 @@ final class CarPlayCoordinator {
         presentation: AlbumLibraryPresentation
     ) async {
         guard #available(iOS 26.0, *) else {
+            albumLibraryTemplate = nil
             await setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
             return
         }
@@ -99,10 +102,25 @@ final class CarPlayCoordinator {
                 onSelectAlbum: onSelectAlbum
             )
         else {
+            albumLibraryTemplate = nil
             await setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
             return
         }
 
+        await applyAlbumLibraryTemplate(template, presentation: presentation)
+    }
+
+    private func applyAlbumLibraryTemplate(
+        _ template: CPListTemplate,
+        presentation: AlbumLibraryPresentation
+    ) async {
+        if presentation == .shuffle, let existing = albumLibraryTemplate {
+            existing.updateSections(template.sections)
+            configureBarButtons(for: existing)
+            return
+        }
+
+        albumLibraryTemplate = template
         configureBarButtons(for: template)
         await setRootTemplate(template, animated: presentation.animated)
     }
