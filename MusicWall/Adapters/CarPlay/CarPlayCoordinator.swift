@@ -3,6 +3,20 @@ import UIKit
 
 @MainActor
 final class CarPlayCoordinator {
+    private struct AlbumLibraryPresentation {
+        let animated: Bool
+        let skipArtworkLoadWhenCached: Bool
+
+        static let connect = AlbumLibraryPresentation(
+            animated: true,
+            skipArtworkLoadWhenCached: false
+        )
+        static let shuffle = AlbumLibraryPresentation(
+            animated: false,
+            skipArtworkLoadWhenCached: true
+        )
+    }
+
     private struct ArtworkCacheKey: Hashable {
         let albumID: AlbumID
         let pixelSize: Int
@@ -46,21 +60,28 @@ final class CarPlayCoordinator {
         )
         switch screen {
         case .setupRequired:
-            await setRootTemplate(CarPlaySetupTemplate.make())
+            await setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
         case .albumLibrary(let albums):
-            await presentAlbumLibrary(albums)
+            await presentAlbumLibrary(albums, presentation: .connect)
         }
     }
 
-    private func presentAlbumLibrary(_ albums: [AlbumRecord]) async {
+    private func presentAlbumLibrary(
+        _ albums: [AlbumRecord],
+        presentation: AlbumLibraryPresentation
+    ) async {
         guard #available(iOS 26.0, *) else {
-            await setRootTemplate(CarPlaySetupTemplate.make())
+            await setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
             return
         }
 
         let placeholder = CarPlayImageRowBuilder.placeholderImage()
         let pixelSize = artworkPixelSize()
-        await ensureArtworkLoaded(for: albums, pixelSize: pixelSize)
+        let shouldLoadArtwork = !presentation.skipArtworkLoadWhenCached
+            || !isArtworkCached(for: albums, pixelSize: pixelSize)
+        if shouldLoadArtwork {
+            await ensureArtworkLoaded(for: albums, pixelSize: pixelSize)
+        }
 
         let imageForAlbum: (AlbumID) -> UIImage = { [artworkByKey] albumID in
             let key = ArtworkCacheKey(albumID: albumID, pixelSize: pixelSize)
@@ -78,12 +99,12 @@ final class CarPlayCoordinator {
                 onSelectAlbum: onSelectAlbum
             )
         else {
-            await setRootTemplate(CarPlaySetupTemplate.make())
+            await setRootTemplate(CarPlaySetupTemplate.make(), animated: true)
             return
         }
 
         configureBarButtons(for: template)
-        await setRootTemplate(template)
+        await setRootTemplate(template, animated: presentation.animated)
     }
 
     @available(iOS 26.0, *)
@@ -105,13 +126,22 @@ final class CarPlayCoordinator {
         ]
     }
 
-    private func setRootTemplate(_ template: CPTemplate) async {
-        _ = try? await interfaceController.setRootTemplate(template, animated: true)
+    private func setRootTemplate(_ template: CPTemplate, animated: Bool) async {
+        _ = try? await interfaceController.setRootTemplate(template, animated: animated)
     }
 
     private func shuffleAndRefresh() async {
         store.temporarilyShuffle()
-        await presentAlbumLibrary(store.items)
+        await presentAlbumLibrary(store.items, presentation: .shuffle)
+    }
+
+    private func isArtworkCached(
+        for albums: [AlbumRecord],
+        pixelSize: Int
+    ) -> Bool {
+        albums.allSatisfy { album in
+            artworkByKey[ArtworkCacheKey(albumID: album.id, pixelSize: pixelSize)] != nil
+        }
     }
 
     private func play(albumID: AlbumID) async {
