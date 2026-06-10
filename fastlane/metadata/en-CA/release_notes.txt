@@ -1,1 +1,1 @@
-• Need to pick a new album on-the-go? Try our new Carplay app!
+Bug fixes and performance improvements (carplay loading was feeling a little slow 🐌)
