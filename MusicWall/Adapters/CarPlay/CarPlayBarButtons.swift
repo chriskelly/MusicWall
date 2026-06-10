@@ -4,7 +4,15 @@ import UIKit
 @MainActor
 enum CarPlayBarButtons {
     static func shuffle(handler: @escaping @MainActor (CPBarButton) -> Void) -> CPBarButton {
-        imageButton(systemName: "shuffle", handler: handler)
+        imageButton(image: shuffleImage(), handler: handler)
+    }
+
+    static func shuffleImage() -> UIImage {
+        symbolImage("shuffle")
+    }
+
+    static func shuffleBusyImage() -> UIImage {
+        symbolImage("clock.arrow.trianglehead.clockwise.rotate.90.path.dotted")
     }
 
     private static func symbolImage(_ name: String) -> UIImage {
@@ -12,10 +20,10 @@ enum CarPlayBarButtons {
     }
 
     private static func imageButton(
-        systemName: String,
+        image: UIImage,
         handler: @escaping @MainActor (CPBarButton) -> Void
     ) -> CPBarButton {
-        CPBarButton(image: symbolImage(systemName)) { button in
+        CPBarButton(image: image) { button in
             MainActor.assumeIsolated {
                 handler(button)
             }
