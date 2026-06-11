@@ -1,1 +1,1 @@
-Bug fixes and performance improvements (carplay loading was feeling a little slow 🐌)
+Bug fixes and performance improvements (carplay loading was feeling a little slow)
