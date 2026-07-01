@@ -53,7 +53,7 @@ final class ShareViewController: UIViewController {
         }
     }
 
-    private static func url(from item: NSSecureCoding?) -> URL? {
+    private nonisolated static func url(from item: NSSecureCoding?) -> URL? {
         if let url = item as? URL {
             return url
         }
