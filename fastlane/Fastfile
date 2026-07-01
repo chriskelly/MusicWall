@@ -55,8 +55,7 @@ def configure_appstore_signing
     use_automatic_signing: true,
     path: XCODEPROJ,
     team_id: TEAM_ID,
-    targets: [SHARE_EXTENSION_TARGET],
-    code_sign_identity: "Apple Distribution"
+    targets: [SHARE_EXTENSION_TARGET]
   )
 end
 
@@ -100,7 +99,6 @@ def build_appstore_ipa(marketing_version: nil, build_number: nil)
     export_method: "app-store",
     output_directory: "./build",
     clean: true,
-    codesigning_identity: "Apple Distribution",
     xcargs: xcargs,
     export_options: {
       provisioningProfiles: {
