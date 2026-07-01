@@ -6,6 +6,7 @@ XCODEPROJ = "MusicWall.xcodeproj"
 SCHEME = "MusicWall"
 TARGET = "MusicWall"
 BUNDLE_ID = ENV["APP_IDENTIFIER"] || "chris.MusicWall"
+SHARE_EXTENSION_BUNDLE_ID = "#{BUNDLE_ID}.ShareExtension"
 TEAM_ID = ENV["DEVELOPMENT_TEAM"] || "CD8XP2U645"
 
 def asc_key_params
@@ -48,11 +49,27 @@ def configure_appstore_signing
     profile_name: profile,
     code_sign_identity: "Apple Distribution"
   )
+
+  share_profile = appstore_profile_name_for(SHARE_EXTENSION_BUNDLE_ID)
+  update_code_signing_settings(
+    use_automatic_signing: false,
+    path: XCODEPROJ,
+    team_id: TEAM_ID,
+    targets: ["MusicWallShareExtension"],
+    bundle_identifier: SHARE_EXTENSION_BUNDLE_ID,
+    profile_name: share_profile,
+    code_sign_identity: "Apple Distribution"
+  )
+end
+
+def appstore_profile_name_for(bundle_id)
+  mapping = lane_context[SharedValues::MATCH_PROVISIONING_PROFILE_MAPPING] || {}
+  mapping[bundle_id] || "match AppStore #{bundle_id}"
 end
 
 def prepare_appstore_signing
   setup_ci if ENV["CI"]
-  match(type: "appstore", readonly: true, app_identifier: BUNDLE_ID)
+  match(type: "appstore", readonly: true, app_identifier: [BUNDLE_ID, SHARE_EXTENSION_BUNDLE_ID])
   configure_appstore_signing
 end
 

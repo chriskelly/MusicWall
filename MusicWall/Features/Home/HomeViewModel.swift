@@ -71,6 +71,17 @@ final class HomeViewModel {
         snackbar = SnackbarState(message: "Album successfully added!")
     }
 
+    func addSharedAlbum(id: String) async {
+        do {
+            try await store.importAlbums(from: [id])
+            albumAdded()
+        } catch {
+            snackbar = SnackbarState(
+                message: "Failed to add album: \(error.localizedDescription)"
+            )
+        }
+    }
+
     func exportAlbums() -> HomeExportResult {
         let albums = store.items
         do {
