@@ -39,18 +39,16 @@ def appstore_profile_name
 end
 
 def share_extension_profile_name
-  lane_context[SharedValues::SIGH_NAME]
+  @share_extension_profile_name || lane_context[SharedValues::SIGH_NAME]
 end
 
 def ensure_share_extension_app_identifier
   Spaceship::ConnectAPI.token = connect_api_token
-  existing = Spaceship::ConnectAPI::BundleId.all(filter: { identifier: SHARE_EXTENSION_BUNDLE_ID })
-  return if existing.any?
+  return if Spaceship::ConnectAPI::BundleId.find(SHARE_EXTENSION_BUNDLE_ID)
 
   Spaceship::ConnectAPI::BundleId.create(
     name: "MusicWall Share Extension",
-    identifier: SHARE_EXTENSION_BUNDLE_ID,
-    platform: Spaceship::ConnectAPI::BundleId::Platform::IOS
+    identifier: SHARE_EXTENSION_BUNDLE_ID
   )
   UI.success("Registered App ID #{SHARE_EXTENSION_BUNDLE_ID}")
 rescue StandardError => e
@@ -71,6 +69,7 @@ def prepare_share_extension_profile
     force: true,
     fail_on_name_taken: false
   )
+  @share_extension_profile_name = lane_context[SharedValues::SIGH_NAME]
 end
 
 def configure_appstore_signing
