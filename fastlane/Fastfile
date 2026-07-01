@@ -87,11 +87,12 @@ end
 
 def build_appstore_ipa(marketing_version: nil, build_number: nil)
   profile = appstore_profile_name
-  xcargs = {
-    DEVELOPMENT_TEAM: TEAM_ID
-  }
-  xcargs[:MARKETING_VERSION] = marketing_version if marketing_version
-  xcargs[:CURRENT_PROJECT_VERSION] = build_number.to_s if build_number
+  xcargs_parts = [
+    "DEVELOPMENT_TEAM=#{TEAM_ID}",
+    "-allowProvisioningUpdates"
+  ]
+  xcargs_parts << "MARKETING_VERSION=#{marketing_version}" if marketing_version
+  xcargs_parts << "CURRENT_PROJECT_VERSION=#{build_number}" if build_number
 
   build_app(
     scheme: SCHEME,
@@ -99,7 +100,7 @@ def build_appstore_ipa(marketing_version: nil, build_number: nil)
     export_method: "app-store",
     output_directory: "./build",
     clean: true,
-    xcargs: xcargs,
+    xcargs: xcargs_parts.join(" "),
     export_options: {
       provisioningProfiles: {
         BUNDLE_ID => profile
