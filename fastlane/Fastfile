@@ -89,8 +89,6 @@ end
 def build_appstore_ipa(marketing_version: nil, build_number: nil)
   profile = appstore_profile_name
   xcargs = {
-    CODE_SIGN_STYLE: "Manual",
-    PROVISIONING_PROFILE_SPECIFIER: profile,
     DEVELOPMENT_TEAM: TEAM_ID
   }
   xcargs[:MARKETING_VERSION] = marketing_version if marketing_version
