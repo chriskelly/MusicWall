@@ -7,6 +7,7 @@ SCHEME = "MusicWall"
 TARGET = "MusicWall"
 BUNDLE_ID = ENV["APP_IDENTIFIER"] || "chris.MusicWall"
 SHARE_EXTENSION_TARGET = "MusicWallShareExtension"
+SHARE_EXTENSION_BUNDLE_ID = "#{BUNDLE_ID}.ShareExtension"
 TEAM_ID = ENV["DEVELOPMENT_TEAM"] || "CD8XP2U645"
 
 def asc_key_params
@@ -37,8 +38,37 @@ def appstore_profile_name
   mapping[BUNDLE_ID] || "match AppStore #{BUNDLE_ID}"
 end
 
+def share_extension_profile_name
+  lane_context[SharedValues::SIGH_NAME]
+end
+
+def ensure_share_extension_app_identifier
+  produce(
+    api_key: asc_api_key,
+    app_identifier: SHARE_EXTENSION_BUNDLE_ID,
+    app_name: "MusicWall Share Extension",
+    skip_itc: true,
+    platform: "ios"
+  )
+rescue StandardError => e
+  UI.important("Share extension App ID may already exist: #{e.message}")
+end
+
+def prepare_share_extension_profile
+  ensure_share_extension_app_identifier
+  sigh(
+    api_key: asc_api_key,
+    app_identifier: SHARE_EXTENSION_BUNDLE_ID,
+    team_id: TEAM_ID,
+    force: true,
+    fail_on_name_taken: false
+  )
+end
+
 def configure_appstore_signing
-  profile = appstore_profile_name
+  main_profile = appstore_profile_name
+  extension_profile = share_extension_profile_name
+  UI.user_error!("Missing share extension provisioning profile from sigh") if extension_profile.to_s.empty?
 
   update_code_signing_settings(
     use_automatic_signing: false,
@@ -46,22 +76,25 @@ def configure_appstore_signing
     team_id: TEAM_ID,
     targets: [TARGET],
     bundle_identifier: BUNDLE_ID,
-    profile_name: profile,
+    profile_name: main_profile,
     code_sign_identity: "Apple Distribution"
   )
 
-  # Share extension uses automatic signing until a match profile is generated locally.
   update_code_signing_settings(
-    use_automatic_signing: true,
+    use_automatic_signing: false,
     path: XCODEPROJ,
     team_id: TEAM_ID,
-    targets: [SHARE_EXTENSION_TARGET]
+    targets: [SHARE_EXTENSION_TARGET],
+    bundle_identifier: SHARE_EXTENSION_BUNDLE_ID,
+    profile_name: extension_profile,
+    code_sign_identity: "Apple Distribution"
   )
 end
 
 def prepare_appstore_signing
   setup_ci if ENV["CI"]
   match(type: "appstore", readonly: true, app_identifier: BUNDLE_ID)
+  prepare_share_extension_profile
   configure_appstore_signing
 end
 
@@ -86,11 +119,9 @@ def set_target_version_in_project(marketing_version: nil, build_number: nil, xco
 end
 
 def build_appstore_ipa(marketing_version: nil, build_number: nil)
-  profile = appstore_profile_name
-  xcargs_parts = [
-    "DEVELOPMENT_TEAM=#{TEAM_ID}",
-    "-allowProvisioningUpdates"
-  ]
+  main_profile = appstore_profile_name
+  extension_profile = share_extension_profile_name
+  xcargs_parts = ["DEVELOPMENT_TEAM=#{TEAM_ID}"]
   xcargs_parts << "MARKETING_VERSION=#{marketing_version}" if marketing_version
   xcargs_parts << "CURRENT_PROJECT_VERSION=#{build_number}" if build_number
 
@@ -103,7 +134,8 @@ def build_appstore_ipa(marketing_version: nil, build_number: nil)
     xcargs: xcargs_parts.join(" "),
     export_options: {
       provisioningProfiles: {
-        BUNDLE_ID => profile
+        BUNDLE_ID => main_profile,
+        SHARE_EXTENSION_BUNDLE_ID => extension_profile
       }
     }
   )
