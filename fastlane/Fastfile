@@ -47,11 +47,15 @@ def ensure_share_extension_app_identifier
     api_key: asc_api_key,
     app_identifier: SHARE_EXTENSION_BUNDLE_ID,
     app_name: "MusicWall Share Extension",
-    skip_itc: true,
-    platform: "ios"
+    skip_itc: true
   )
 rescue StandardError => e
-  UI.important("Share extension App ID may already exist: #{e.message}")
+  message = e.message.downcase
+  if message.include?("already") || message.include?("exists") || message.include?("registered")
+    UI.important("Share extension App ID already exists: #{e.message}")
+  else
+    raise
+  end
 end
 
 def prepare_share_extension_profile
