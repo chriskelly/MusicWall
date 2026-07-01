@@ -14,7 +14,7 @@ final class ShareViewController: UIViewController {
         }
 
         let providers = extensionItems
-            .flatMap(\.attachments ?? [])
+            .flatMap { $0.attachments ?? [] }
             .filter { provider in
                 provider.hasItemConformingToTypeIdentifier(UTType.url.identifier)
                     || provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier)
@@ -29,7 +29,7 @@ final class ShareViewController: UIViewController {
             ? UTType.url.identifier
             : UTType.plainText.identifier
 
-        provider.loadItem(forTypeIdentifier: typeIdentifier) { [weak self] item, _ in
+        provider.loadItem(forTypeIdentifier: typeIdentifier) { [weak self] (item: NSSecureCoding?, _: Error?) in
             DispatchQueue.main.async {
                 self?.handleLoadedItem(item)
             }
@@ -46,7 +46,9 @@ final class ShareViewController: UIViewController {
         }
 
         extensionContext?.open(deepLink) { [weak self] _ in
-            self?.finish()
+            DispatchQueue.main.async {
+                self?.finish()
+            }
         }
     }
 
