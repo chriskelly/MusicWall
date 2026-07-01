@@ -30,14 +30,15 @@ final class ShareViewController: UIViewController {
             : UTType.plainText.identifier
 
         provider.loadItem(forTypeIdentifier: typeIdentifier) { [weak self] (item: NSSecureCoding?, _: Error?) in
+            let url = Self.url(from: item)
             DispatchQueue.main.async {
-                self?.handleLoadedItem(item)
+                self?.handleLoadedURL(url)
             }
         }
     }
 
-    private func handleLoadedItem(_ item: NSSecureCoding?) {
-        guard let url = url(from: item),
+    private func handleLoadedURL(_ url: URL?) {
+        guard let url,
               let albumID = AppleMusicURLParser.albumID(from: url),
               let deepLink = MusicWallDeepLink.addAlbumURL(albumID: albumID)
         else {
@@ -52,7 +53,7 @@ final class ShareViewController: UIViewController {
         }
     }
 
-    private func url(from item: NSSecureCoding?) -> URL? {
+    private static func url(from item: NSSecureCoding?) -> URL? {
         if let url = item as? URL {
             return url
         }
