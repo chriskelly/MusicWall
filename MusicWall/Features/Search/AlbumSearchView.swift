@@ -40,10 +40,9 @@ private struct AlbumSearchContent: View {
                     .textFieldStyle(.roundedBorder)
                     .padding()
                     .focused($isSearchFieldFocused)
-                Button("Search") {
-                    isSearchFieldFocused = false
-                    Task { await viewModel.search() }
-                }
+                    .submitLabel(.search)
+                    .onSubmit { submitSearch() }
+                Button("Search", action: submitSearch)
                 .disabled(viewModel.isSearching)
                 if viewModel.isSearching {
                     ProgressView("Searching…")
@@ -58,6 +57,9 @@ private struct AlbumSearchContent: View {
                 }
                 resultsView()
             }
+            .task(id: viewModel.trimmedQuery) {
+                await viewModel.queryDidChange()
+            }
             .navigationTitle("Find Album")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -68,6 +70,13 @@ private struct AlbumSearchContent: View {
                 }
             }
         }
+    }
+
+    /// The Search button and the keyboard submit key do the same thing: dismiss the
+    /// keyboard and search the current text immediately, without the typing debounce.
+    private func submitSearch() {
+        isSearchFieldFocused = false
+        Task { await viewModel.search() }
     }
 
     private func resultsView() -> some View {
