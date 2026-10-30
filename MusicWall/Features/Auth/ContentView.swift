@@ -12,6 +12,7 @@ struct ContentView: View {
     let dependencies: AppDependencies
     @State private var viewModel: AuthViewModel
     @State private var homeViewModel: HomeViewModel
+    @State private var pendingSharedAlbumID: String?
     @Environment(\.openURL) private var openURL
 
     init(dependencies: AppDependencies) {
@@ -42,6 +43,31 @@ struct ContentView: View {
         .task {
             await viewModel.checkAuthorization()
         }
+        .onOpenURL { url in
+            guard let albumID = MusicWallDeepLink.albumID(from: url)
+                ?? AppleMusicURLParser.albumID(from: url)
+            else { return }
+            pendingSharedAlbumID = albumID
+            Task { await processPendingSharedAlbumIfNeeded() }
+        }
+        .onChange(of: viewModel.state) { _, newState in
+            guard newState == .authorized else { return }
+            Task { await processPendingSharedAlbumIfNeeded() }
+        }
+        .onChange(of: homeViewModel.hasLoaded) { _, loaded in
+            guard loaded else { return }
+            Task { await processPendingSharedAlbumIfNeeded() }
+        }
+    }
+
+    @MainActor
+    private func processPendingSharedAlbumIfNeeded() async {
+        guard viewModel.state == .authorized,
+              homeViewModel.hasLoaded,
+              let albumID = pendingSharedAlbumID
+        else { return }
+        pendingSharedAlbumID = nil
+        await homeViewModel.addSharedAlbum(id: albumID)
     }
 
     private func authorizationDeniedView() -> some View {

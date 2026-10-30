@@ -213,6 +213,47 @@ struct HomeViewModelTests {
     }
 
     @Test @MainActor
+    func addSharedAlbum_fetchesAndAddsAlbum() async {
+        let expectedID = "shared-album-id"
+        let repository = MockAlbumRepository()
+        repository.fetchHandler = { ids in
+            ids.map {
+                AlbumFixtures.record(id: $0.rawValue, title: "Shared", artistName: "Artist")
+            }
+        }
+        let viewModel = HomeViewModel(
+            preferences: InMemoryPreferencesStore(),
+            repository: repository,
+            backup: MockAlbumBackupService()
+        )
+
+        await viewModel.addSharedAlbum(id: expectedID)
+
+        #expect(viewModel.store.items.count == 1)
+        #expect(viewModel.store.items.first?.id.rawValue == expectedID)
+        #expect(viewModel.snackbar?.message == "Album successfully added!")
+        #expect(repository.fetchCalls == [[AlbumID(rawValue: expectedID)]])
+    }
+
+    @Test @MainActor
+    func addSharedAlbum_failureShowsSnackbar() async {
+        struct TestError: Error, LocalizedError {
+            var errorDescription: String? { "network down" }
+        }
+        let repository = MockAlbumRepository()
+        repository.fetchHandler = { _ in throw TestError() }
+        let viewModel = HomeViewModel(
+            preferences: InMemoryPreferencesStore(),
+            repository: repository,
+            backup: MockAlbumBackupService()
+        )
+
+        await viewModel.addSharedAlbum(id: "missing")
+
+        #expect(viewModel.snackbar?.message == "Failed to add album: network down")
+    }
+
+    @Test @MainActor
     func load_hydratesFromSavedPreferences() async {
         let preferences = InMemoryPreferencesStore()
         let records = [AlbumFixtures.record(id: "loaded", title: "Loaded", artistName: "Artist")]
