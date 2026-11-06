@@ -21,3 +21,7 @@ vendor/bundle/
 # Secrets
 .env
 AuthKey_*.p8
+
+# Agent artifacts (local-only)
+.agents/specs/
+.agents/plans/
