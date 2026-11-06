@@ -7,7 +7,7 @@
 | Layer | Target | Framework |
 |-------|--------|-----------|
 | Core / Adapters / ViewModels | `MusicWallTests` | Swift Testing |
-| SwiftUI views (Snackbar, SortMenu, AlbumEdit) | `MusicWallTests` | Swift Testing + ViewInspector |
+| SwiftUI views with logic worth testing | `MusicWallTests` | Swift Testing + ViewInspector |
 | End-to-end smoke | `MusicWallUITests` | XCTest / XCUITest |
 
 Layer, design, and TDD rules live in `../AGENTS.md`; this guide adds only test-specific conventions.
@@ -32,5 +32,5 @@ Unit-only, single-test, UI-only, coverage-only, and warnings-only commands: `doc
 
 - Full test and coverage commands → `docs/commands.md`
 - UI launch arguments and accessibility identifiers → `docs/ui-tests.md`
-- ViewInspector patterns and inventory → `docs/viewinspector.md`
+- ViewInspector patterns → `docs/viewinspector.md`
 - Coverage thresholds and adapter exclusions → `docs/coverage.md`

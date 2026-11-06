@@ -21,7 +21,7 @@ flowchart LR
 | Feature validation | Successful completion of `ci-tests` on a PR (default) | `testflight-release` runs match → build → **TestFlight internal** | **Test on device** before approving the PR |
 | Store release | Push tag `v*` (for example `vX.Y.Z`) or **Actions → App Store Release → Run workflow** with a version | Upload and **submit for review**; **automatic release** after Apple approves | Monitor in App Store Connect (no manual Release click) |
 
-A docs-only or trivial change should carry the **`no-deploy`** label so the TestFlight upload is skipped. After implementation, the PR comment bot posts the TestFlight build number and status; reference that number in review notes.
+The **`no-deploy`** label skips signing and the TestFlight upload for that PR; `testflight-release` still runs and comments that the upload was skipped. For a PR without `no-deploy`, the PR comment bot posts the workflow run number (labeled `Build number` in its comment) and a run link. The uploaded build number is the `Build number N` line in the Actions log, or the `using BUILD_NUMBER` line if the App Store Connect lookup fails; reference that in review notes.
 
 ## Secrets (humans only)
 
@@ -40,7 +40,7 @@ Stored in GitHub → Settings → Secrets and variables → Actions. Agents refe
 
 1. Confirm `ci-tests` passes before relying on `testflight-release`, or explain why `no-deploy` is appropriate.
 2. Note any MusicKit or device-only verification for the human.
-3. Never claim TestFlight or App Store success without workflow evidence.
+3. **Workflow evidence** means the Actions run log and the bot's run link; TestFlight processing and App Store submission status come from App Store Connect.
 
 ## Common failures
 
