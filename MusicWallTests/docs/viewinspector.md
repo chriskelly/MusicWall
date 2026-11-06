@@ -27,10 +27,12 @@ try await ViewHosting.host(view) {
 
 See the [ViewInspector guide](https://github.com/nalexn/ViewInspector/blob/master/guide.md).
 
-## Inventory
+## Finding view tests
 
-| Suite | File | Coverage |
-|-------|------|----------|
-| Snackbar | `MusicWallTests/UI/SnackbarViewTests.swift` | message, action button, undo callback |
-| Sort menu | `MusicWallTests/UI/SortMenuViewTests.swift` | direction arrow on active sort |
-| Edit album | `MusicWallTests/UI/AlbumEditViewTests.swift` | Save disabled when the title is whitespace-only |
+View tests live in `MusicWallTests/UI/`, one `<View>Tests.swift` per view with logic worth testing. Find them with:
+
+```sh
+ls MusicWallTests/UI/*ViewTests.swift
+```
+
+Match the suite to the view you change.

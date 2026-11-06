@@ -24,11 +24,10 @@ A production launch omits both arguments and uses `AppDependencies.live`.
 
 ## Accessibility identifiers
 
-| Identifier | Element |
-|------------|---------|
-| `home.addAlbum` | Add album toolbar button |
-| `home.emptyWelcome` | Empty collection welcome container |
-| `home.emptyWelcome.addAlbum` | Welcome primary button |
-| `home.emptyWelcome.import` | Welcome import button |
-| `search.cancel` | Search sheet Cancel |
-| `uitest.lastPlayedAlbum` | Hidden playback bridge (mock launch only) |
+Identifiers are namespaced by screen (`home.*`, `search.*`) and the UI tests match on them, so change an identifier and its tests together. Discover the current set from the source:
+
+```sh
+grep -rn 'accessibilityIdentifier' MusicWall
+```
+
+Add an identifier beside the control when none fits.

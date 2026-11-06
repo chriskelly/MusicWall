@@ -102,12 +102,12 @@ CI runs `Scripts/check_core_imports.sh`: `MusicWall/Core/` must not import Music
 - Prefer compiler-driven safety over force-unwraps.
 - Add **unit tests** under `MusicWallTests/` for pure logic and composition-root smoke coverage — not every UI tweak.
 
-**TDD rules** — follow these before any skill's checklist.
+**TDD rules** — the user's explicit instruction outranks these rules; follow these before any skill's checklist.
 
 1. A red is valid only when the test runs and fails on its assertion. A compile error, missing symbol, or import error is **scaffolding**, not a red; add the minimum structure and run again. Do not record the structural run as the red step.
 2. Test our logic — branches, calculations, state transitions, error mapping — not framework wiring, trivial getters, or defaults with no logic.
 3. Fakes and mocks are normal at boundaries (MusicKit, files, UserDefaults, time); the repo's conventions decide the tool. Assert on the state or value produced, not on mock calls.
-4. When a skill's checklist conflicts with these rules, follow these rules and say which clause was overridden. The TDD skill still supplies the workflow.
+4. When a skill's checklist conflicts with these rules, follow these rules and say which clause was overridden. Finish with the full suite: `bundle exec fastlane ci_tests` (see `MusicWallTests/AGENTS.md`).
 
 ### Warnings policy
 
