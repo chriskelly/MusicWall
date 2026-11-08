@@ -2,9 +2,9 @@
 
 <!-- What changed? -->
 
-## App Store release (if shipping to the store)
+## Release notes (What's New)
 
-- [ ] Updated `fastlane/metadata/en-CA/release_notes.txt` for this version (N/A — not a store release PR)
+- [ ] Added one customer-facing line to `fastlane/metadata/en-CA/release_notes.txt` (N/A — no customer-facing change)
 
 ## TestFlight
 

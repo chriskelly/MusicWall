@@ -1,0 +1,59 @@
+name: Clear release notes
+
+# What's New lives in fastlane/metadata/en-CA/release_notes.txt so a release runs
+# without opening App Store Connect. Once a release has been submitted, those
+# notes describe a version that already exists, so they are cleared here: the
+# next release has to write its own, and app_store_release refuses to submit an
+# empty file.
+#
+# This is the only workflow that commits to main. It touches one metadata file
+# and pushes with [skip ci], so it cannot deploy anything or consume a signing
+# secret.
+
+on:
+  workflow_run:
+    workflows: ["App Store Release"]
+    types: [completed]
+
+concurrency:
+  group: clear-release-notes
+  cancel-in-progress: false
+
+jobs:
+  clear:
+    name: Clear the submitted release notes
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Empty the notes file
+        run: |
+          file=fastlane/metadata/en-CA/release_notes.txt
+          if [ ! -f "$file" ]; then
+            echo "::error::$file does not exist"
+            exit 1
+          fi
+          status=0
+          grep -q '[^[:space:]]' "$file" || status=$?
+          case "$status" in
+            0) ;;
+            1) echo "Release notes are already empty; nothing to clear."; exit 0 ;;
+            *) echo "::error::cannot read $file"; exit 1 ;;
+          esac
+
+          # Truncate rather than delete: an empty file is what
+          # validate_release_notes! refuses, and keeping the path makes the next
+          # release's diff obvious.
+          : > "$file"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$file"
+          git commit -m "chore(release): clear the release notes after submitting the App Store release [skip ci]"
+          git push origin HEAD:main

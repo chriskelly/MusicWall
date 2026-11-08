@@ -7,6 +7,14 @@ SCHEME = "MusicWall"
 TARGET = "MusicWall"
 BUNDLE_ID = ENV["APP_IDENTIFIER"] || "chris.MusicWall"
 TEAM_ID = ENV["DEVELOPMENT_TEAM"] || "CD8XP2U645"
+# Fixed while the Fastfile is parsed, so the value does not depend on the working
+# directory a lane later runs in.
+PROJECT_ROOT = File.expand_path("..", __dir__)
+# What's New, kept in the repository so a release runs end to end without
+# opening App Store Connect. The locale has to match the app record's primary
+# language; deliver uploads release_notes.txt from that directory as What's New.
+RELEASE_NOTES_PATH = File.join(PROJECT_ROOT, "fastlane/metadata/en-CA/release_notes.txt")
+RELEASE_NOTES_LIMIT = 4000
 
 def asc_key_params
   {
@@ -177,6 +185,38 @@ def run_app_store_metadata_precheck
   )
 end
 
+# `submit_for_review` rejects an update whose What's New is empty, but only after
+# a signed archive has been built and uploaded. Fail before the build instead, so
+# a forgotten note costs seconds. The Clear release notes workflow empties the
+# file after every successful release, which makes this check the thing that
+# forces the next release to describe itself.
+def validate_release_notes!
+  path = RELEASE_NOTES_PATH
+  unless File.exist?(path)
+    UI.user_error!("#{path} is missing; an App Store update needs What's New")
+  end
+
+  raw = File.read(path, encoding: "UTF-8")
+  unless raw.valid_encoding? && !raw.include?("\u0000")
+    UI.user_error!("#{path} contains NUL bytes or is not UTF-8 text; save the notes as UTF-8")
+  end
+
+  notes = raw.delete_prefix("\uFEFF")
+  if notes.match?(/\A[[:space:]]*\z/)
+    UI.user_error!("#{path} is empty; write this release's customer-facing changes before releasing")
+  end
+
+  # deliver uploads the file as it is, so the whole file — trailing newline and
+  # all — counts against Apple's limit.
+  if notes.length > RELEASE_NOTES_LIMIT
+    UI.user_error!("#{path} is #{notes.length} characters; App Store Connect accepts #{RELEASE_NOTES_LIMIT}")
+  end
+
+  UI.message("Release notes: #{notes.length}/#{RELEASE_NOTES_LIMIT} characters")
+rescue SystemCallError => e
+  UI.user_error!("#{path} could not be read (#{e.message})")
+end
+
 platform :ios do
   desc "Simulator build only (no signing upload; local / no-deploy)"
   lane :ci_build do
@@ -240,6 +280,8 @@ platform :ios do
 
   desc "App Store Release workflow: upload and submit for review"
   lane :app_store_release do
+    validate_release_notes!
+
     prepare_appstore_signing
 
     release_version = ENV.fetch("RELEASE_VERSION")
