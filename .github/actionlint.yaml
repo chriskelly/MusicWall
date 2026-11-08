@@ -1,7 +1,6 @@
 # actionlint project config.
 #
-# The clear-release-notes workflow pins `runs-on: ubuntu-26.04`, the
-# GitHub-hosted image that `ubuntu-latest` is migrating to. actionlint's
+# The clear-release-notes workflow pins `runs-on: ubuntu-26.04`. actionlint's
 # built-in runner-label list ships with each release and does not know that
 # label yet, so declare it here — the escape hatch actionlint documents for
 # labels it cannot infer. Nothing in CI runs actionlint; it is for local runs

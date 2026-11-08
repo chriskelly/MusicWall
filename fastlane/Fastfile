@@ -198,14 +198,16 @@ def validate_release_notes!
 
   raw = File.read(path, encoding: "UTF-8")
   unless raw.valid_encoding? && !raw.include?("\u0000")
-    UI.user_error!("#{path} is not UTF-8 text; save the notes as UTF-8")
+    UI.user_error!("#{path} contains NUL bytes or is not UTF-8 text; save the notes as UTF-8")
   end
 
-  notes = raw.delete_prefix("\uFEFF").strip
+  notes = raw.delete_prefix("\uFEFF")
   if notes.match?(/\A[[:space:]]*\z/)
     UI.user_error!("#{path} is empty; write this release's customer-facing changes before releasing")
   end
 
+  # deliver uploads the file as it is, so the whole file — trailing newline and
+  # all — counts against Apple's limit.
   if notes.length > RELEASE_NOTES_LIMIT
     UI.user_error!("#{path} is #{notes.length} characters; App Store Connect accepts #{RELEASE_NOTES_LIMIT}")
   end
