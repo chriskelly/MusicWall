@@ -13,6 +13,8 @@ flowchart LR
   Approve --> Main[Merge to main]
   Tag[Human tags vX.Y.Z or manual dispatch] --> Release[app-store-release workflow]
   Release --> ASC[App Store Connect review]
+  Release --> Clear[clear-release-notes workflow]
+  Clear --> Notes[release_notes.txt emptied on main]
 ```
 
 | Stage | Trigger | What runs | Human |
@@ -20,6 +22,7 @@ flowchart LR
 | Fast feedback | PR push or push to `main` | `ci-tests` runs `ci_tests`: both test targets, coverage gate, warnings report | Optional |
 | Feature validation | Successful completion of `ci-tests` on a PR (default) | `testflight-release` runs match → build → **TestFlight internal** | **Test on device** before approving the PR |
 | Store release | Push tag `v*` (for example `vX.Y.Z`) or **Actions → App Store Release → Run workflow** with a version | Upload and **submit for review**; **automatic release** after Apple approves | Monitor in App Store Connect (no manual Release click) |
+| Store release cleanup | Successful **App Store Release** run | `clear-release-notes` truncates `release_notes.txt` on `main` in one bot commit with `[skip ci]` | Optional |
 
 The **`no-deploy`** label skips signing and the TestFlight upload for that PR; `testflight-release` still runs and comments that the upload was skipped. For a PR without `no-deploy`, the PR comment bot posts the workflow run number (labeled `Build number` in its comment) and a run link. The uploaded build number is the `Build number N` line in the Actions log, or the `using BUILD_NUMBER` line if the App Store Connect lookup fails; reference that in review notes.
 
