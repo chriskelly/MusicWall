@@ -24,7 +24,11 @@ flowchart LR
 | Store release | Push tag `v*` (for example `vX.Y.Z`) or **Actions → App Store Release → Run workflow** with a version | Upload and **submit for review**; **automatic release** after Apple approves | Monitor in App Store Connect (no manual Release click) |
 | Store release cleanup | Successful **App Store Release** run | `clear-release-notes` truncates `release_notes.txt` on `main` in one bot commit with `[skip ci]` | Optional |
 
-The **`no-deploy`** label skips signing and the TestFlight upload for that PR; `testflight-release` still runs and comments that the upload was skipped. For a PR without `no-deploy`, the PR comment bot posts the workflow run number (labeled `Build number` in its comment) and a run link. The uploaded build number is the `Build number N` line in the Actions log, or the `using BUILD_NUMBER` line if the App Store Connect lookup fails; reference that in review notes.
+The **`no-deploy`** label skips signing and the TestFlight upload for that PR; `testflight-release` still runs and comments that the upload was skipped.
+
+A run with a PR is named `TestFlight — PR <number>`, from the manual `pr_number` input or the `workflow_run` payload, even though a chained run's own ref says `main`. A chained run whose CI failed is named the same way but skipped by the job guard. A chained run whose payload carries no PR is named `TestFlight — <head branch>`; it produces no build: a successful same-repo PR run fails in `Resolve PR context`, and a push to `main` is skipped by the job guard.
+
+For a PR without `no-deploy`, the PR comment bot posts the workflow run number (labeled `Build number` in its comment) and a run link. The uploaded build number is the `Build number N` line in the Actions log, or the `using BUILD_NUMBER` line if the App Store Connect lookup fails; reference that in review notes.
 
 ## Secrets (humans only)
 
