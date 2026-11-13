@@ -4,7 +4,7 @@ name: TestFlight Release
 # the job resolves the PR only after the name is fixed. So the name comes from
 # the event: the required input for a manual dispatch, the payload's PR number
 # when present, and the CI run's head branch when it is not. The branch fallback
-# is display-only; the job still fails when the payload carries no PR.
+# is display-only; nothing builds when the payload carries no PR.
 run-name: >-
   TestFlight — ${{ github.event_name == 'workflow_dispatch'
   && format('PR {0}', inputs.pr_number)

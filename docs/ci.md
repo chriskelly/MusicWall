@@ -26,7 +26,7 @@ flowchart LR
 
 The **`no-deploy`** label skips signing and the TestFlight upload for that PR; `testflight-release` still runs and comments that the upload was skipped.
 
-Each run is named `TestFlight — PR <number>`, from the manual `pr_number` input or the `workflow_run` payload, even though the run's own ref says `main`. A chained run whose payload carries no PR is named `TestFlight — <head branch>`; it produces no build: a PR-triggered run fails in `Resolve PR context`, and a push to `main` skips the job as `TestFlight — main`.
+A run with a PR is named `TestFlight — PR <number>`, from the manual `pr_number` input or the `workflow_run` payload, even though a chained run's own ref says `main`. A chained run whose payload carries no PR is named `TestFlight — <head branch>`; it produces no build: a successful same-repo PR run fails in `Resolve PR context`, and a push to `main` is skipped by the job guard.
 
 For a PR without `no-deploy`, the PR comment bot posts the workflow run number (labeled `Build number` in its comment) and a run link. The uploaded build number is the `Build number N` line in the Actions log, or the `using BUILD_NUMBER` line if the App Store Connect lookup fails; reference that in review notes.
 
