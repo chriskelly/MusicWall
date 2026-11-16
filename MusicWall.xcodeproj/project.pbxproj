@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1B2C3D4E5F6012345678903 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678902 /* ShareViewController.swift */; };
+		A1B2C3D4E5F6012345678905 /* AppleMusicURLParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678904 /* AppleMusicURLParser.swift */; };
+		A1B2C3D4E5F6012345678907 /* MusicWallDeepLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678906 /* MusicWallDeepLink.swift */; };
+		A1B2C3D4E5F6012345678913 /* MusicWallShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678901 /* MusicWallShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A1B2C3D4E5F6012345678914 /* AppleMusicURLParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678915 /* AppleMusicURLParserTests.swift */; };
+		A1B2C3D4E5F6012345678916 /* MusicWallDeepLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678917 /* MusicWallDeepLinkTests.swift */; };
 		7A3C9E2F1B4D8A605E92F3C1 /* AlbumFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */; };
 		9F2E5C8A3D1B7F406A8E2D59 /* AlbumSorterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1A6E3D92F8B4C5071D2A6E8 /* AlbumSorterTests.swift */; };
 		A0D1E2F31418293A4B5F0 /* DomainErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D1E2F31418293A4B5F0 /* DomainErrorTests.swift */; };
@@ -64,9 +70,22 @@
 			remoteGlobalIDString = 835DD9872E5FB592001CD95F;
 			remoteInfo = MusicWall;
 		};
+		A1B2C3D4E5F6012345678910 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 835DD9802E5FB592001CD95F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1B2C3D4E5F6012345678909 /* MusicWallShareExtension */;
+			remoteInfo = MusicWallShareExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A1B2C3D4E5F6012345678901 /* MusicWallShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MusicWallShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1B2C3D4E5F6012345678902 /* ShareViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6012345678904 /* AppleMusicURLParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicWall/Core/AppleMusicURLParser.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3D4E5F6012345678906 /* MusicWallDeepLink.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicWall/Core/MusicWallDeepLink.swift; sourceTree = SOURCE_ROOT; };
+		A1B2C3D4E5F6012345678915 /* AppleMusicURLParserTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppleMusicURLParserTests.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6012345678917 /* MusicWallDeepLinkTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MusicWallDeepLinkTests.swift; sourceTree = "<group>"; };
 		4074DBA99A12CE4F48D648E1 /* MusicWallTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MusicWallTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D8B2F19E6A03C5D7B1E904 /* AlbumFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlbumFixtures.swift; sourceTree = "<group>"; };
 		835DD9882E5FB592001CD95F /* MusicWall.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicWall.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -142,12 +161,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1B2C3D4E5F601234567890B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		2F8A1C4E9D6B3A7051E8C2D0 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				A1B2C3D4E5F6012345678915 /* AppleMusicURLParserTests.swift */,
+				A1B2C3D4E5F6012345678917 /* MusicWallDeepLinkTests.swift */,
 				F3A4B5C6D7E80718293A4B5C /* AlbumRepositoryTests.swift */,
 				F4A5B6C7D8E90718293A4B5D /* AlbumTapCoordinatorTests.swift */,
 				F0C1D2E3F40918293A4B5DA /* ImageCacheTests.swift */,
@@ -174,16 +202,28 @@
 			isa = PBXGroup;
 			children = (
 				835DD98A2E5FB592001CD95F /* MusicWall */,
+				A1B2C3D4E5F6012345678908 /* MusicWallShareExtension */,
 				835DD9892E5FB592001CD95F /* Products */,
 				850E21353DFC86412384C721 /* MusicWallTests */,
 				C0DE00112233445566779900 /* MusicWallUITests */,
 			);
 			sourceTree = "<group>";
 		};
+		A1B2C3D4E5F6012345678908 /* MusicWallShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				A1B2C3D4E5F6012345678902 /* ShareViewController.swift */,
+				A1B2C3D4E5F6012345678904 /* AppleMusicURLParser.swift */,
+				A1B2C3D4E5F6012345678906 /* MusicWallDeepLink.swift */,
+			);
+			path = MusicWallShareExtension;
+			sourceTree = "<group>";
+		};
 		835DD9892E5FB592001CD95F /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				835DD9882E5FB592001CD95F /* MusicWall.app */,
+				A1B2C3D4E5F6012345678901 /* MusicWallShareExtension.appex */,
 				4074DBA99A12CE4F48D648E1 /* MusicWallTests.xctest */,
 				C0DE001122334455667788AA /* MusicWallUITests.xctest */,
 			);
@@ -337,10 +377,12 @@
 				835DD9842E5FB592001CD95F /* Sources */,
 				835DD9852E5FB592001CD95F /* Frameworks */,
 				835DD9862E5FB592001CD95F /* Resources */,
+				A1B2C3D4E5F6012345678912 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A1B2C3D4E5F6012345678911 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				835DD98A2E5FB592001CD95F /* MusicWall */,
@@ -349,6 +391,23 @@
 			productName = "Vinyl Wall";
 			productReference = 835DD9882E5FB592001CD95F /* MusicWall.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A1B2C3D4E5F6012345678909 /* MusicWallShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1B2C3D4E5F601234567890F /* Build configuration list for PBXNativeTarget "MusicWallShareExtension" */;
+			buildPhases = (
+				A1B2C3D4E5F601234567890A /* Sources */,
+				A1B2C3D4E5F601234567890B /* Frameworks */,
+				A1B2C3D4E5F601234567890C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MusicWallShareExtension;
+			productName = MusicWallShareExtension;
+			productReference = A1B2C3D4E5F6012345678901 /* MusicWallShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		C0DE00112233445566778899 /* MusicWallUITests */ = {
 			isa = PBXNativeTarget;
@@ -385,6 +444,9 @@
 					835DD9872E5FB592001CD95F = {
 						CreatedOnToolsVersion = 16.4;
 					};
+					A1B2C3D4E5F6012345678909 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 					C0DE00112233445566778899 = {
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 835DD9872E5FB592001CD95F;
@@ -409,11 +471,26 @@
 			projectRoot = "";
 			targets = (
 				835DD9872E5FB592001CD95F /* MusicWall */,
+				A1B2C3D4E5F6012345678909 /* MusicWallShareExtension */,
 				5F0BEB58C2BFF7CB66E9D450 /* MusicWallTests */,
 				C0DE00112233445566778899 /* MusicWallUITests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A1B2C3D4E5F6012345678912 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A1B2C3D4E5F6012345678913 /* MusicWallShareExtension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXResourcesBuildPhase section */
 		835DD9862E5FB592001CD95F /* Resources */ = {
@@ -431,6 +508,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		E511F21C2922B3CE6EAEE8B6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1B2C3D4E5F601234567890C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -459,6 +543,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1B2C3D4E5F6012345678914 /* AppleMusicURLParserTests.swift in Sources */,
+				A1B2C3D4E5F6012345678916 /* MusicWallDeepLinkTests.swift in Sources */,
 				7A3C9E2F1B4D8A605E92F3C1 /* AlbumFixtures.swift in Sources */,
 				9F2E5C8A3D1B7F406A8E2D59 /* AlbumSorterTests.swift in Sources */,
 				D4E5F60718293A4B5C6D7E8F9 /* AlbumCollectionTests.swift in Sources */,
@@ -500,6 +586,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A1B2C3D4E5F601234567890A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D4E5F6012345678903 /* ShareViewController.swift in Sources */,
+				A1B2C3D4E5F6012345678905 /* AppleMusicURLParser.swift in Sources */,
+				A1B2C3D4E5F6012345678907 /* MusicWallDeepLink.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -514,6 +610,12 @@
 			name = MusicWall;
 			target = 835DD9872E5FB592001CD95F /* MusicWall */;
 			targetProxy = C0DE00112233445566779905 /* PBXContainerItemProxy */;
+		};
+		A1B2C3D4E5F6012345678911 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = MusicWallShareExtension;
+			target = A1B2C3D4E5F6012345678909 /* MusicWallShareExtension */;
+			targetProxy = A1B2C3D4E5F6012345678910 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -809,6 +911,67 @@
 			};
 			name = Debug;
 		};
+		A1B2C3D4E5F601234567890D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/MusicWallShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CD8XP2U645;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/MusicWallShareExtension-Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MusicWall;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = chris.MusicWall.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1B2C3D4E5F601234567890E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/MusicWallShareExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CD8XP2U645;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/MusicWallShareExtension-Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = MusicWall;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = chris.MusicWall.ShareExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				GCC_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -844,6 +1007,15 @@
 			buildConfigurations = (
 				C0DE00112233445566779903 /* Release */,
 				C0DE00112233445566779902 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1B2C3D4E5F601234567890F /* Build configuration list for PBXNativeTarget "MusicWallShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1B2C3D4E5F601234567890E /* Release */,
+				A1B2C3D4E5F601234567890D /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

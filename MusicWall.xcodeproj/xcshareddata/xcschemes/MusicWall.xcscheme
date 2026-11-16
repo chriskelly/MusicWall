@@ -21,6 +21,20 @@
                ReferencedContainer = "container:MusicWall.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A1B2C3D4E5F6012345678909"
+               BuildableName = "MusicWallShareExtension.appex"
+               BlueprintName = "MusicWallShareExtension"
+               ReferencedContainer = "container:MusicWall.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
