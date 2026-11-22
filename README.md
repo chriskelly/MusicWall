@@ -37,26 +37,12 @@ MusicWall is an iOS app that integrates with Apple Music to help users curate an
 
 ## Project Structure
 
-```
-MusicWall/
-├── MusicWallApp.swift          # App entry point
-├── ContentView.swift            # Main view with authorization handling
-├── HomePageView.swift           # Primary album display interface
-├── AlbumSearchView.swift        # Album search and selection
-├── Album.swift                  # Data models and album management
-├── MusicService.swift           # Apple Music API service layer
-├── LayoutViews.swift            # Grid and list layout implementations
-├── ImageCache.swift             # Album artwork caching
-├── Core/PreferencesStore.swift    # Persistence protocol
-├── Adapters/UserDefaultsPreferencesStore.swift
-└── SnackbarView.swift           # User notification component
-```
+Layer responsibilities: [`AGENTS.md`](AGENTS.md#layers-and-folders). For the current file list, run `find MusicWall -name '*.swift'`.
 
 ## Requirements
 
-- iOS 17.0+
-- Xcode 15.0+
-- Swift 5.9+
+Toolchain versions live with the project and CI: the deployment target and Swift version are in [`MusicWall.xcodeproj/project.pbxproj`](MusicWall.xcodeproj/project.pbxproj); the Xcode version is the `macos-26` runner default used by [`.github/workflows/ci-tests.yml`](.github/workflows/ci-tests.yml).
+
 - Apple Music subscription (for catalog access)
 - Apple Developer account (for MusicKit entitlements)
 
