@@ -48,17 +48,9 @@ Toolchain versions live with the project and CI: the deployment target and Swift
 
 ## CI/CD
 
-GitHub Actions on `macos-26` (Xcode 26 default) with Fastlane and [match](https://docs.fastlane.tools/actions/match/):
+GitHub Actions on `macos-26` (Xcode 26 default) with Fastlane and [match](https://docs.fastlane.tools/actions/match/).
 
-| Event | Workflow | Result |
-|-------|----------|--------|
-| Pull request / push to `main` | `ci-tests.yml` | Simulator unit tests (`fastlane ci_tests`) |
-| Pull request (default, when CI Tests pass) | `testflight-release.yml` | TestFlight **internal** build |
-| PR with label `no-deploy` | `testflight-release.yml` | Skip TestFlight upload |
-| Tag `v*` (e.g. `v1.2.0`) | `app-store-release.yml` | App Store upload + submit for review |
-
-CI and delivery: [`docs/ci.md`](docs/ci.md). Agent conventions: [`AGENTS.md`](AGENTS.md).
-On PRs, `testflight-release.yml` is triggered by successful completion of `CI Tests`.
+Stages, triggers, and the `no-deploy` label: [`docs/ci.md`](docs/ci.md). Agent conventions: [`AGENTS.md`](AGENTS.md).
 
 Local Fastlane (after `bundle install`):
 
