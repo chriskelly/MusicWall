@@ -28,7 +28,7 @@ enum AlbumFixtures {
         )
     }
 
-    /// Canonical three-album sample (stable IDs/dates). Reused by PR 4+ collection tests.
+    /// Canonical three-album sample (stable IDs/dates), shared by collection, sorting, home, CarPlay, and UI-fixture consistency tests.
     static var baseTrio: [AlbumRecord] {
         [
             record(id: "fixture-drake", title: "Take Care", artistName: "Drake", releaseDate: utcDate(year: 2011, month: 11, day: 15)),

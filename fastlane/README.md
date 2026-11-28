@@ -29,7 +29,7 @@ Simulator build only (no signing upload; local / no-deploy)
 [bundle exec] fastlane ios ci_tests
 ```
 
-CI Tests workflow: unit tests on iOS Simulator
+CI Tests workflow: unit and UI tests on iOS Simulator, coverage gate, warnings
 
 ### ios testflight_release
 
